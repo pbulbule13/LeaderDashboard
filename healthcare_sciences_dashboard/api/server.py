@@ -51,9 +51,9 @@ try:
     app.include_router(dashboard_router, prefix='/api/dashboard', tags=['dashboard'])
     app.include_router(query_router, prefix='/api/query', tags=['query'])
     
-    print('✓ Routes loaded successfully')
+    print('[OK] Routes loaded successfully')
 except Exception as e:
-    print(f'⚠ Warning: Could not load routes: {e}')
+    print(f'[WARNING] Could not load routes: {e}')
     print('API running with basic endpoints only')
 
 if __name__ == '__main__':
