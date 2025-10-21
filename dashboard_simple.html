@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Sciences - CEO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-gray-800">HealthCare Sciences - CEO Dashboard</h1>
+            <p class="text-sm text-gray-600">Executive Command Center</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 py-6">
+        
+        <!-- AI Assistant -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold text-white mb-4">AI Executive Assistant</h2>
+            
+            <div id="chatMessages" class="bg-white rounded-lg p-4 mb-4 h-64 overflow-y-auto">
+                <p class="text-gray-500 text-sm">Ask me anything about your company...</p>
+            </div>
+
+            <div class="flex gap-2">
+                <input 
+                    type="text" 
+                    id="queryInput"
+                    placeholder="Ask about products, revenue, budget, etc."
+                    class="flex-1 px-4 py-3 rounded-lg text-gray-800"
+                    onkeypress="if(event.key==='Enter') askQuestion()"
+                />
+                <button 
+                    onclick="askQuestion()"
+                    class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50">
+                    Send
+                </button>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Revenue Today</h3>
+                <p class="text-3xl font-bold text-green-600">.2M</p>
+                <p class="text-sm text-green-600 mt-1">↑ 8.5% vs yesterday</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Active Orders</h3>
+                <p class="text-3xl font-bold text-blue-600">15,234</p>
+                <p class="text-sm text-blue-600 mt-1">3,245 today</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Employees</h3>
+                <p class="text-3xl font-bold text-purple-600">6,200</p>
+                <p class="text-sm text-purple-600 mt-1">12 new this month</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Open Tickets</h3>
+                <p class="text-3xl font-bold text-orange-600">88</p>
+                <p class="text-sm text-orange-600 mt-1">3 critical</p>
+            </div>
+        </div>
+
+        <!-- Dashboard Tiles -->
+        <div class="grid grid-cols-2 gap-6 mb-6">
+            <button onclick="loadTile('products')" class="bg-white rounded-xl shadow-lg p-6 text-left hover:shadow-xl transition">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">📦 Products & Orders</h3>
+                <p class="text-sm text-gray-600">View product performance and orders</p>
+            </button>
+
+            <button onclick="loadTile('revenue')" class="bg-white rounded-xl shadow-lg p-6 text-left hover:shadow-xl transition">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">💰 Revenue Performance</h3>
+                <p class="text-sm text-gray-600">Track revenue vs targets</p>
+            </button>
+
+            <button onclick="loadTile('budget')" class="bg-white rounded-xl shadow-lg p-6 text-left hover:shadow-xl transition">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">📊 Budget Analysis</h3>
+                <p class="text-sm text-gray-600">Monitor spending and allocation</p>
+            </button>
+
+            <button onclick="loadTile('support')" class="bg-white rounded-xl shadow-lg p-6 text-left hover:shadow-xl transition">
+                <h3 class="text-xl font-bold text-gray-800 mb-2">🎫 Support Tickets</h3>
+                <p class="text-sm text-gray-600">Track support operations</p>
+            </button>
+        </div>
+
+        <!-- Data Display Area -->
+        <div id="tileDisplay" class="bg-white rounded-xl shadow-lg p-6">
+            <p class="text-center text-gray-500">Click a tile above to view detailed data</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        async function loadTile(tileName) {
+            const display = document.getElementById('tileDisplay');
+            display.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div><p class="mt-4 text-gray-600">Loading...</p></div>';
+
+            try {
+                const response = await fetch(API_BASE + '/api/dashboard/tiles/' + tileName);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTile(tileName, result.data);
+                } else {
+                    display.innerHTML = '<p class="text-red-600 text-center">Failed to load data</p>';
+                }
+            } catch (error) {
+                display.innerHTML = '<p class="text-red-600 text-center">Error: ' + error.message + '<br>Make sure API server is running on port 8000</p>';
+            }
+        }
+
+        function renderTile(tileName, data) {
+            const display = document.getElementById('tileDisplay');
+
+            if (tileName === 'products') {
+                display.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-6">Products & Orders</h2>' +
+                    '<div class="grid grid-cols-4 gap-4">' +
+                    data.products.map(p => 
+                        '<div class="bg-blue-50 rounded-lg p-4 border border-blue-200">' +
+                        '<h3 class="font-bold text-gray-800 mb-3">' + p.name + '</h3>' +
+                        '<p class="text-2xl font-bold text-blue-600">' + p.orders_received.toLocaleString() + '</p>' +
+                        '<p class="text-xs text-gray-600">Orders Received</p>' +
+                        '<p class="text-lg font-semibold text-green-600 mt-2">$' + (p.revenue/1000000).toFixed(1) + 'M</p>' +
+                        '<p class="text-xs text-gray-600">Revenue</p>' +
+                        '</div>'
+                    ).join('') +
+                    '</div>';
+            } else if (tileName === 'revenue') {
+                display.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-6">Revenue Performance</h2>' +
+                    '<div class="grid grid-cols-3 gap-6">' +
+                    data.records.map(r => 
+                        '<div class="bg-green-50 rounded-lg p-6 border border-green-200">' +
+                        '<h3 class="font-bold text-gray-800 mb-4">' + r.period + '</h3>' +
+                        '<p class="text-3xl font-bold text-green-600">' +
+                        (r.actual > 0 ? '$' + (r.actual/1000000).toFixed(0) + 'M' : '—') +
+                        '</p>' +
+                        '<p class="text-sm text-gray-600 mt-2">Target: $' + (r.projected/1000000).toFixed(0) + 'M</p>' +
+                        (r.actual > 0 ? '<p class="text-sm font-semibold mt-2 ' + (r.actual >= r.projected ? 'text-green-600' : 'text-orange-600') + '">' +
+                        (r.actual/r.projected*100).toFixed(1) + '% of target</p>' : '') +
+                        '</div>'
+                    ).join('') +
+                    '</div>';
+            } else if (tileName === 'budget') {
+                display.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-6">Budget Analysis</h2>' +
+                    '<div class="grid grid-cols-2 gap-6">' +
+                    data.quarters.map(q => 
+                        '<div><h3 class="font-bold text-gray-800 mb-4">' + q.quarter + '</h3>' +
+                        '<div class="space-y-3">' +
+                        q.items.map(item =>
+                            '<div class="bg-gray-50 rounded-lg p-4">' +
+                            '<div class="flex justify-between mb-2"><span class="font-semibold">' + item.department + '</span>' +
+                            '<span class="text-blue-600">$' + (item.allocated/1000000).toFixed(1) + 'M</span></div>' +
+                            '<p class="text-sm text-gray-600">Spent: $' + (item.spent/1000000).toFixed(1) + 'M</p>' +
+                            '<div class="w-full bg-gray-200 rounded-full h-2 mt-2">' +
+                            '<div class="bg-blue-600 h-2 rounded-full" style="width: ' + (item.spent/item.allocated*100) + '%"></div>' +
+                            '</div></div>'
+                        ).join('') +
+                        '</div></div>'
+                    ).join('') +
+                    '</div>';
+            } else if (tileName === 'support') {
+                display.innerHTML = '<h2 class="text-2xl font-bold text-gray-800 mb-6">Support Operations</h2>' +
+                    '<div class="grid grid-cols-4 gap-4">' +
+                    data.tickets.map(t => 
+                        '<div class="rounded-lg p-4 border-2 ' +
+                        (t.priority === 'Critical' ? 'bg-red-50 border-red-300' :
+                         t.priority === 'High' ? 'bg-orange-50 border-orange-300' :
+                         t.priority === 'Medium' ? 'bg-yellow-50 border-yellow-300' :
+                         'bg-blue-50 border-blue-300') + '">' +
+                        '<h3 class="font-bold text-gray-800 mb-3">' + t.priority + '</h3>' +
+                        '<p class="text-2xl font-bold text-orange-600">' + t.open + '</p>' +
+                        '<p class="text-xs text-gray-600">Open Tickets</p>' +
+                        '<p class="text-sm text-gray-600 mt-2">Avg: ' + t.avg_resolution + '</p>' +
+                        '</div>'
+                    ).join('') +
+                    '</div>';
+            }
+        }
+
+        async function askQuestion() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            
+            chatMessages.innerHTML += '<div class="bg-blue-100 rounded-lg p-3 mb-2"><p class="text-sm font-semibold">You:</p><p class="text-sm">' + query + '</p></div>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+
+            chatMessages.innerHTML += '<div id="loading" class="bg-gray-100 rounded-lg p-3 mb-2"><p class="text-sm">AI is thinking...</p></div>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch(API_BASE + '/api/query/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, context: {} })
+                });
+                
+                const result = await response.json();
+                document.getElementById('loading').remove();
+
+                if (result.success) {
+                    chatMessages.innerHTML += '<div class="bg-white border rounded-lg p-3 mb-2"><p class="text-sm font-semibold">AI:</p><p class="text-sm">' + result.response + '</p></div>';
+                } else {
+                    chatMessages.innerHTML += '<div class="bg-red-100 rounded-lg p-3 mb-2"><p class="text-sm text-red-700">Error getting response</p></div>';
+                }
+            } catch (error) {
+                document.getElementById('loading').remove();
+                chatMessages.innerHTML += '<div class="bg-red-100 rounded-lg p-3 mb-2"><p class="text-sm text-red-700">Error: ' + error.message + '</p></div>';
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Auto-load products on page load
+        window.addEventListener('load', function() {
+            setTimeout(function() { loadTile('products'); }, 500);
+        });
+    </script>
+</body>
+</html>

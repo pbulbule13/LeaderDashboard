@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeaderDashboard - Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f0f4f8, #ffffff);
+        }
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        .diagram-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .diagram-section h2 {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .diagram-section p {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .mermaid {
+            text-align: center;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .toc {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        .toc h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li {
+            padding: 5px 0;
+        }
+        .toc a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .note strong {
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <h1>LeaderDashboard Architecture Diagrams</h1>
+    <p class="subtitle">Interactive Mermaid Diagrams - HealthCare Sciences CEO Dashboard</p>
+
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#diagram1">1. System Architecture Overview</a></li>
+            <li><a href="#diagram2">2. Agent Query Processing Flow</a></li>
+            <li><a href="#diagram3">3. LangGraph State Machine</a></li>
+            <li><a href="#diagram4">4. Dashboard Tile Loading Flow</a></li>
+            <li><a href="#diagram5">5. Component Layer Architecture</a></li>
+            <li><a href="#diagram6">6. Data Flow: AI Query Processing</a></li>
+            <li><a href="#diagram7">7. Agent Class Hierarchy</a></li>
+            <li><a href="#diagram8">8. Deployment Architecture</a></li>
+            <li><a href="#diagram9">9. Request-Response Cycle</a></li>
+            <li><a href="#diagram10">10. Technology Stack Overview</a></li>
+            <li><a href="#diagram11">11. Error Handling Flow</a></li>
+            <li><a href="#diagram12">12. Agent Orchestration Pattern</a></li>
+            <li><a href="#diagram13">13. Future Microservices Architecture</a></li>
+        </ul>
+    </div>
+
+    <div class="note">
+        <strong>Note:</strong> These diagrams are interactive. You can zoom in/out and click on elements for better viewing.
+    </div>
+
+    <div class="diagram-section" id="diagram1">
+        <h2>1. System Architecture Overview</h2>
+        <p>This diagram shows the complete system architecture with all layers: Frontend, API, Orchestration, Agents, Data, and External Services.</p>
+        <div class="mermaid">
+graph TB
+    subgraph "Frontend Layer"
+        UI[CEO Dashboard HTML/JS]
+        Charts[Chart.js Visualizations]
+        Chat[AI Chat Interface]
+    end
+
+    subgraph "API Layer"
+        FastAPI[FastAPI Server :8000]
+        Health[/health endpoint]
+        Tiles[/api/dashboard/tiles/*]
+        Query[/api/query/ask]
+    end
+
+    subgraph "Orchestration Layer"
+        Orchestrator[Dashboard Orchestrator]
+        Router[Query Router]
+        Graph[LangGraph Workflow]
+    end
+
+    subgraph "Agent Layer"
+        ProductsAgent[Products Agent]
+        RevenueAgent[Revenue Agent]
+        BudgetAgent[Budget Agent]
+        SupportAgent[Support Agent]
+        WorkforceAgent[Workforce Agent]
+        StockAgent[Stock Agent]
+        BaseAgent[Base Agent]
+    end
+
+    subgraph "Data Layer"
+        ProductRepo[Product Repository]
+        RevenueRepo[Revenue Repository]
+        BudgetRepo[Budget Repository]
+        SupportRepo[Support Repository]
+        WorkforceRepo[Workforce Repository]
+        StockRepo[Stock Repository]
+    end
+
+    subgraph "External Services"
+        OpenAI[OpenAI API]
+        []
+        AlphaVantage[Alpha Vantage API]
+    end
+
+    UI --> FastAPI
+    Charts --> FastAPI
+    Chat --> FastAPI
+
+    FastAPI --> Health
+    FastAPI --> Tiles
+    FastAPI --> Query
+
+    Query --> Orchestrator
+    Tiles --> ProductRepo
+    Tiles --> RevenueRepo
+    Tiles --> BudgetRepo
+    Tiles --> SupportRepo
+    Tiles --> WorkforceRepo
+
+    Orchestrator --> Router
+    Router --> Graph
+
+    Graph --> ProductsAgent
+    Graph --> RevenueAgent
+    Graph --> BudgetAgent
+    Graph --> SupportAgent
+    Graph --> WorkforceAgent
+    Graph --> StockAgent
+
+    ProductsAgent --> BaseAgent
+    RevenueAgent --> BaseAgent
+    BudgetAgent --> BaseAgent
+    SupportAgent --> BaseAgent
+    WorkforceAgent --> BaseAgent
+    StockAgent --> BaseAgent
+
+    ProductsAgent --> ProductRepo
+    RevenueAgent --> RevenueRepo
+    BudgetAgent --> BudgetRepo
+    SupportAgent --> SupportRepo
+    WorkforceAgent --> WorkforceRepo
+    StockAgent --> StockRepo
+
+    BaseAgent --> OpenAI
+    BaseAgent --> 
+    StockAgent --> AlphaVantage
+
+    style UI fill:#e1f5ff
+    style FastAPI fill:#ffe1e1
+    style Orchestrator fill:#fff4e1
+    style BaseAgent fill:#e1ffe1
+    style OpenAI fill:#f0e1ff
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram2">
+        <h2>2. Agent Query Processing Flow</h2>
+        <p>Sequence diagram showing how a user query flows through the system from the dashboard to the AI agents and back.</p>
+        <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant Dashboard
+    participant FastAPI
+    participant Orchestrator
+    participant Router
+    participant Agent
+    participant LLM
+    participant DataRepo
+
+    User->>Dashboard: Ask query: "How is Cologuard performing?"
+    Dashboard->>FastAPI: POST /api/query/ask
+    FastAPI->>Orchestrator: process_query(query, context)
+    Orchestrator->>Router: Analyze query intent
+    Router->>Router: Determine target agent
+    Router-->>Orchestrator: Route to ProductsAgent
+    Orchestrator->>Agent: Execute agent
+    Agent->>DataRepo: Fetch product data
+    DataRepo-->>Agent: Return product metrics
+    Agent->>LLM: Generate natural language response
+    LLM-->>Agent: "Cologuard shows strong performance..."
+    Agent-->>Orchestrator: Return formatted response
+    Orchestrator-->>FastAPI: final_response
+    FastAPI-->>Dashboard: JSON response
+    Dashboard-->>User: Display AI response
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram3">
+        <h2>3. LangGraph State Machine</h2>
+        <p>State machine showing how queries are routed to different agents based on intent.</p>
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> Router: User Query
+    Router --> ProductsAgent: Product query
+    Router --> RevenueAgent: Revenue query
+    Router --> BudgetAgent: Budget query
+    Router --> SupportAgent: Support query
+    Router --> WorkforceAgent: Workforce query
+    Router --> StockAgent: Stock query
+    Router --> AssistantAgent: General query
+
+    ProductsAgent --> Aggregator: Return data
+    RevenueAgent --> Aggregator: Return data
+    BudgetAgent --> Aggregator: Return data
+    SupportAgent --> Aggregator: Return data
+    WorkforceAgent --> Aggregator: Return data
+    StockAgent --> Aggregator: Return data
+    AssistantAgent --> Aggregator: Return data
+
+    Aggregator --> FinalResponse: Format response
+    FinalResponse --> [*]: Return to user
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram4">
+        <h2>4. Dashboard Tile Loading Flow</h2>
+        <p>How dashboard tiles load data from the backend when the page is first accessed.</p>
+        <div class="mermaid">
+sequenceDiagram
+    participant Browser
+    participant Dashboard
+    participant FastAPI
+    participant Repository
+    participant DataSource
+
+    Browser->>Dashboard: Load page
+    Dashboard->>Dashboard: Render static content
+    Dashboard->>FastAPI: GET /api/dashboard/tiles/products
+    FastAPI->>Repository: get_products()
+    Repository->>DataSource: Fetch data
+    DataSource-->>Repository: Mock data
+    Repository-->>FastAPI: Product metrics
+    FastAPI-->>Dashboard: JSON response
+    Dashboard->>Dashboard: Render Chart.js graph
+    Dashboard-->>Browser: Display visualization
+
+    Note over Dashboard,FastAPI: Same flow for all tiles:<br/>revenue, budget, support, workforce
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram5">
+        <h2>5. Component Layer Architecture</h2>
+        <p>Detailed view of all architectural layers and their relationships.</p>
+        <div class="mermaid">
+graph TB
+    subgraph "Presentation Layer"
+        HTML[HTML/CSS/JS]
+        Components[UI Components]
+        Charts[Chart.js]
+    end
+
+    subgraph "API Gateway Layer"
+        Routes[API Routes]
+        Middleware[Middleware]
+        Validation[Request Validation]
+    end
+
+    subgraph "Business Logic Layer"
+        Orchestrator[Orchestrator]
+        AgentFactory[Agent Factory]
+        StateMachine[State Machine]
+    end
+
+    subgraph "Agent Layer"
+        Agents[Specialized Agents]
+        BaseLogic[Base Agent Logic]
+        PromptMgmt[Prompt Management]
+    end
+
+    subgraph "Integration Layer"
+        LLMClient[LLM Client]
+        APIClients[API Clients]
+        DataAdapters[Data Adapters]
+    end
+
+    subgraph "Data Access Layer"
+        Repositories[Repositories]
+        Models[Data Models]
+        Cache[Cache Layer]
+    end
+
+    HTML --> Routes
+    Components --> Routes
+    Charts --> Routes
+
+    Routes --> Middleware
+    Middleware --> Validation
+    Validation --> Orchestrator
+
+    Orchestrator --> AgentFactory
+    AgentFactory --> StateMachine
+    StateMachine --> Agents
+
+    Agents --> BaseLogic
+    BaseLogic --> PromptMgmt
+    PromptMgmt --> LLMClient
+
+    Agents --> DataAdapters
+    DataAdapters --> Repositories
+    LLMClient --> APIClients
+
+    Repositories --> Models
+    Repositories --> Cache
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram6">
+        <h2>6. Data Flow: AI Query Processing</h2>
+        <p>Flowchart showing the complete data flow when processing an AI query through the agent system.</p>
+        <div class="mermaid">
+flowchart TD
+    Start([User Query]) --> Input[Receive Query]
+    Input --> InitState[Initialize Dashboard State]
+    InitState --> Router{Query Router}
+
+    Router -->|Product| PA[Products Agent]
+    Router -->|Revenue| RA[Revenue Agent]
+    Router -->|Budget| BA[Budget Agent]
+    Router -->|Support| SA[Support Agent]
+    Router -->|Workforce| WA[Workforce Agent]
+    Router -->|Stock| STA[Stock Agent]
+    Router -->|General| AA[Assistant Agent]
+
+    PA --> FetchData1[Fetch Product Data]
+    RA --> FetchData2[Fetch Revenue Data]
+    BA --> FetchData3[Fetch Budget Data]
+    SA --> FetchData4[Fetch Support Data]
+    WA --> FetchData5[Fetch Workforce Data]
+    STA --> FetchData6[Fetch Stock Data]
+    AA --> FetchData7[Fetch Context Data]
+
+    FetchData1 --> BuildPrompt1[Build LLM Prompt]
+    FetchData2 --> BuildPrompt2[Build LLM Prompt]
+    FetchData3 --> BuildPrompt3[Build LLM Prompt]
+    FetchData4 --> BuildPrompt4[Build LLM Prompt]
+    FetchData5 --> BuildPrompt5[Build LLM Prompt]
+    FetchData6 --> BuildPrompt6[Build LLM Prompt]
+    FetchData7 --> BuildPrompt7[Build LLM Prompt]
+
+    BuildPrompt1 --> LLM[Call LLM API]
+    BuildPrompt2 --> LLM
+    BuildPrompt3 --> LLM
+    BuildPrompt4 --> LLM
+    BuildPrompt5 --> LLM
+    BuildPrompt6 --> LLM
+    BuildPrompt7 --> LLM
+
+    LLM --> Format[Format Response]
+    Format --> UpdateState[Update State]
+    UpdateState --> Response([Return Response])
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram7">
+        <h2>7. Agent Class Hierarchy</h2>
+        <p>Object-oriented class diagram showing the inheritance structure of the agent system.</p>
+        <div class="mermaid">
+classDiagram
+    class BaseAgent {
+        +llm: LLM
+        +prompt_template: str
+        +run(state: DashboardState)
+        #format_data(data: dict)
+        #generate_response(prompt: str)
+    }
+
+    class ProductsAgent {
+        +repository: ProductRepository
+        +run(state: DashboardState)
+        -analyze_products()
+    }
+
+    class RevenueAgent {
+        +repository: RevenueRepository
+        +run(state: DashboardState)
+        -analyze_revenue()
+    }
+
+    class BudgetAgent {
+        +repository: BudgetRepository
+        +run(state: DashboardState)
+        -analyze_budget()
+    }
+
+    class SupportAgent {
+        +repository: SupportRepository
+        +run(state: DashboardState)
+        -analyze_tickets()
+    }
+
+    class WorkforceAgent {
+        +repository: WorkforceRepository
+        +run(state: DashboardState)
+        -analyze_workforce()
+    }
+
+    class StockAgent {
+        +api_client: AlphaVantageClient
+        +run(state: DashboardState)
+        -fetch_stock_price()
+    }
+
+    BaseAgent <|-- ProductsAgent
+    BaseAgent <|-- RevenueAgent
+    BaseAgent <|-- BudgetAgent
+    BaseAgent <|-- SupportAgent
+    BaseAgent <|-- WorkforceAgent
+    BaseAgent <|-- StockAgent
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram8">
+        <h2>8. Deployment Architecture</h2>
+        <p>Production deployment architecture showing load balancing, scaling, and data tier components.</p>
+        <div class="mermaid">
+graph LR
+    subgraph "Client Tier"
+        Browser[Web Browser]
+        Mobile[Mobile Browser]
+    end
+
+    subgraph "Load Balancer"
+        LB[nginx/Load Balancer]
+    end
+
+    subgraph "Application Tier"
+        API1[FastAPI Instance 1]
+        API2[FastAPI Instance 2]
+        API3[FastAPI Instance N]
+    end
+
+    subgraph "Service Tier"
+        Orchestrator[Agent Orchestrator]
+        Agents[AI Agents Pool]
+    end
+
+    subgraph "External APIs"
+        OpenAI[OpenAI API]
+        []
+        AlphaVantage[Alpha Vantage]
+    end
+
+    subgraph "Data Tier"
+        Primary[(Primary DB)]
+        Replica[(Read Replica)]
+        Redis[(Redis Cache)]
+    end
+
+    Browser --> LB
+    Mobile --> LB
+    LB --> API1
+    LB --> API2
+    LB --> API3
+
+    API1 --> Orchestrator
+    API2 --> Orchestrator
+    API3 --> Orchestrator
+
+    Orchestrator --> Agents
+
+    Agents --> OpenAI
+    Agents --> 
+    Agents --> AlphaVantage
+
+    API1 --> Redis
+    API2 --> Redis
+    API3 --> Redis
+
+    Agents --> Primary
+    Agents --> Replica
+
+    Primary -.Replication.-> Replica
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram9">
+        <h2>9. Request-Response Cycle</h2>
+        <p>Complete request-response cycle showing all steps from user request to final response.</p>
+        <div class="mermaid">
+graph LR
+    A[User] -->|1. HTTP Request| B[FastAPI]
+    B -->|2. Validate| C[Pydantic Model]
+    C -->|3. Route| D[API Endpoint]
+    D -->|4. Invoke| E[Orchestrator]
+    E -->|5. Create State| F[DashboardState]
+    F -->|6. Execute| G[LangGraph]
+    G -->|7. Route| H[Agent]
+    H -->|8. Query| I[Repository]
+    I -->|9. Return Data| H
+    H -->|10. Call| J[LLM]
+    J -->|11. Response| H
+    H -->|12. Update State| G
+    G -->|13. Final State| E
+    E -->|14. Extract Response| D
+    D -->|15. JSON| B
+    B -->|16. HTTP Response| A
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram10">
+        <h2>10. Technology Stack Overview</h2>
+        <p>Mind map showing all technologies used in the project organized by category.</p>
+        <div class="mermaid">
+mindmap
+    root((LeaderDashboard))
+        Frontend
+            HTML5
+            Tailwind CSS
+            Chart.js
+            JavaScript
+        Backend
+            Python 3.x
+            FastAPI
+            Uvicorn
+            Pydantic
+        AI/ML
+            LangChain
+            LangGraph
+            OpenAI
+            
+        Data
+            Repositories
+            Mock Data
+            Future: PostgreSQL
+        DevOps
+            pytest
+            dotenv
+            Git
+        External APIs
+            Alpha Vantage
+            Healthcare Sciences API
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram11">
+        <h2>11. Error Handling Flow</h2>
+        <p>Error handling strategy showing how different types of errors are processed and returned to users.</p>
+        <div class="mermaid">
+flowchart TD
+    Start([Request]) --> Try{Try Processing}
+    Try -->|Success| Process[Process Query]
+    Try -->|Error| ErrorType{Error Type}
+
+    Process --> Success([Return Success])
+
+    ErrorType -->|Validation| ValError[Validation Error]
+    ErrorType -->|LLM API| LLMError[LLM Error]
+    ErrorType -->|Data| DataError[Data Error]
+    ErrorType -->|Unknown| UnknownError[Unknown Error]
+
+    ValError --> Log1[Log Error]
+    LLMError --> Log2[Log Error]
+    DataError --> Log3[Log Error]
+    UnknownError --> Log4[Log Error]
+
+    Log1 --> Return1[Return 400 Error]
+    Log2 --> Retry{Retry?}
+    Log3 --> Return3[Return 500 Error]
+    Log4 --> Return4[Return 500 Error]
+
+    Retry -->|Yes| Process
+    Retry -->|No| Return2[Return 503 Error]
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram12">
+        <h2>12. Agent Orchestration Pattern</h2>
+        <p>Detailed sequence diagram showing the complete agent orchestration pattern with all components.</p>
+        <div class="mermaid">
+sequenceDiagram
+    participant Client
+    participant API
+    participant Orchestrator
+    participant LangGraph
+    participant Router
+    participant Agent
+    participant Repository
+    participant LLM
+
+    Client->>API: POST /api/query/ask
+    API->>Orchestrator: process_query()
+    Orchestrator->>LangGraph: ainvoke(initial_state)
+
+    LangGraph->>Router: route_query(state)
+    Router->>Router: Analyze intent
+    Router-->>LangGraph: target_agent = "products"
+
+    LangGraph->>Agent: execute_agent(state)
+    Agent->>Repository: get_products()
+    Repository-->>Agent: product_data
+
+    Agent->>Agent: build_prompt(data)
+    Agent->>LLM: generate(prompt)
+    LLM-->>Agent: response_text
+
+    Agent->>Agent: update_state(response)
+    Agent-->>LangGraph: updated_state
+
+    LangGraph->>LangGraph: aggregate_results()
+    LangGraph-->>Orchestrator: final_state
+
+    Orchestrator->>Orchestrator: extract final_response
+    Orchestrator-->>API: response_text
+
+    API-->>Client: JSON response
+        </div>
+    </div>
+
+    <div class="diagram-section" id="diagram13">
+        <h2>13. Future Microservices Architecture</h2>
+        <p>Proposed future architecture showing how the system could evolve into a microservices-based design.</p>
+        <div class="mermaid">
+graph TB
+    subgraph "API Gateway"
+        Gateway[API Gateway]
+        Auth[Auth Service]
+    end
+
+    subgraph "Frontend Services"
+        WebApp[Web Application]
+        MobileApp[Mobile App]
+    end
+
+    subgraph "Microservices"
+        ProductSvc[Product Service]
+        RevenueSvc[Revenue Service]
+        BudgetSvc[Budget Service]
+        SupportSvc[Support Service]
+        WorkforceSvc[Workforce Service]
+        QuerySvc[Query Service]
+    end
+
+    subgraph "AI Services"
+        LLMGateway[LLM Gateway]
+        AgentPool[Agent Pool]
+        PromptMgmt[Prompt Management]
+    end
+
+    subgraph "Data Services"
+        PostgreSQL[(PostgreSQL)]
+        MongoDB[(MongoDB)]
+        Redis[(Redis)]
+        S3[S3 Storage]
+    end
+
+    subgraph "Message Queue"
+        RabbitMQ[RabbitMQ]
+    end
+
+    WebApp --> Gateway
+    MobileApp --> Gateway
+
+    Gateway --> Auth
+    Auth --> ProductSvc
+    Auth --> RevenueSvc
+    Auth --> BudgetSvc
+    Auth --> SupportSvc
+    Auth --> WorkforceSvc
+    Auth --> QuerySvc
+
+    QuerySvc --> LLMGateway
+    LLMGateway --> AgentPool
+    AgentPool --> PromptMgmt
+
+    ProductSvc --> PostgreSQL
+    RevenueSvc --> PostgreSQL
+    BudgetSvc --> MongoDB
+    SupportSvc --> MongoDB
+    WorkforceSvc --> PostgreSQL
+
+    ProductSvc --> Redis
+    RevenueSvc --> Redis
+
+    QuerySvc --> RabbitMQ
+    AgentPool --> RabbitMQ
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                diagramMarginX: 50,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                boxTextMargin: 5,
+                noteMargin: 10,
+                messageMargin: 35,
+                mirrorActors: true
+            }
+        });
+    </script>
+</body>
+</html>

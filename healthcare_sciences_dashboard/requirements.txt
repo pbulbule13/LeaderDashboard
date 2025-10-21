@@ -1,0 +1,25 @@
+# Core Framework
+langgraph
+langchain
+langchain-openai
+
+# API & Web
+fastapi
+uvicorn
+websockets
+pydantic
+python-dotenv
+
+# Data Processing
+pandas
+numpy
+sqlalchemy
+
+# Monitoring & Logging
+structlog
+prometheus-client
+
+# Testing
+pytest
+pytest-asyncio
+httpx

@@ -1,0 +1,368 @@
+<div class="grid grid-cols-4 gap-4">
+                            ${products.products.map(p => `
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <p class="font-bold text-slate-800">${p.name}</p>
+                                    <p class="text-2xl font-bold text-blue-600 mt-2">${p.orders_received.toLocaleString()}</p>
+                                    <p class="text-xs text-slate-600">Orders</p>
+                                    <p class="text-sm text-green-600 mt-2">$${(p.revenue/1000000).toFixed(1)}M Revenue</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // AI Assistant Functions
+        async function askAI() {
+            const input = document.getElementById('aiQueryInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            const chatMessages = document.getElementById('aiChatMessages');
+            
+            // Add user message
+            chatMessages.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-blue-500 text-white rounded-lg p-3 max-w-[80%]">
+                        <p class="text-sm">${query}</p>
+                    </div>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+
+            // Add loading
+            chatMessages.innerHTML += `
+                <div id="loading" class="flex justify-start">
+                    <div class="bg-slate-200 rounded-lg p-3">
+                        <p class="text-sm text-slate-600">AI is thinking...</p>
+                    </div>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/query/ask`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query, context: {} })
+                });
+                
+                const result = await response.json();
+                document.getElementById('loading').remove();
+
+                if (result.success) {
+                    chatMessages.innerHTML += `
+                        <div class="flex justify-start">
+                            <div class="bg-white border border-slate-200 rounded-lg p-3 max-w-[80%]">
+                                <p class="text-sm text-slate-700">${result.response}</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    chatMessages.innerHTML += `
+                        <div class="flex justify-start">
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3 max-w-[80%]">
+                                <p class="text-sm text-red-700">Error: Failed to get response</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('loading')?.remove();
+                chatMessages.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-3 max-w-[80%]">
+                            <p class="text-sm text-red-700">Error: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function askQuick(query) {
+            document.getElementById('aiQueryInput').value = query;
+            askAI();
+        }
+
+        function clearChat() {
+            document.getElementById('aiChatMessages').innerHTML = `
+                <div class="text-center text-slate-500 text-sm">
+                    <p class="mb-2">👋 Hello! I'm your AI Executive Assistant.</p>
+                    <p>Ask me anything about your company, schedule, emails, reports, or operations.</p>
+                </div>
+            `;
+        }
+
+        // Notes Functions
+        let notes = JSON.parse(localStorage.getItem('ceoNotes') || '[]');
+
+        function saveNote() {
+            const noteText = document.getElementById('quickNotes').value.trim();
+            if (!noteText) return;
+
+            const note = {
+                id: Date.now(),
+                text: noteText,
+                timestamp: new Date().toLocaleString()
+            };
+
+            notes.unshift(note);
+            localStorage.setItem('ceoNotes', JSON.stringify(notes));
+            
+            document.getElementById('quickNotes').value = '';
+            renderNotes();
+            
+            // Show success message
+            alert('Note saved successfully!');
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('savedNotes');
+            if (notes.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = notes.slice(0, 5).map(note => `
+                <div class="bg-white rounded-lg shadow p-3 border border-yellow-200">
+                    <p class="text-sm text-slate-700">${note.text}</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <p class="text-xs text-slate-500">${note.timestamp}</p>
+                        <button onclick="deleteNote(${note.id})" class="text-xs text-red-600 hover:underline">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(id) {
+            notes = notes.filter(n => n.id !== id);
+            localStorage.setItem('ceoNotes', JSON.stringify(notes));
+            renderNotes();
+        }
+
+        function viewAllNotes() {
+            alert(`You have ${notes.length} saved notes.\n\nThis would open a full notes manager.`);
+        }
+
+        // Notification Functions
+        function showNotifications() {
+            document.getElementById('notificationPanel').classList.remove('translate-x-full');
+        }
+
+        function closeNotifications() {
+            document.getElementById('notificationPanel').classList.add('translate-x-full');
+        }
+
+        // Quick Action Functions
+        function draftEmail() {
+            switchTab('email');
+            setTimeout(() => composeEmail(), 100);
+        }
+
+        function composeEmail() {
+            alert('Email composer would open here with AI assistance for drafting.');
+        }
+
+        function scheduleNewMeeting() {
+            switchTab('calendar');
+            alert('Meeting scheduler would open here.');
+        }
+
+        function viewReports() {
+            switchTab('reports');
+        }
+
+        function checkBudget() {
+            switchTab('financial');
+        }
+
+        function viewProjects() {
+            switchTab('projects');
+        }
+
+        function searchEmployee() {
+            switchTab('people');
+        }
+
+        function showSettings() {
+            alert('Settings panel would open here.');
+        }
+
+        function refreshEmails() {
+            alert('Refreshing emails...');
+        }
+
+        function aiSummarizeEmails() {
+            alert('AI is summarizing your unread emails...');
+        }
+
+        function aiDraftResponses() {
+            alert('AI is drafting responses for urgent emails...');
+        }
+
+        function aiPrioritize() {
+            alert('AI is re-prioritizing your inbox...');
+        }
+
+        function aiScheduleFollowups() {
+            alert('AI is scheduling follow-up reminders...');
+        }
+
+        function useTemplate(templateName) {
+            alert(`Loading ${templateName} template...`);
+        }
+
+        function viewReport(reportName) {
+            alert(`Opening ${reportName} report...`);
+        }
+
+        function generateReport(reportType) {
+            alert(`Generating ${reportType} with AI...`);
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Revenue Trend Chart
+            const revenueTrendCtx = document.getElementById('revenueTrendChart');
+            if (revenueTrendCtx) {
+                new Chart(revenueTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Revenue ($M)',
+                            data: [42, 45, 43, 48],
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Product Performance Chart
+            const productCtx = document.getElementById('productChart');
+            if (productCtx) {
+                new Chart(productCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Cologuard', 'Oncotype DX', 'Prevention', 'Cologuard+'],
+                        datasets: [{
+                            label: 'Revenue ($M)',
+                            data: [89.5, 67.8, 34.2, 28.9],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(168, 85, 247, 0.8)',
+                                'rgba(251, 146, 60, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // Department Chart
+            const deptCtx = document.getElementById('departmentChart');
+            if (deptCtx) {
+                new Chart(deptCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['R&D', 'Sales', 'Operations', 'Support', 'G&A'],
+                        datasets: [{
+                            data: [1450, 2100, 1800, 580, 270],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(251, 146, 60, 0.8)',
+                                'rgba(168, 85, 247, 0.8)',
+                                'rgba(249, 115, 22, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+
+            // Ticket Trend Chart
+            const ticketCtx = document.getElementById('ticketTrendChart');
+            if (ticketCtx) {
+                new Chart(ticketCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                        datasets: [{
+                            label: 'Open Tickets',
+                            data: [95, 92, 88, 85, 88],
+                            borderColor: 'rgb(251, 146, 60)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Project Status Chart
+            const projectCtx = document.getElementById('projectStatusChart');
+            if (projectCtx) {
+                new Chart(projectCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['On Track', 'At Risk', 'Delayed'],
+                        datasets: [{
+                            data: [7, 3, 2],
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(251, 191, 36, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            renderNotes();
+            initializeCharts();
+            // Start with overview tab
+            switchTab('overview');
+        });
+
+        // Auto-refresh certain data every 5 minutes
+        setInterval(() => {
+            const currentTab = document.querySelector('.tab-active').id.replace('tab-', '');
+            if (currentTab === 'financial') {
+                loadFinancialData();
+            } else if (currentTab === 'operations') {
+                loadOperationsData();
+            }
+        }, 300000); // 5 minutes
+    </script>
+</body>
+</html>

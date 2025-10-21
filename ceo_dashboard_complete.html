@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Sciences - CEO Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tab-active { border-bottom: 3px solid #3B82F6; color: #3B82F6; font-weight: 600; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .notification-badge {
+            position: absolute; top: -8px; right: -8px; background: #EF4444;
+            color: white; border-radius: 9999px; width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <nav class="bg-white shadow-lg border-b-2 border-blue-500 sticky top-0 z-50">
+        <div class="max-w-full mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-xl">HCS</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">CEO Command Center</h1>
+                        <p class="text-xs text-gray-600">HealthCare Sciences | October 18, 2025</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right">
+                        <p class="text-xs text-gray-500">HCS Stock</p>
+                        <p class="text-xl font-bold text-green-600">$62.45</p>
+                        <p class="text-xs text-green-600">↑ +2.01%</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">CEO</div>
+                </div>
+            </div>
+            <div class="flex gap-1 mt-4 border-b overflow-x-auto">
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active">📊 Overview</button>
+                <button onclick="switchTab('assistant')" id="tab-assistant" class="px-4 py-2 text-sm hover:bg-gray-50 relative">🤖 AI Assistant<span class="notification-badge">3</span></button>
+                <button onclick="switchTab('calendar')" id="tab-calendar" class="px-4 py-2 text-sm hover:bg-gray-50">📅 Calendar</button>
+                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 relative">📧 Email<span class="notification-badge">12</span></button>
+                <button onclick="switchTab('financial')" id="tab-financial" class="px-4 py-2 text-sm hover:bg-gray-50">💰 Financial</button>
+                <button onclick="switchTab('operations')" id="tab-operations" class="px-4 py-2 text-sm hover:bg-gray-50">📦 Operations</button>
+                <button onclick="switchTab('people')" id="tab-people" class="px-4 py-2 text-sm hover:bg-gray-50">👥 People</button>
+                <button onclick="switchTab('projects')" id="tab-projects" class="px-4 py-2 text-sm hover:bg-gray-50">📋 Projects</button>
+            </div>
+        </div>
+    </nav>
+    <div class="max-w-full mx-auto px-6 py-6">
+<div id="content-overview" class="tab-content fade-in">
+            <div class="grid grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Today's Revenue</h3>
+                    <p class="text-3xl font-bold text-gray-800">$6.2M</p>
+                    <p class="text-sm text-green-600 mt-1">↑ 8.5% vs yesterday</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Active Orders</h3>
+                    <p class="text-3xl font-bold text-gray-800">15,234</p>
+                    <p class="text-sm text-blue-600 mt-1">3,245 today</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Team Members</h3>
+                    <p class="text-3xl font-bold text-gray-800">6,200</p>
+                    <p class="text-sm text-purple-600 mt-1">12 new this month</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">Open Tickets</h3>
+                    <p class="text-3xl font-bold text-gray-800">88</p>
+                    <p class="text-sm text-orange-600 mt-1">3 critical</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-6">
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Today's Priorities</h3>
+                        <div class="space-y-3">
+                            <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
+                                <p class="font-semibold text-gray-800">FDA Pre-submission Meeting</p>
+                                <p class="text-sm text-gray-600 mt-1">11:00 AM - Critical</p>
+                            </div>
+                            <div class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4">
+                                <p class="font-semibold text-gray-800">Board Report Approval</p>
+                                <p class="text-sm text-gray-600 mt-1">Due: 5:00 PM Today</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📝 Quick Notes</h3>
+                        <textarea id="quickNotes" placeholder="Type a quick note..." class="w-full p-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:outline-none min-h-[100px] bg-white"></textarea>
+                        <button onclick="saveNote()" class="w-full mt-3 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">💾 Save Note</button>
+                    </div>
+                    <div id="savedNotes" class="space-y-2"></div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Revenue Trend</h3>
+                        <canvas id="revenueTrendChart" height="200"></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Product Performance</h3>
+                        <canvas id="productChart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🚨 Critical Alerts</h3>
+                        <div class="space-y-3">
+                            <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-3">
+                                <p class="font-semibold text-red-800 text-sm">VP Clinical Affairs Vacancy</p>
+                                <p class="text-xs text-red-600 mt-1">52 days open - Impacting FDA submissions</p>
+                            </div>
+                            <div class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-3">
+                                <p class="font-semibold text-orange-800 text-sm">Q4 Revenue at 96% of Target</p>
+                                <p class="text-xs text-orange-600 mt-1">$20M shortfall - 6 weeks remaining</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">⏳ Pending Approvals</h3>
+                        <div class="space-y-2">
+                            <div class="bg-blue-50 rounded-lg p-3">
+                                <p class="font-semibold text-gray-800 text-sm">Email Draft: Board Update</p>
+                                <button class="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">Approve & Send</button>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-3">
+                                <p class="font-semibold text-gray-800 text-sm">Budget Reallocation: +$2M</p>
+                                <button class="mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600">Approve</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                        <h3 class="text-lg font-bold mb-4">⚡ Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="switchTab('email')" class="bg-white/20 hover:bg-white/30 rounded-lg p-3 text-sm font-medium">📧 Email</button>
+                            <button onclick="switchTab('calendar')" class="bg-white/20 hover:bg-white/30 rounded-lg p-3 text-sm font-medium">📅 Calendar</button>
+                            <button onclick="switchTab('financial')" class="bg-white/20 hover:bg-white/30 rounded-lg p-3 text-sm font-medium">💰 Budget</button>
+                            <button onclick="switchTab('projects')" class="bg-white/20 hover:bg-white/30 rounded-lg p-3 text-sm font-medium">📋 Projects</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div id="content-assistant" class="tab-content hidden fade-in">
+            <div class="grid grid-cols-3 gap-6">
+                <div class="col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6 h-[calc(100vh-250px)]">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">🤖 AI Executive Assistant</h3>
+                        <div id="aiChatMessages" class="h-[calc(100%-120px)] overflow-y-auto mb-4 p-4 bg-gray-50 rounded-lg">
+                            <p class="text-center text-gray-500 text-sm">Ask me anything about your company...</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="aiQueryInput" placeholder="Ask anything..." class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" onkeypress="if(event.key==='Enter') askAI()"/>
+                            <button onclick="askAI()" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:opacity-90 font-medium">Send</button>
+                        </div>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <button onclick="askQuick('Summarize my day')" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200">Summarize my day</button>
+                            <button onclick="askQuick('What needs approval?')" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs hover:bg-green-200">What needs approval?</button>
+                            <button onclick="askQuick('Revenue vs target')" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs hover:bg-purple-200">Revenue status</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-lg p-6 text-white">
+                        <h3 class="text-lg font-bold mb-3">💡 AI Insights</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="bg-white/20 rounded-lg p-3">
+                                <p class="font-semibold">Revenue Opportunity</p>
+                                <p class="text-xs mt-1">Cologuard orders up 12% - consider increasing marketing</p>
+                            </div>
+                            <div class="bg-white/20 rounded-lg p-3">
+                                <p class="font-semibold">Action Needed</p>
+                                <p class="text-xs mt-1">3 critical tickets over 48 hours old</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content-calendar" class="tab-content hidden fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">📅 Today's Schedule</h3>
+                <div class="space-y-4">
+                    <div class="border-l-4 border-blue-500 bg-blue-50 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <div class="text-center">
+                                <p class="text-sm font-bold text-blue-600">9:00 AM</p>
+                                <p class="text-xs text-blue-600">30 min</p>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800">Executive Team Standup</h4>
+                                <p class="text-sm text-gray-600 mt-1">Conference Room A | 8 attendees</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-red-500 bg-red-50 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <div class="text-center">
+                                <p class="text-sm font-bold text-red-600">11:00 AM</p>
+                                <p class="text-xs text-red-600">2 hours</p>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800">FDA Pre-submission Meeting</h4>
+                                <p class="text-sm text-gray-600 mt-1">Virtual | 12 attendees | CRITICAL</p>
+                                <div class="mt-2 p-2 bg-white rounded border border-red-200">
+                                    <p class="text-xs font-semibold text-red-800">⚠️ Prep Required: Review submission package</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-l-4 border-green-500 bg-green-50 rounded-lg p-4">
+                        <div class="flex items-start gap-4">
+                            <div class="text-center">
+                                <p class="text-sm font-bold text-green-600">2:00 PM</p>
+                                <p class="text-xs text-green-600">1 hour</p>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800">Investor Update Call</h4>
+                                <p class="text-sm text-gray-600 mt-1">Virtual | 5 attendees</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="content-email" class="tab-content hidden fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">📧 Email Command Center</h3>
+                <div class="space-y-3">
+                    <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="font-bold text-gray-800">FDA Regulatory Affairs</p>
+                                <p class="font-semibold text-gray-700 mt-1">Response Required: Test Validation Query</p>
+                                <p class="text-sm text-gray-600 mt-1">Request for additional documentation...</p>
+                                <p class="text-xs text-gray-500 mt-2">4 hours ago | URGENT</p>
+                            </div>
+                            <button class="px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">Draft Reply</button>
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <p class="font-bold text-gray-800">Board Chair</p>
+                                <p class="font-semibold text-gray-700 mt-1">Q4 Performance Review Preparation</p>
+                                <p class="text-sm text-gray-600 mt-1">Need to discuss key metrics...</p>
+                                <p class="text-xs text-gray-500 mt-2">2 hours ago | HIGH</p>
+                            </div>
+                            <button class="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">AI Draft</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div id="content-financial" class="tab-content hidden fade-in">
+            <div id="financialContent">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading financial data...</p>
+                </div>
+            </div>
+        </div>
+        <div id="content-operations" class="tab-content hidden fade-in">
+            <div id="operationsContent">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading operations data...</p>
+                </div>
+            </div>
+        </div>
+        <div id="content-people" class="tab-content hidden fade-in">
+            <div id="peopleContent">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading workforce data...</p>
+                </div>
+            </div>
+        </div>
+        <div id="content-projects" class="tab-content hidden fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">📋 Active Projects</h3>
+                <div class="space-y-4">
+                    <div class="border-l-4 border-green-500 bg-green-50 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-gray-800">Cologuard Plus FDA Submission</h4>
+                            <span class="px-3 py-1 bg-green-200 text-green-800 rounded-full text-xs">On Track</span>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Progress</span>
+                                <span class="font-semibold text-green-600">75%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">Timeline: Dec 15, 2025 | Owner: Dr. Chen</p>
+                    </div>
+                    <div class="border-l-4 border-yellow-500 bg-yellow-50 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-gray-800">Q1 2026 Sales Campaign Launch</h4>
+                            <span class="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs">At Risk</span>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Progress</span>
+                                <span class="font-semibold text-yellow-600">45%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-white border border-yellow-300 rounded p-2 mb-2">
+                            <p class="text-xs font-semibold text-yellow-800">⚠️ Blocker: Creative assets delayed by 1 week</p>
+                        </div>
+                        <p class="text-sm text-gray-600">Timeline: Jan 5, 2026 | Owner: Jennifer Lee</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+        const API_BASE = 'http://localhost:8000';
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            if (tabName === 'financial') loadFinancialData();
+            if (tabName === 'operations') loadOperationsData();
+            if (tabName === 'people') loadPeopleData();
+        }
+        async function loadFinancialData() {
+            try {
+                const revenue = await fetch(API_BASE + '/api/dashboard/tiles/revenue').then(r => r.json());
+                const budget = await fetch(API_BASE + '/api/dashboard/tiles/budget').then(r => r.json());
+                document.getElementById('financialContent').innerHTML = '<div class="grid grid-cols-2 gap-6"><div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-xl font-bold mb-4">Revenue</h3>' + revenue.data.records.map(r => '<div class="mb-4"><p class="font-semibold">' + r.period + '</p><p class="text-2xl font-bold text-green-600">$' + (r.actual/1000000).toFixed(1) + 'M</p></div>').join('') + '</div><div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-xl font-bold mb-4">Budget</h3>' + budget.data.quarters[0].items.map(i => '<div class="mb-3"><p class="font-semibold">' + i.department + '</p><p class="text-sm text-gray-600">$' + (i.spent/1000000).toFixed(1) + 'M / $' + (i.allocated/1000000).toFixed(1) + 'M</p></div>').join('') + '</div></div>';
+            } catch (error) {
+                document.getElementById('financialContent').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+        async function loadOperationsData() {
+            try {
+                const products = await fetch(API_BASE + '/api/dashboard/tiles/products').then(r => r.json());
+                const support = await fetch(API_BASE + '/api/dashboard/tiles/support').then(r => r.json());
+                document.getElementById('operationsContent').innerHTML = '<div class="bg-white rounded-xl shadow-lg p-6 mb-6"><h3 class="text-xl font-bold mb-4">Products</h3><div class="grid grid-cols-4 gap-4">' + products.data.products.map(p => '<div class="bg-blue-50 p-4 rounded-lg"><p class="font-bold">' + p.name + '</p><p class="text-2xl font-bold text-blue-600 mt-2">' + p.orders_received.toLocaleString() + '</p><p class="text-xs text-gray-600">Orders</p></div>').join('') + '</div></div><div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-xl font-bold mb-4">Support</h3><div class="grid grid-cols-4 gap-4">' + support.data.tickets.map(t => '<div class="bg-gray-50 p-4 rounded-lg"><p class="font-bold">' + t.priority + '</p><p class="text-2xl font-bold text-orange-600 mt-2">' + t.open + '</p><p class="text-xs text-gray-600">Open</p></div>').join('') + '</div></div>';
+            } catch (error) {
+                document.getElementById('operationsContent').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+        async function loadPeopleData() {
+            try {
+                const workforce = await fetch(API_BASE + '/api/dashboard/tiles/workforce').then(r => r.json());
+                document.getElementById('peopleContent').innerHTML = '<div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-xl font-bold mb-4">Workforce</h3><div class="grid grid-cols-2 gap-6"><div><p class="text-sm text-gray-600">Total Employees</p><p class="text-4xl font-bold text-gray-800">' + workforce.data.total_employees.toLocaleString() + '</p></div><div><p class="text-sm text-gray-600">Turnover Rate</p><p class="text-4xl font-bold text-purple-600">' + workforce.data.turnover_rate + '%</p></div></div><h4 class="text-lg font-bold mt-6 mb-3">Critical Vacancies</h4>' + workforce.data.critical_vacancies.map(v => '<div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-3 mb-2"><p class="font-semibold">' + v.role + '</p><p class="text-sm text-gray-600">' + v.location + ' | ' + v.days_open + ' days open</p></div>').join('') + '</div>';
+            } catch (error) {
+                document.getElementById('peopleContent').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+        async function askAI() {
+            const input = document.getElementById('aiQueryInput');
+            const query = input.value.trim();
+            if (!query) return;
+            const chatMessages = document.getElementById('aiChatMessages');
+            chatMessages.innerHTML += '<div class="flex justify-end mb-3"><div class="bg-blue-500 text-white rounded-lg p-3 max-w-[80%]"><p class="text-sm">' + query + '</p></div></div>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+            chatMessages.innerHTML += '<div id="loading" class="flex justify-start mb-3"><div class="bg-gray-200 rounded-lg p-3"><p class="text-sm text-gray-600">Thinking...</p></div></div>';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                const response = await fetch(API_BASE + '/api/query/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, context: {} })
+                });
+                const result = await response.json();
+                document.getElementById('loading').remove();
+                if (result.success) {
+                    chatMessages.innerHTML += '<div class="flex justify-start mb-3"><div class="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%]"><p class="text-sm text-gray-700">' + result.response + '</p></div></div>';
+                } else {
+                    chatMessages.innerHTML += '<div class="flex justify-start mb-3"><div class="bg-red-50 rounded-lg p-3 max-w-[80%]"><p class="text-sm text-red-700">Error getting response</p></div></div>';
+                }
+            } catch (error) {
+                document.getElementById('loading')?.remove();
+                chatMessages.innerHTML += '<div class="flex justify-start mb-3"><div class="bg-red-50 rounded-lg p-3 max-w-[80%]"><p class="text-sm text-red-700">Error: ' + error.message + '</p></div></div>';
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        function askQuick(query) {
+            document.getElementById('aiQueryInput').value = query;
+            askAI();
+        }
+let notes = JSON.parse(localStorage.getItem('ceoNotes') || '[]');
+        function saveNote() {
+            const noteText = document.getElementById('quickNotes').value.trim();
+            if (!noteText) return;
+            const note = { id: Date.now(), text: noteText, timestamp: new Date().toLocaleString() };
+            notes.unshift(note);
+            localStorage.setItem('ceoNotes', JSON.stringify(notes));
+            document.getElementById('quickNotes').value = '';
+            renderNotes();
+            alert('Note saved!');
+        }
+        function renderNotes() {
+            const container = document.getElementById('savedNotes');
+            if (notes.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            container.innerHTML = notes.slice(0, 5).map(note => 
+                '<div class="bg-white rounded-lg shadow p-3 border border-yellow-200">' +
+                '<p class="text-sm text-gray-700">' + note.text + '</p>' +
+                '<div class="flex items-center justify-between mt-2">' +
+                '<p class="text-xs text-gray-500">' + note.timestamp + '</p>' +
+                '<button onclick="deleteNote(' + note.id + ')" class="text-xs text-red-600 hover:underline">Delete</button>' +
+                '</div></div>'
+            ).join('');
+        }
+        function deleteNote(id) {
+            notes = notes.filter(n => n.id !== id);
+            localStorage.setItem('ceoNotes', JSON.stringify(notes));
+            renderNotes();
+        }
+        function initializeCharts() {
+            const revenueTrendCtx = document.getElementById('revenueTrendChart');
+            if (revenueTrendCtx) {
+                new Chart(revenueTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                        datasets: [{
+                            label: 'Revenue ($M)',
+                            data: [42, 45, 43, 48],
+                            borderColor: 'rgb(34, 197, 94)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+            const productCtx = document.getElementById('productChart');
+            if (productCtx) {
+                new Chart(productCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Cologuard', 'Oncotype DX', 'Prevention', 'Cologuard+'],
+                        datasets: [{
+                            label: 'Revenue ($M)',
+                            data: [89.5, 67.8, 34.2, 28.9],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(168, 85, 247, 0.8)',
+                                'rgba(251, 146, 60, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+        window.addEventListener('load', function() {
+            renderNotes();
+            initializeCharts();
+            switchTab('overview');
+        });
+        setInterval(function() {
+            const currentTab = document.querySelector('.tab-active')?.id?.replace('tab-', '');
+            if (currentTab === 'financial') loadFinancialData();
+            else if (currentTab === 'operations') loadOperationsData();
+            else if (currentTab === 'people') loadPeopleData();
+        }, 300000);
+    </script>
+</body>
+</html>
