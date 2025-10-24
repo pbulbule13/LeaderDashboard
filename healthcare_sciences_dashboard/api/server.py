@@ -29,11 +29,22 @@ app.add_middleware(
 async def root():
     return {
         'message': 'HealthCare Sciences CEO Dashboard API',
-        'version': '1.0.0',
+        'version': '2.0.0',
         'status': 'running',
         'endpoints': {
             'health': '/health',
+            'overview': '/api/dashboard/overview',
+            'order_volume': '/api/dashboard/tiles/order-volume',
+            'compliance': '/api/dashboard/tiles/compliance',
+            'reimbursement': '/api/dashboard/tiles/reimbursement',
+            'operating_costs': '/api/dashboard/tiles/operating-costs',
+            'lab_metrics': '/api/dashboard/tiles/lab-metrics',
+            'regional': '/api/dashboard/tiles/regional',
+            'forecasting': '/api/dashboard/tiles/forecasting',
+            'market_intelligence': '/api/dashboard/tiles/market-intelligence',
+            'milestones': '/api/dashboard/tiles/milestones',
             'products': '/api/dashboard/tiles/products',
+            'stock': '/api/dashboard/tiles/stock',
             'all_tiles': '/api/dashboard/tiles/all',
             'query': '/api/query/ask'
         }
