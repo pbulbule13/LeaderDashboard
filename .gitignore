@@ -30,11 +30,65 @@ env/
 .venv
 ceodashboard/
 
-# Environment Variables
+# Environment Variables & Secrets
 .env
 .env.local
 .env.*.local
 .enveol
+*.env
+.env.*
+!.env.example
+!.env.template
+!.env.sample
+
+# Credentials & Passwords
+*password*
+*passwd*
+*credentials*
+*secret*
+*secrets*
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+*.der
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.ppk
+
+# API Keys & Tokens
+*apikey*
+*api_key*
+*api-key*
+*token*
+*access_token*
+*.token
+auth.json
+credentials.json
+service-account*.json
+client_secret*.json
+
+# Cloud Provider Credentials
+.aws/credentials
+.aws/config
+.azure/
+.gcloud/
+gcloud-credentials.json
+
+# Configuration files that may contain secrets
+config.local.*
+config.prod.*
+config.production.*
+settings.local.*
+settings.prod.*
+settings.production.*
+*-secrets.yml
+*-secrets.yaml
+*-secrets.json
 
 # IDE
 .vscode/
@@ -76,6 +130,3 @@ Thumbs.db
 .cache/
 temp/
 tmp/
-
-# Keep important files
-!.env.example

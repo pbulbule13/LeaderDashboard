@@ -4,12 +4,17 @@ Agentic AI-powered executive dashboard with LangGraph orchestration.
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Navigate to Project Directory
+```powershell
+cd healthcare_sciences_dashboard
+```
+
+### 2. Install Dependencies
 ```powershell
 pip install -e .
 ```
 
-### 2. Configure Environment
+### 3. Configure Environment
 ```powershell
 # Copy example env file
 copy .env.example .env
@@ -23,22 +28,31 @@ Add your OpenAI key:
 OPENAI_API_KEY=sk-your-key-here
 ```
 
-### 3. Run the Application
+### 4. Run the Application
 
-**Option A: Demo Mode (Test Agents)**
+**Option A: API Server (Main Dashboard)**
+```powershell
+python run_server.py
+```
+Then visit:
+- **API Docs**: http://localhost:8000/docs
+- **Health Check**: http://localhost:8000/health
+
+**Option B: Demo Mode (Test Agents)**
 ```powershell
 python run_demo.py
 ```
 
-**Option B: API Server**
-```powershell
-python run_server.py
-```
-Then visit: http://localhost:8000/docs
-
 **Option C: Run Tests**
 ```powershell
 python run_tests.py
+```
+
+### Troubleshooting
+
+If you get `ModuleNotFoundError`, ensure dependencies are installed:
+```powershell
+pip install -e .
 ```
 
 ## 📡 API Endpoints
