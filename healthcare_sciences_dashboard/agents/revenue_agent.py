@@ -1,7 +1,7 @@
 ﻿from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.revenue_repository import RevenueRepository
-from prompts.revenue_prompts import REVENUE_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class RevenueAgent(BaseAgent):
     '''Agent responsible for Revenue Performance tile'''
@@ -35,9 +35,11 @@ class RevenueAgent(BaseAgent):
         '''Process queries about revenue'''
         tile_data = await self.get_tile_data()
         
-        prompt = REVENUE_ANALYSIS_PROMPT.format(
+        prompt = get_prompt(
+            agent_type='reimbursement',
+            prompt_type='analysis',
             query=query,
-            revenue_data=tile_data
+            reimbursement_data=tile_data
         )
         
         messages = [

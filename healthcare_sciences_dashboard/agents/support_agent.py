@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.support_repository import SupportRepository
-from prompts.support_prompts import SUPPORT_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class SupportAgent(BaseAgent):
     '''Agent for Support Operations tile'''
@@ -34,9 +34,11 @@ class SupportAgent(BaseAgent):
         '''Process support queries'''
         tile_data = await self.get_tile_data()
         
-        prompt = SUPPORT_ANALYSIS_PROMPT.format(
+        prompt = get_prompt(
+            agent_type='compliance',
+            prompt_type='analysis',
             query=query,
-            support_data=tile_data
+            compliance_data=tile_data
         )
         
         messages = [

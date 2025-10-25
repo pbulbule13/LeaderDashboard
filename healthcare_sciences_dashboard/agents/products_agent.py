@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from .base_agent import BaseAgent
 from data.repositories.products_repository import ProductsRepository
-from prompts.products_prompts import PRODUCTS_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class ProductsAgent(BaseAgent):
     """Agent responsible for Products & Orders tile"""
@@ -26,9 +26,11 @@ class ProductsAgent(BaseAgent):
         """Process queries about products"""
         tile_data = await self.get_tile_data()
         
-        prompt = PRODUCTS_ANALYSIS_PROMPT.format(
+        prompt = get_prompt(
+            agent_type='order_volume',
+            prompt_type='analysis',
             query=query,
-            products_data=tile_data
+            order_data=tile_data
         )
         
         messages = [

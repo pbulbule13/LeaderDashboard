@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.budget_repository import BudgetRepository
-from prompts.budget_prompts import BUDGET_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class BudgetAgent(BaseAgent):
     '''Agent responsible for Budget Analysis tile'''
@@ -41,9 +41,11 @@ class BudgetAgent(BaseAgent):
         '''Process budget queries'''
         tile_data = await self.get_tile_data()
         
-        prompt = BUDGET_ANALYSIS_PROMPT.format(
+        prompt = get_prompt(
+            agent_type='costs',
+            prompt_type='analysis',
             query=query,
-            budget_data=tile_data
+            cost_data=tile_data
         )
         
         messages = [

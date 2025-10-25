@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.workforce_repository import WorkforceRepository
-from prompts.workforce_prompts import WORKFORCE_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class WorkforceAgent(BaseAgent):
     '''Agent for Workforce Insights tile'''
@@ -35,9 +35,11 @@ class WorkforceAgent(BaseAgent):
         '''Process workforce queries'''
         tile_data = await self.get_tile_data()
         
-        prompt = WORKFORCE_ANALYSIS_PROMPT.format(
+        prompt = get_prompt(
+            agent_type='regional',
+            prompt_type='analysis',
             query=query,
-            workforce_data=tile_data
+            regional_data=tile_data
         )
         
         messages = [
