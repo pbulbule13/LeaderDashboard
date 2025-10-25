@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:8000';
+// Load configuration from config.js
+const CONFIG = window.DASHBOARD_CONFIG;
+const API_BASE = CONFIG.api.baseUrl;
 let overviewChartsCreated = false;
 let charts = {};
 
@@ -15,11 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderNotes();
     generateCalendar();
 
-    // Auto-refresh every 5 minutes
-    setInterval(() => {
-        loadOverviewData();
-        loadStockData();
-    }, 300000);
+    // Auto-refresh based on config
+    if (CONFIG.features.autoRefresh) {
+        setInterval(() => {
+            loadOverviewData();
+            loadStockData();
+        }, CONFIG.api.refreshInterval);
+    }
 });
 
 // AI Panel Functions
@@ -114,6 +118,12 @@ function saveNote() {
     };
 
     notes.unshift(note);
+
+    // Keep only configured max notes
+    if (notes.length > CONFIG.overview.widgets.notes.maxNotes) {
+        notes = notes.slice(0, CONFIG.overview.widgets.notes.maxNotes);
+    }
+
     localStorage.setItem('ceoNotes', JSON.stringify(notes));
 
     document.getElementById('quickNotes').value = '';
@@ -127,7 +137,7 @@ function renderNotes() {
         return;
     }
 
-    container.innerHTML = notes.slice(0, 3).map(note => `
+    container.innerHTML = notes.slice(0, CONFIG.overview.widgets.notes.displayNotes).map(note => `
         <div class="bg-white rounded-lg shadow p-3 border border-amber-300">
             <p class="text-sm text-gray-700">${note.text}</p>
             <div class="flex items-center justify-between mt-2">
@@ -243,7 +253,7 @@ function createOverviewCharts(data) {
 // Load Overview Data
 async function loadOverviewData() {
     try {
-        const response = await fetch(`${API_BASE}/api/dashboard/overview`);
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
         const result = await response.json();
         if (!result.success) return;
 
@@ -303,7 +313,7 @@ async function loadOverviewData() {
         `;
 
         // Regional
-        document.getElementById('overview-regional').innerHTML = data.regional.territories.slice(0, 5).map(t => `
+        document.getElementById('overview-regional').innerHTML = data.regional.territories.slice(0, CONFIG.limits.topTerritories).map(t => `
             <div class="flex justify-between text-sm hover:bg-gray-50 p-2 rounded cursor-pointer" onclick="switchTab('regional')">
                 <span class="font-medium">${t.territory_name}</span>
                 <span class="font-bold text-blue-600">${t.orders.toLocaleString()}</span>
@@ -330,7 +340,7 @@ async function loadOverviewData() {
                     <span class="font-bold text-red-600">${data.milestones.projects_delayed}</span>
                 </div>
             </div>
-            ${data.milestones.active_projects.slice(0, 2).map(p => `
+            ${data.milestones.active_projects.slice(0, CONFIG.limits.recentProjects).map(p => `
                 <div class="text-xs p-2 rounded mt-2 ${p.overall_status === 'on_track' ? 'bg-green-50' : p.overall_status === 'at_risk' ? 'bg-orange-50' : 'bg-red-50'}">
                     <div class="flex justify-between mb-1">
                         <span class="font-medium">${p.project_name}</span>
@@ -351,7 +361,7 @@ async function loadOverviewData() {
         if (data.market_intelligence.critical_alerts.length > 0) {
             alerts.push(...data.market_intelligence.critical_alerts.map(alert => `<div class="bg-red-50 border-l-4 border-red-500 rounded p-2 text-xs">${alert}</div>`));
         }
-        document.getElementById('overview-alerts').innerHTML = alerts.length > 0 ? alerts.slice(0, 4).join('') : '<p class="text-gray-600 text-sm">No critical alerts</p>';
+        document.getElementById('overview-alerts').innerHTML = alerts.length > 0 ? alerts.slice(0, CONFIG.limits.criticalAlerts).join('') : '<p class="text-gray-600 text-sm">No critical alerts</p>';
 
         // Operations
         document.getElementById('overview-stats').innerHTML = `
@@ -377,7 +387,7 @@ async function loadOverviewData() {
         `;
 
         // Market Intelligence
-        document.getElementById('overview-market').innerHTML = data.market_intelligence.latest_news.slice(0, 4).map(n => `
+        document.getElementById('overview-market').innerHTML = data.market_intelligence.latest_news.slice(0, CONFIG.limits.marketNews).map(n => `
             <div class="text-sm p-3 rounded border-l-4 ${n.importance === 'high' ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50'}">
                 <p class="font-semibold text-xs mb-1">${n.title}</p>
                 <p class="text-xs text-gray-600">${n.summary}</p>
@@ -386,7 +396,7 @@ async function loadOverviewData() {
         `).join('');
 
         // Competitors
-        document.getElementById('overview-competitors').innerHTML = data.market_intelligence.competitor_updates.slice(0, 4).map(c => `
+        document.getElementById('overview-competitors').innerHTML = data.market_intelligence.competitor_updates.slice(0, CONFIG.limits.competitorUpdates).map(c => `
             <div class="text-sm p-3 rounded border-l-4 ${c.impact_level === 'high' ? 'border-red-500 bg-red-50' : 'border-orange-500 bg-orange-50'}">
                 <p class="font-semibold text-xs mb-1">${c.competitor_name}</p>
                 <p class="text-xs text-gray-700">${c.description}</p>
@@ -402,7 +412,7 @@ async function loadOverviewData() {
 // Load Stock Data
 async function loadStockData() {
     try {
-        const response = await fetch(`${API_BASE}/api/dashboard/tiles/stock`);
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.stock}`);
         const result = await response.json();
         if (result.success) {
             const stock = result.data.current_price;
@@ -513,47 +523,24 @@ async function loadMilestonesData() {
 // ==================== INTERACTIVE METRIC CHARTS ====================
 
 // Store metric data and chart instances for interactive period switching
-let metricData = {
-    orders: null,
-    reimbursement: null,
-    compliance: null,
-    lab: null,
-    costs: null,
-    forecast: null
-};
-
+let metricData = {};
 let metricCharts = {};
-let currentPeriods = {
-    orders: 'day',
-    reimbursement: 'day',
-    compliance: 'day',
-    lab: 'day',
-    costs: 'day',
-    forecast: 'day'
-};
+let currentPeriods = {};
+
+// Initialize from config
+Object.keys(CONFIG.metrics).forEach(metricKey => {
+    metricData[metricKey] = null;
+    currentPeriods[metricKey] = CONFIG.metrics[metricKey].defaultPeriod;
+});
 
 // Generate sample data for different time periods
 function generateMetricData(metric, period) {
-    const periods = {
-        day: { labels: ['12AM', '4AM', '8AM', '12PM', '4PM', '8PM'], count: 6 },
-        week: { labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], count: 7 },
-        month: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], count: 4 },
-        year: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], count: 12 }
-    };
-
+    const periods = CONFIG.charts.periods;
     const config = periods[period];
     const data = [];
 
-    const baseValues = {
-        orders: { day: 1500, week: 35000, month: 250000, year: 1000000 },
-        reimbursement: { day: 97, week: 98, month: 99, year: 98.5 },
-        compliance: { day: 99.2, week: 99.4, month: 99.3, year: 99.5 },
-        lab: { day: 38, week: 39, month: 40, year: 39 },
-        costs: { day: 3500000, week: 24500000, month: 103500000, year: 1242000000 },
-        forecast: { day: 45000, week: 315000, month: 1350000, year: 16200000 }
-    };
-
-    const baseValue = baseValues[metric][period];
+    const metricConfig = CONFIG.metrics[metric];
+    const baseValue = metricConfig.baseValues[period];
 
     for (let i = 0; i < config.count; i++) {
         const variance = (Math.random() - 0.5) * 0.2; // ±10% variance
@@ -569,20 +556,18 @@ function updateMetricPeriod(metric, period) {
 
     // Update button styles
     const buttons = document.querySelectorAll(`[data-metric="${metric}"]`);
+    const metricConfig = CONFIG.metrics[metric];
+
     buttons.forEach(btn => {
         const btnPeriod = btn.getAttribute('data-period');
         if (btnPeriod === period) {
+            // Apply active button style from config
+            btn.style.backgroundColor = metricConfig.bgColor;
+            btn.style.color = metricConfig.textColor;
             btn.className = `period-btn px-2 py-1 text-xs rounded font-semibold`;
-            const colors = {
-                orders: 'bg-blue-100 text-blue-600',
-                reimbursement: 'bg-purple-100 text-purple-600',
-                compliance: 'bg-green-100 text-green-600',
-                lab: 'bg-orange-100 text-orange-600',
-                costs: 'bg-red-100 text-red-600',
-                forecast: 'bg-indigo-100 text-indigo-600'
-            };
-            btn.className += ` ${colors[metric]}`;
         } else {
+            btn.style.backgroundColor = '';
+            btn.style.color = '';
             btn.className = 'period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600';
         }
     });
@@ -600,34 +585,33 @@ function updateMetricPeriod(metric, period) {
 
 // Create all metric charts
 function createMetricCharts() {
-    const chartConfigs = {
-        orders: { color: 'rgba(59, 130, 246', label: 'Orders', format: (v) => (v/1000).toFixed(0) + 'K' },
-        reimbursement: { color: 'rgba(168, 85, 247', label: 'Reimbursement %', format: (v) => v.toFixed(1) + '%' },
-        compliance: { color: 'rgba(34, 197, 94', label: 'Compliance %', format: (v) => v.toFixed(1) + '%' },
-        lab: { color: 'rgba(249, 115, 22', label: 'TAT (hours)', format: (v) => v.toFixed(1) + 'h' },
-        costs: { color: 'rgba(239, 68, 68', label: 'Costs', format: (v) => '$' + (v/1000000).toFixed(1) + 'M' },
-        forecast: { color: 'rgba(99, 102, 241', label: 'Forecast', format: (v) => (v/1000).toFixed(0) + 'K' }
-    };
-
-    Object.keys(chartConfigs).forEach(metric => {
+    Object.keys(CONFIG.metrics).forEach(metric => {
         const canvas = document.getElementById(`chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`);
         if (!canvas) return;
 
-        const config = chartConfigs[metric];
-        const { labels, data } = generateMetricData(metric, 'day');
+        const metricConfig = CONFIG.metrics[metric];
+        const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
+
+        // Convert hex color to rgba
+        const hexToRgba = (hex, alpha = 1) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
 
         metricCharts[metric] = new Chart(canvas.getContext('2d'), {
-            type: 'line',
+            type: metricConfig.chartType,
             data: {
                 labels,
                 datasets: [{
-                    label: config.label,
+                    label: metricConfig.label,
                     data,
-                    borderColor: config.color + ', 1)',
-                    backgroundColor: config.color + ', 0.1)',
-                    tension: 0.4,
+                    borderColor: hexToRgba(metricConfig.color, 1),
+                    backgroundColor: hexToRgba(metricConfig.color, CONFIG.charts.fillOpacity),
+                    tension: CONFIG.charts.tension,
                     fill: true,
-                    borderWidth: 2
+                    borderWidth: CONFIG.charts.borderWidth
                 }]
             },
             options: {
@@ -637,7 +621,7 @@ function createMetricCharts() {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: (context) => config.format(context.parsed.y)
+                            label: (context) => metricConfig.format(context.parsed.y)
                         }
                     }
                 },
@@ -645,7 +629,7 @@ function createMetricCharts() {
                     y: {
                         beginAtZero: metric === 'reimbursement' || metric === 'compliance' ? false : true,
                         ticks: {
-                            callback: config.format
+                            callback: metricConfig.format
                         }
                     },
                     x: {
@@ -695,7 +679,7 @@ async function askReasoning() {
     input.value = '';
 
     try {
-        const response = await fetch(`${API_BASE}/api/query/ask`, {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.aiQuery}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query, context: { page: getCurrentTab() } })
@@ -752,8 +736,10 @@ function saveQuickNote() {
         timestamp: new Date().toLocaleString()
     });
 
-    // Keep only last 10 notes
-    if (notes.length > 10) notes.pop();
+    // Keep only configured max notes
+    if (notes.length > CONFIG.overview.widgets.notes.maxNotes) {
+        notes = notes.slice(0, CONFIG.overview.widgets.notes.maxNotes);
+    }
 
     localStorage.setItem('quickNotes', JSON.stringify(notes));
     input.value = '';
@@ -771,7 +757,7 @@ function renderQuickNotes() {
         return;
     }
 
-    display.innerHTML = notes.slice(0, 3).map(note => `
+    display.innerHTML = notes.slice(0, CONFIG.overview.widgets.notes.displayNotes).map(note => `
         <div class="bg-amber-50 border-l-2 border-amber-500 p-2 rounded">
             <p class="text-gray-800">${note.text}</p>
             <p class="text-gray-400 text-xs mt-1">${note.timestamp}</p>
