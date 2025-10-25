@@ -1,6 +1,6 @@
 from typing import Dict, Any, List
 from langchain_openai import ChatOpenAI
-from config import config
+from app_config import config
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.outputs import ChatGeneration
 

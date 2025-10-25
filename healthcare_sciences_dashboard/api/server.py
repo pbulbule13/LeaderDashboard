@@ -9,7 +9,7 @@ from pathlib import Path
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-from config import config
+from app_config import config
 
 app = FastAPI(
     title='HealthCare Sciences CEO Dashboard API',
