@@ -32,6 +32,6 @@ class MilestonesAgent(BaseAgent):
         }
 
     async def analyze_metric(self, metric_name: str) -> Dict[str, Any]:
-        """Analyze specific metrics"}
+        """Analyze specific metrics"""
         tile_data = await self.get_tile_data()
         return {"metric": metric_name, "data": tile_data}

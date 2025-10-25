@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Sciences - CEO Dashboard V2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tab-active { border-bottom: 3px solid #3B82F6; color: #3B82F6; font-weight: 600; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tile { transition: transform 0.2s; }
+        .tile:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <!-- Header -->
+    <nav class="bg-white shadow-lg border-b-2 border-blue-500 sticky top-0 z-50">
+        <div class="max-w-full mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-xl">HCS</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">CEO Dashboard V2.0</h1>
+                        <p class="text-xs text-gray-600">HealthCare Sciences | October 23, 2025</p>
+                    </div>
+                </div>
+                <div id="stockPrice" class="text-right">
+                    <p class="text-xs text-gray-500">Loading...</p>
+                </div>
+            </div>
+            <div class="flex gap-1 mt-4 border-b overflow-x-auto">
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap">📊 Overview</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">📈 Orders</button>
+                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">✅ Compliance</button>
+                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">💵 Reimbursement</button>
+                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">💰 Costs</button>
+                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">🔬 Lab</button>
+                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">🗺️ Regional</button>
+                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">🔮 Forecast</button>
+                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">📰 Market</button>
+                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap">🎯 Milestones</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-full mx-auto px-6 py-6">
+        <!-- Overview Tab -->
+        <div id="content-overview" class="tab-content fade-in">
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500 tile cursor-pointer" onclick="switchTab('orders')">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">📈 Monthly Orders</h3>
+                    <p id="overview-orders" class="text-3xl font-bold text-gray-800">...</p>
+                    <p id="overview-orders-growth" class="text-sm mt-1">Loading...</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500 tile cursor-pointer" onclick="switchTab('compliance')">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">✅ Compliance Rate</h3>
+                    <p id="overview-compliance" class="text-3xl font-bold text-gray-800">...</p>
+                    <p id="overview-compliance-returns" class="text-sm mt-1">Loading...</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500 tile cursor-pointer" onclick="switchTab('reimbursement')">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">💵 Reimbursement</h3>
+                    <p id="overview-reimbursement" class="text-3xl font-bold text-gray-800">...</p>
+                    <p id="overview-reimbursement-claims" class="text-sm mt-1">Loading...</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500 tile cursor-pointer" onclick="switchTab('lab')">
+                    <h3 class="text-sm font-semibold text-gray-600 mb-2">🔬 Lab Turnaround</h3>
+                    <p id="overview-lab" class="text-3xl font-bold text-gray-800">...</p>
+                    <p id="overview-lab-target" class="text-sm mt-1">Loading...</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Quick Stats</h3>
+                    <div id="overview-stats" class="space-y-3">
+                        <p class="text-gray-600">Loading dashboard data...</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Regional Performance</h3>
+                    <div id="overview-regional" class="space-y-2">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🚨 Alerts & Actions</h3>
+                    <div id="overview-alerts" class="space-y-2">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Volume Tab -->
+        <div id="content-orders" class="tab-content hidden fade-in">
+            <div id="orders-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading order volume data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance Tab -->
+        <div id="content-compliance" class="tab-content hidden fade-in">
+            <div id="compliance-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading compliance data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reimbursement Tab -->
+        <div id="content-reimbursement" class="tab-content hidden fade-in">
+            <div id="reimbursement-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading reimbursement data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operating Costs Tab -->
+        <div id="content-costs" class="tab-content hidden fade-in">
+            <div id="costs-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading costs data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Metrics Tab -->
+        <div id="content-lab" class="tab-content hidden fade-in">
+            <div id="lab-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading lab metrics...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Tab -->
+        <div id="content-regional" class="tab-content hidden fade-in">
+            <div id="regional-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading regional data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecasting Tab -->
+        <div id="content-forecasting" class="tab-content hidden fade-in">
+            <div id="forecasting-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading forecast data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Intelligence Tab -->
+        <div id="content-market" class="tab-content hidden fade-in">
+            <div id="market-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading market intelligence...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Milestones Tab -->
+        <div id="content-milestones" class="tab-content hidden fade-in">
+            <div id="milestones-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading project milestones...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Remove active from all tabs
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
+            // Show selected content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            // Activate tab
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+
+            // Load data based on tab
+            if (tabName === 'orders') loadOrdersData();
+            else if (tabName === 'compliance') loadComplianceData();
+            else if (tabName === 'reimbursement') loadReimbursementData();
+            else if (tabName === 'costs') loadCostsData();
+            else if (tabName === 'lab') loadLabData();
+            else if (tabName === 'regional') loadRegionalData();
+            else if (tabName === 'forecasting') loadForecastingData();
+            else if (tabName === 'market') loadMarketData();
+            else if (tabName === 'milestones') loadMilestonesData();
+        }
+
+        async function loadOverviewData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/overview`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+
+                // Update quick stats
+                document.getElementById('overview-orders').textContent = data.order_volume.monthly_orders.toLocaleString();
+                document.getElementById('overview-orders-growth').textContent = `↑ ${data.order_volume.growth_metrics.mom}% MoM`;
+                document.getElementById('overview-orders-growth').className = `text-sm mt-1 ${data.order_volume.growth_metrics.mom >= 0 ? 'text-green-600' : 'text-red-600'}`;
+
+                document.getElementById('overview-compliance').textContent = `${(100 - data.compliance.overall_return_rate).toFixed(1)}%`;
+                document.getElementById('overview-compliance-returns').textContent = `${data.compliance.total_returns} returns`;
+                document.getElementById('overview-compliance-returns').className = 'text-sm mt-1 text-orange-600';
+
+                document.getElementById('overview-reimbursement').textContent = `${data.reimbursement.reimbursement_percentage.toFixed(1)}%`;
+                document.getElementById('overview-reimbursement-claims').textContent = `${data.reimbursement.claims_reimbursed.toLocaleString()} approved`;
+                document.getElementById('overview-reimbursement-claims').className = 'text-sm mt-1 text-green-600';
+
+                document.getElementById('overview-lab').textContent = `${data.lab_metrics.average_turnaround_hours.toFixed(1)}h`;
+                document.getElementById('overview-lab-target').textContent = `Target: ${data.lab_metrics.target_turnaround_hours}h`;
+                document.getElementById('overview-lab-target').className = `text-sm mt-1 ${data.lab_metrics.average_turnaround_hours <= data.lab_metrics.target_turnaround_hours ? 'text-green-600' : 'text-orange-600'}`;
+
+                // Update stats section
+                document.getElementById('overview-stats').innerHTML = `
+                    <div class="flex justify-between"><span class="text-gray-600">Operating Costs:</span><span class="font-bold">$${(data.operating_costs.total_operating_costs / 1000000).toFixed(1)}M</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Forecasting - Next Qtr:</span><span class="font-bold">${(data.forecasting.next_quarter_orders / 1000).toFixed(0)}K orders</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Active Projects:</span><span class="font-bold">${data.milestones.total_projects}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Projects On Track:</span><span class="font-bold text-green-600">${data.milestones.projects_on_track}</span></div>
+                `;
+
+                // Update regional section
+                document.getElementById('overview-regional').innerHTML = data.regional.territories.slice(0, 5).map(t => `
+                    <div class="flex justify-between text-sm">
+                        <span>${t.territory_name}</span>
+                        <span class="font-bold text-blue-600">${t.orders.toLocaleString()}</span>
+                    </div>
+                `).join('');
+
+                // Update alerts
+                const alerts = [];
+                if (data.milestones.critical_items.length > 0) {
+                    alerts.push(...data.milestones.critical_items.map(item => `<div class="bg-orange-50 border-l-4 border-orange-500 rounded p-2 text-sm">${item}</div>`));
+                }
+                if (data.market_intelligence.critical_alerts.length > 0) {
+                    alerts.push(...data.market_intelligence.critical_alerts.map(alert => `<div class="bg-red-50 border-l-4 border-red-500 rounded p-2 text-sm">${alert}</div>`));
+                }
+                document.getElementById('overview-alerts').innerHTML = alerts.length > 0 ? alerts.join('') : '<p class="text-gray-600 text-sm">No critical alerts</p>';
+
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        async function loadOrdersData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/order-volume`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('orders-content').innerHTML = `
+                    <div class="grid grid-cols-5 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Daily Orders</h4>
+                            <p class="text-3xl font-bold text-blue-600">${data.daily_orders.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">↑ ${data.growth_metrics.dod}% DoD</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Weekly Orders</h4>
+                            <p class="text-3xl font-bold text-indigo-600">${data.weekly_orders.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">↑ ${data.growth_metrics.wow}% WoW</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Monthly Orders</h4>
+                            <p class="text-3xl font-bold text-purple-600">${data.monthly_orders.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">↑ ${data.growth_metrics.mom}% MoM</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Quarterly Orders</h4>
+                            <p class="text-3xl font-bold text-pink-600">${data.quarterly_orders.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">↑ ${data.growth_metrics.qoq}% QoQ</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Yearly Orders</h4>
+                            <p class="text-3xl font-bold text-red-600">${data.yearly_orders.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">↑ ${data.growth_metrics.yoy}% YoY</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Product Line Breakdown</h3>
+                            ${data.product_lines.map(p => `
+                                <div class="mb-3">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="font-semibold">${p.product_line}</span>
+                                        <span>${p.orders.toLocaleString()} (${p.percentage}%)</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${p.percentage}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Trend Data</h3>
+                            <div class="space-y-2">
+                                ${data.trend_data.map(t => `
+                                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded">
+                                        <span class="font-semibold">${t.period}</span>
+                                        <div class="text-right">
+                                            <span class="font-bold">${t.count.toLocaleString()}</span>
+                                            <span class="text-sm text-green-600 ml-2">↑${t.growth}%</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('orders-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadComplianceData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/compliance`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('compliance-content').innerHTML = `
+                    <div class="grid grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Total Returns</h4>
+                            <p class="text-4xl font-bold text-orange-600">${data.total_returns.toLocaleString()}</p>
+                            <p class="text-sm text-gray-600 mt-2">Out of ${data.total_orders.toLocaleString()} orders</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Return Rate</h4>
+                            <p class="text-4xl font-bold text-blue-600">${data.overall_return_rate.toFixed(2)}%</p>
+                            <p class="text-sm text-green-600 mt-2">Target: < 1%</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Compliance Score</h4>
+                            <p class="text-4xl font-bold text-green-600">${data.compliance_score}%</p>
+                            <p class="text-sm text-gray-600 mt-2">Excellent</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Returns by Product</h3>
+                            ${data.product_returns.map(p => `
+                                <div class="mb-4">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="font-semibold">${p.product_name}</span>
+                                        <span class="text-orange-600">${p.return_rate.toFixed(2)}%</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>${p.kits_returned} returns</span>
+                                        <span>${p.total_orders.toLocaleString()} total</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Return Reasons</h3>
+                            ${data.return_reasons.map(r => `
+                                <div class="mb-3">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>${r.reason}</span>
+                                        <span class="font-semibold">${r.percentage.toFixed(1)}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-orange-500 h-2 rounded-full" style="width: ${r.percentage}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('compliance-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadReimbursementData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/reimbursement`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('reimbursement-content').innerHTML = `
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Claims Submitted</h4>
+                            <p class="text-3xl font-bold text-blue-600">${data.claims_submitted.toLocaleString()}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Reimbursed</h4>
+                            <p class="text-3xl font-bold text-green-600">${data.claims_reimbursed.toLocaleString()}</p>
+                            <p class="text-sm text-green-600">${data.reimbursement_percentage.toFixed(1)}%</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Rejected</h4>
+                            <p class="text-3xl font-bold text-red-600">${data.claims_rejected.toLocaleString()}</p>
+                            <p class="text-sm text-red-600">${data.rejection_percentage.toFixed(1)}%</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Avg Processing</h4>
+                            <p class="text-3xl font-bold text-purple-600">${data.average_reimbursement_time_days}</p>
+                            <p class="text-sm text-gray-600">days</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Rejection Reasons</h3>
+                            ${data.rejection_reasons.map(r => `
+                                <div class="bg-red-50 border-l-4 border-red-500 rounded p-3 mb-2">
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold text-sm">${r.reason}</span>
+                                        <span class="text-red-600 font-bold">${r.count.toLocaleString()}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-600 mt-1">${r.percentage.toFixed(1)}% of rejections</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Trending Issues</h3>
+                            ${data.trending_issues.map(issue => `
+                                <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded p-3 mb-2">
+                                    <p class="text-sm font-semibold">${issue}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('reimbursement-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadCostsData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/operating-costs`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('costs-content').innerHTML = `
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Total Operating Costs</h4>
+                            <p class="text-3xl font-bold text-gray-800">$${(data.total_operating_costs / 1000000).toFixed(1)}M</p>
+                            <p class="text-sm text-gray-600">${data.period}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">AWS/Cloud</h4>
+                            <p class="text-3xl font-bold text-blue-600">$${(data.aws_cloud_costs / 1000000).toFixed(1)}M</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Salaries</h4>
+                            <p class="text-3xl font-bold text-green-600">$${(data.salary_expenses / 1000000).toFixed(1)}M</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Lab/Facility</h4>
+                            <p class="text-3xl font-bold text-purple-600">$${(data.lab_facility_costs / 1000000).toFixed(1)}M</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Cost Breakdown</h3>
+                            ${data.cost_breakdown.map(c => `
+                                <div class="mb-3">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="font-semibold">${c.category}</span>
+                                        <span>$${(c.amount / 1000000).toFixed(1)}M (${c.percentage.toFixed(1)}%)</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${c.percentage}%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Trend: ${c.trend}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Monthly Trend</h3>
+                            <div class="space-y-2">
+                                ${data.monthly_trend.map(m => `
+                                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded">
+                                        <span class="text-sm font-semibold">${m.month}</span>
+                                        <div class="text-right">
+                                            <span class="font-bold">$${(m.total_cost / 1000000).toFixed(1)}M</span>
+                                            <span class="text-xs ${m.change_percentage >= 0 ? 'text-red-600' : 'text-green-600'} ml-2">
+                                                ${m.change_percentage >= 0 ? '↑' : '↓'}${Math.abs(m.change_percentage).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('costs-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadLabData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/lab-metrics`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('lab-content').innerHTML = `
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Monthly Volume</h4>
+                            <p class="text-3xl font-bold text-blue-600">${data.monthly_processing_volume.toLocaleString()}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Avg Turnaround</h4>
+                            <p class="text-3xl font-bold text-green-600">${data.average_turnaround_hours.toFixed(1)}h</p>
+                            <p class="text-sm text-gray-600">Target: ${data.target_turnaround_hours}h</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Efficiency Score</h4>
+                            <p class="text-3xl font-bold text-purple-600">${data.efficiency_score}%</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Capacity Used</h4>
+                            <p class="text-3xl font-bold text-orange-600">${data.lab_capacity.utilization_percentage.toFixed(1)}%</p>
+                            <p class="text-sm text-gray-600">${data.lab_capacity.current_utilization.toLocaleString()} / ${data.lab_capacity.total_capacity.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Turnaround Time by Product</h3>
+                            ${data.turnaround_by_product.map(p => `
+                                <div class="mb-3 p-3 rounded ${p.performance === 'ahead' ? 'bg-green-50' : 'bg-gray-50'}">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="font-semibold">${p.product}</span>
+                                        <span class="text-sm ${p.performance === 'ahead' ? 'text-green-600' : 'text-gray-600'}">${p.performance}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>Average: ${p.average_hours.toFixed(1)}h</span>
+                                        <span>Target: ${p.target_hours}h</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Quality Metrics</h3>
+                            ${data.quality_metrics.map(q => `
+                                <div class="mb-3 p-3 rounded ${q.status === 'pass' ? 'bg-green-50' : 'bg-red-50'}">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="font-semibold text-sm">${q.metric_name}</span>
+                                        <span class="text-sm ${q.status === 'pass' ? 'text-green-600' : 'text-red-600'}">${q.status.toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-600">
+                                        <span>Value: ${q.value}%</span>
+                                        <span>Target: ${q.target}%</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div class="mt-4 p-3 bg-blue-50 rounded">
+                                <p class="text-sm font-semibold">Error Rate</p>
+                                <p class="text-2xl font-bold text-blue-600">${data.error_rate}%</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('lab-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadRegionalData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/regional`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('regional-content').innerHTML = `
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Top Performing Territories</h3>
+                        <div class="space-y-3">
+                            ${data.territories.map((t, idx) => `
+                                <div class="flex items-center justify-between p-3 rounded ${idx < 3 ? 'bg-green-50' : 'bg-gray-50'}">
+                                    <div>
+                                        <span class="font-bold text-lg">#${t.rank}</span>
+                                        <span class="font-semibold ml-3">${t.territory_name}</span>
+                                        <span class="text-sm text-gray-600 ml-2">(${t.region})</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-blue-600">${t.orders.toLocaleString()} orders</p>
+                                        <p class="text-sm text-green-600">↑ ${t.growth_rate}% growth</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Regional Summary</h3>
+                            ${data.regional_summary.map(r => `
+                                <div class="mb-3 p-3 bg-gray-50 rounded">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="font-semibold">${r.region}</span>
+                                        <span class="text-blue-600 font-bold">${r.total_orders.toLocaleString()}</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>${r.territories_count} territories</span>
+                                        <span class="text-green-600">↑ ${r.average_growth}%</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Performance Overview</h3>
+                            <div class="space-y-3">
+                                <div class="p-3 bg-green-50 rounded">
+                                    <p class="text-sm text-gray-600">Top Territory</p>
+                                    <p class="text-xl font-bold text-green-600">${data.top_performing_territory}</p>
+                                </div>
+                                <div class="p-3 bg-orange-50 rounded">
+                                    <p class="text-sm text-gray-600">Needs Attention</p>
+                                    <p class="text-xl font-bold text-orange-600">${data.lowest_performing_territory}</p>
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded">
+                                    <p class="text-sm text-gray-600">Total Territories</p>
+                                    <p class="text-xl font-bold text-blue-600">${data.total_territories}</p>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded">
+                                    <p class="text-sm text-gray-600">Coverage</p>
+                                    <p class="text-xl font-bold text-purple-600">${data.coverage_percentage}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('regional-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadForecastingData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/forecasting`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('forecasting-content').innerHTML = `
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Next Quarter Forecast</h4>
+                            <p class="text-4xl font-bold text-blue-600">${(data.next_quarter_orders / 1000).toFixed(0)}K</p>
+                            <p class="text-sm text-gray-600">orders | $${(data.next_quarter_revenue / 1000000).toFixed(1)}M revenue</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Next Year Forecast</h4>
+                            <p class="text-4xl font-bold text-purple-600">${(data.next_year_orders / 1000000).toFixed(1)}M</p>
+                            <p class="text-sm text-gray-600">orders | $${(data.next_year_revenue / 1000000).toFixed(0)}M revenue</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Quarterly Forecasts</h3>
+                            ${data.quarterly_forecasts.map(q => `
+                                <div class="mb-4 p-3 bg-gray-50 rounded">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="font-semibold">${q.period}</span>
+                                        <span class="font-bold text-blue-600">${(q.projected_orders / 1000).toFixed(0)}K</span>
+                                    </div>
+                                    <div class="text-sm text-gray-600">
+                                        <p>Revenue: $${(q.projected_revenue / 1000000).toFixed(1)}M</p>
+                                        <p class="text-xs mt-1">Confidence: ${q.confidence_level}% (${(q.confidence_low / 1000000).toFixed(0)}M - ${(q.confidence_high / 1000000).toFixed(0)}M)</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Product Forecasts</h3>
+                            ${data.product_forecasts.map(p => `
+                                <div class="mb-3 p-3 bg-blue-50 rounded">
+                                    <div class="flex justify-between mb-1">
+                                        <span class="font-semibold">${p.product_name}</span>
+                                        <span class="text-green-600 text-sm">↑ ${p.growth_projection}%</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>${(p.projected_orders / 1000).toFixed(0)}K orders</span>
+                                        <span>$${(p.projected_revenue / 1000000).toFixed(1)}M</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <div class="mt-4 p-3 bg-yellow-50 rounded">
+                                <p class="text-xs font-semibold mb-2">Key Assumptions:</p>
+                                ${data.assumptions.map(a => `<p class="text-xs text-gray-700">• ${a}</p>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('forecasting-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadMarketData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/market-intelligence`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('market-content').innerHTML = `
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Total News Items</h4>
+                            <p class="text-4xl font-bold text-blue-600">${data.total_news_items}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">High Priority</h4>
+                            <p class="text-4xl font-bold text-orange-600">${data.high_priority_items}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Action Items</h4>
+                            <p class="text-4xl font-bold text-red-600">${data.action_items}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Latest News</h3>
+                            ${data.latest_news.map(n => `
+                                <div class="mb-3 p-3 rounded border-l-4 ${n.importance === 'high' ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50'}">
+                                    <p class="font-semibold text-sm">${n.title}</p>
+                                    <p class="text-xs text-gray-600 mt-1">${n.summary}</p>
+                                    <div class="flex justify-between mt-2 text-xs">
+                                        <span class="text-gray-500">${n.source} | ${n.date}</span>
+                                        <span class="font-semibold ${n.importance === 'high' ? 'text-red-600' : 'text-blue-600'}">${n.category.toUpperCase()}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">Competitor Updates</h3>
+                                ${data.competitor_updates.map(c => `
+                                    <div class="mb-2 p-3 bg-orange-50 border-l-4 border-orange-500 rounded">
+                                        <p class="font-semibold text-sm">${c.competitor_name}</p>
+                                        <p class="text-xs text-gray-700 mt-1">${c.description}</p>
+                                        <p class="text-xs text-gray-500 mt-1">${c.update_type} | Impact: ${c.impact_level}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">Critical Alerts</h3>
+                                ${data.critical_alerts.map(alert => `
+                                    <div class="bg-red-50 border-l-4 border-red-500 rounded p-3 mb-2">
+                                        <p class="text-sm font-semibold text-red-800">${alert}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('market-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadMilestonesData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/milestones`);
+                const result = await response.json();
+                if (!result.success) return;
+
+                const data = result.data;
+                document.getElementById('milestones-content').innerHTML = `
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Total Projects</h4>
+                            <p class="text-4xl font-bold text-blue-600">${data.total_projects}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">On Track</h4>
+                            <p class="text-4xl font-bold text-green-600">${data.projects_on_track}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">At Risk</h4>
+                            <p class="text-4xl font-bold text-yellow-600">${data.projects_at_risk}</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h4 class="text-sm text-gray-600">Delayed</h4>
+                            <p class="text-4xl font-bold text-red-600">${data.projects_delayed}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Active Projects</h3>
+                            ${data.active_projects.map(p => `
+                                <div class="mb-4 p-4 rounded border-l-4 ${p.overall_status === 'on_track' ? 'border-green-500 bg-green-50' : p.overall_status === 'at_risk' ? 'border-yellow-500 bg-yellow-50' : 'border-red-500 bg-red-50'}">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="font-bold">${p.project_name}</span>
+                                        <span class="text-xs px-2 py-1 rounded ${p.overall_status === 'on_track' ? 'bg-green-200 text-green-800' : p.overall_status === 'at_risk' ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800'}">${p.overall_status.replace('_', ' ').toUpperCase()}</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span>Progress</span>
+                                            <span class="font-semibold">${p.completion_percentage}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="${p.overall_status === 'on_track' ? 'bg-green-500' : p.overall_status === 'at_risk' ? 'bg-yellow-500' : 'bg-red-500'} h-2 rounded-full" style="width: ${p.completion_percentage}%"></div>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-600">Category: ${p.category} | Risk: ${p.risk_level}</p>
+                                    ${p.next_milestone ? `<p class="text-xs text-blue-600 mt-1">Next: ${p.next_milestone}</p>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">FDA Submissions</h3>
+                                ${data.fda_submissions.map(f => `
+                                    <div class="mb-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                                        <p class="font-semibold text-sm">${f.project_name}</p>
+                                        <p class="text-xs text-gray-600 mt-1">${f.completion_percentage}% complete</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="bg-white rounded-xl shadow-lg p-6">
+                                <h3 class="text-xl font-bold text-gray-800 mb-4">Critical Items</h3>
+                                ${data.critical_items.map(item => `
+                                    <div class="bg-orange-50 border-l-4 border-orange-500 rounded p-3 mb-2">
+                                        <p class="text-sm font-semibold">${item}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('milestones-content').innerHTML = '<p class="text-center text-red-600">Error loading data</p>';
+            }
+        }
+
+        async function loadStockData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/tiles/stock`);
+                const result = await response.json();
+                if (result.success) {
+                    const stock = result.data.current_price;
+                    document.getElementById('stockPrice').innerHTML = `
+                        <p class="text-xs text-gray-500">HCS Stock</p>
+                        <p class="text-xl font-bold ${stock.change >= 0 ? 'text-green-600' : 'text-red-600'}">$${stock.price}</p>
+                        <p class="text-xs ${stock.change >= 0 ? 'text-green-600' : 'text-red-600'}">${stock.change >= 0 ? '↑' : '↓'} ${stock.change_percentage}%</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading stock data:', error);
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            switchTab('overview');
+            loadOverviewData();
+            loadStockData();
+            // Refresh data every 5 minutes
+            setInterval(() => {
+                loadOverviewData();
+                loadStockData();
+            }, 300000);
+        });
+    </script>
+</body>
+</html>

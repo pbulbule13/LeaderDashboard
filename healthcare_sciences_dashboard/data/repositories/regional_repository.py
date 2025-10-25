@@ -11,6 +11,13 @@ class RegionalRepository:
             TerritoryPerformance(territory_name="Texas", region="Southwest", orders=95000, revenue=26800000, growth_rate=22.1, market_share=9.3, rank=3),
             TerritoryPerformance(territory_name="Florida", region="Southeast", orders=87000, revenue=24200000, growth_rate=14.5, market_share=8.5, rank=4),
             TerritoryPerformance(territory_name="Illinois", region="Midwest", orders=72000, revenue=19800000, growth_rate=9.2, market_share=7.1, rank=5),
+            TerritoryPerformance(territory_name="Pennsylvania", region="Northeast", orders=68000, revenue=18700000, growth_rate=11.8, market_share=6.7, rank=6),
+            TerritoryPerformance(territory_name="Ohio", region="Midwest", orders=64000, revenue=17600000, growth_rate=13.2, market_share=6.3, rank=7),
+            TerritoryPerformance(territory_name="Georgia", region="Southeast", orders=59000, revenue=16200000, growth_rate=16.5, market_share=5.8, rank=8),
+            TerritoryPerformance(territory_name="North Carolina", region="Southeast", orders=54000, revenue=14800000, growth_rate=19.3, market_share=5.3, rank=9),
+            TerritoryPerformance(territory_name="Michigan", region="Midwest", orders=51000, revenue=14000000, growth_rate=8.7, market_share=5.0, rank=10),
+            TerritoryPerformance(territory_name="New Jersey", region="Northeast", orders=49000, revenue=13500000, growth_rate=12.4, market_share=4.8, rank=11),
+            TerritoryPerformance(territory_name="Arizona", region="Southwest", orders=46000, revenue=12600000, growth_rate=24.1, market_share=4.5, rank=12),
         ]
 
         regional_summary = [

@@ -13,12 +13,14 @@ class StockAgent(BaseAgent):
     async def get_tile_data(self) -> Dict[str, Any]:
         '''Get stock metrics'''
         metrics = await self.repository.get_stock_metrics()
-        
+
         return {
             'symbol': metrics.symbol,
-            'current_price': metrics.current_price,
-            'change': metrics.change,
-            'change_percent': metrics.change_percent,
+            'current_price': {
+                'price': metrics.current_price,
+                'change': metrics.change,
+                'change_percentage': metrics.change_percent
+            },
             'market_cap': metrics.market_cap,
             'day_high': metrics.day_high,
             'day_low': metrics.day_low,
@@ -52,13 +54,14 @@ class StockAgent(BaseAgent):
     async def analyze_metric(self, metric_name: str) -> Dict[str, Any]:
         '''Analyze stock metrics'''
         tile_data = await self.get_tile_data()
-        
+
         if metric_name == 'performance':
+            current_price = tile_data['current_price']
             return {
                 'metric': 'daily_performance',
-                'change': tile_data['change'],
-                'change_percent': tile_data['change_percent'],
-                'status': 'up' if tile_data['change'] > 0 else 'down'
+                'change': current_price['change'],
+                'change_percent': current_price['change_percentage'],
+                'status': 'up' if current_price['change'] > 0 else 'down'
             }
-        
+
         return {}

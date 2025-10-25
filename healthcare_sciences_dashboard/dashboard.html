@@ -3,427 +3,805 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthCare Sciences - CEO Dashboard</title>
+    <title>HealthCare Sciences - Executive Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        .tile-hover {
-            transition: all 0.3s ease;
-        }
-        .tile-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-        }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .chat-message {
-            animation: fadeIn 0.3s ease-out;
-        }
+        .tab-active { border-bottom: 3px solid #2563EB; color: #2563EB; font-weight: 600; background: #EFF6FF; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .tile { transition: all 0.3s ease; }
+        .tile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.2); }
+        .chart-container { position: relative; height: 300px; }
+        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
+        .email-item:hover { background: #F0F9FF; }
+        .calendar-event { border-left: 4px solid #2563EB; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-white to-slate-50 min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-6 py-4">
+    <nav class="bg-white shadow-md border-b border-blue-200 sticky top-0 z-50">
+        <div class="max-w-full mx-auto px-6 py-3">
             <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-slate-800">HealthCare Sciences</h1>
-                    <p class="text-sm text-slate-600">CEO Executive Dashboard</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow">
+                        <span class="text-white font-bold text-xl">HCS</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Executive Command Center</h1>
+                        <p class="text-xs text-gray-500">HealthCare Sciences | <span id="currentDate"></span></p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="text-right">
-                        <p class="text-xs text-slate-500">HCS Stock</p>
-                        <p class="text-xl font-bold text-green-600">$62.45</p>
-                        <p class="text-xs text-green-600">+2.01%</p>
+                    <div id="stockPrice" class="text-right bg-blue-50 px-4 py-2 rounded-lg">
+                        <p class="text-xs text-gray-600">Loading...</p>
                     </div>
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
-                        CEO
-                    </div>
+                    <button onclick="toggleAIPanel()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition text-sm font-semibold">
+                        🤖 AI Assistant
+                    </button>
                 </div>
             </div>
+            <div class="flex gap-1 mt-4 border-b overflow-x-auto">
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">📊 Dashboard</button>
+                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📧 Email</button>
+                <button onclick="switchTab('calendar')" id="tab-calendar" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📅 Calendar</button>
+                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💼 Personal</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📈 Orders</button>
+                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">✅ Compliance</button>
+                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💵 Reimbursement</button>
+                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💰 Costs</button>
+                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔬 Lab</button>
+                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🗺️ Regional</button>
+                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔮 Forecast</button>
+                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📰 Market</button>
+                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🎯 Projects</button>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <div class="max-w-7xl mx-auto px-6 py-6">
-        <!-- AI Assistant & Metrics Grid -->
-        <div class="grid grid-cols-3 gap-6 mb-6">
-            <!-- AI Assistant Sidebar -->
-            <div class="col-span-1">
-                <div class="gradient-bg rounded-xl shadow-lg p-6 text-white">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+    <!-- AI Assistant Sidebar -->
+    <div id="aiPanel" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200">
+        <div class="h-full flex flex-col">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 flex justify-between items-center">
+                <h2 class="text-xl font-bold">AI Executive Assistant</h2>
+                <button onclick="toggleAIPanel()" class="text-white hover:bg-white/20 rounded p-1">✕</button>
+            </div>
+            <div id="aiChatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+                <div class="text-center text-gray-500 text-sm">
+                    <p class="mb-2">👋 Hello! I'm your AI Executive Assistant.</p>
+                    <p>I can help you with emails, schedule, analytics, and strategic insights.</p>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-white">
+                <div class="flex gap-2 mb-3 flex-wrap">
+                    <button onclick="askQuick('Summarize my unread emails')" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-100">📧 Emails</button>
+                    <button onclick="askQuick('What meetings do I have today?')" class="text-xs bg-green-50 text-green-600 px-3 py-1 rounded-full hover:bg-green-100">📅 Schedule</button>
+                    <button onclick="askQuick('Top priorities for today')" class="text-xs bg-purple-50 text-purple-600 px-3 py-1 rounded-full hover:bg-purple-100">🎯 Priorities</button>
+                    <button onclick="askQuick('What needs my attention?')" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full hover:bg-red-100">⚠️ Alerts</button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="aiQueryInput" placeholder="Ask me anything..."
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        onkeypress="if(event.key==='Enter') askAI()">
+                    <button onclick="askAI()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                         </svg>
-                        <h2 class="text-lg font-semibold">AI Assistant</h2>
-                    </div>
-                    
-                    <div id="chatMessages" class="bg-white/20 backdrop-blur rounded-lg p-3 mb-3 h-64 overflow-y-auto">
-                        <p class="text-white/70 text-xs">Ask me anything about your dashboard...</p>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <input 
-                            type="text" 
-                            id="queryInput"
-                            placeholder="e.g., How is Cologuard performing?"
-                            class="flex-1 px-3 py-2 text-sm rounded-lg text-slate-800 border-0 focus:ring-2 focus:ring-blue-300"
-                        />
-                        <button 
-                            onclick="askQuestion()"
-                            class="bg-white text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="mt-4 space-y-2">
-                        <div class="bg-white/20 rounded-lg p-3">
-                            <div class="flex items-center text-xs mb-1">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="font-semibold">Next Meeting</span>
-                            </div>
-                            <p class="text-xs">FDA Pre-submission - 11:00 AM</p>
-                        </div>
-                        <div class="bg-white/20 rounded-lg p-3">
-                            <div class="flex items-center text-xs mb-1">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="font-semibold">Urgent Email</span>
-                            </div>
-                            <p class="text-xs">FDA Response Required (4h)</p>
-                        </div>
-                    </div>
+                    </button>
                 </div>
-            </div>
-
-            <!-- Metric Selection -->
-            <div class="col-span-2">
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h2 class="text-xl font-bold text-slate-800 mb-4">Dashboard Metrics</h2>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="loadTile('products')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-blue-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Products & Orders</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Real-time orders and returns</p>
-                                </div>
-                            </div>
-                        </button>
-
-                        <button onclick="loadTile('revenue')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-green-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Revenue Performance</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Actual vs projected revenue</p>
-                                </div>
-                            </div>
-                        </button>
-
-                        <button onclick="loadTile('budget')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-purple-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Budget Analysis</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Current & next quarter budget</p>
-                                </div>
-                            </div>
-                        </button>
-
-                        <button onclick="loadTile('support')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-orange-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Support Operations</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Tickets and resolution times</p>
-                                </div>
-                            </div>
-                        </button>
-
-                        <button onclick="loadTile('workforce')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-indigo-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Workforce Insights</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Headcount and vacancies</p>
-                                </div>
-                            </div>
-                        </button>
-
-                        <button onclick="loadTile('stock')" class="tile-hover p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-500 text-left transition">
-                            <div class="flex items-start gap-3">
-                                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                </svg>
-                                <div>
-                                    <h3 class="font-semibold text-slate-800">Stock Performance</h3>
-                                    <p class="text-xs text-slate-600 mt-1">Real-time HCS stock data</p>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dynamic Tile Display -->
-        <div id="tileDisplay" class="fade-in">
-            <div class="bg-white rounded-xl shadow-md p-6 text-center text-slate-500">
-                <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                <p class="text-lg font-medium">Select a metric to view detailed data</p>
-                <p class="text-sm mt-2">Click on any tile above to see live dashboard data</p>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_BASE = 'http://localhost:8000';
+    <!-- AI Reasoning Widget - Fixed across all pages -->
+    <div id="aiReasoningWidget" class="fixed right-4 bottom-4 w-96 z-40">
+        <div class="bg-white border-2 border-purple-300 rounded-xl shadow-2xl">
+            <div class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-4 py-3 rounded-t-xl font-bold flex justify-between items-center">
+                <span>🧠 AI Analytics & Reasoning</span>
+                <button onclick="toggleReasoningWidget()" class="text-white hover:bg-white/20 rounded px-2">−</button>
+            </div>
+            <div id="reasoningContent" class="p-4 max-h-96 overflow-y-auto">
+                <p class="text-xs text-gray-600 mb-3">Ask me to analyze any chart, data point, or business metric visible on this page.</p>
+                <div class="flex gap-2 mb-3 flex-wrap">
+                    <button onclick="analyzeCurrentPage()" class="text-xs bg-purple-50 text-purple-600 px-3 py-1 rounded-full hover:bg-purple-100">📊 Analyze This Page</button>
+                    <button onclick="askQuick('Compare trends across metrics')" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full hover:bg-indigo-100">📈 Compare Trends</button>
+                    <button onclick="askQuick('What needs attention?')" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full hover:bg-red-100">⚠️ Alerts</button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="reasoningInput" placeholder="Ask about this data..."
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        onkeypress="if(event.key==='Enter') askReasoning()">
+                    <button onclick="askReasoning()" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
+                        →
+                    </button>
+                </div>
+                <div id="reasoningMessages" class="mt-3 space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
 
-        // Load tile data
-        async function loadTile(tileName) {
-            const display = document.getElementById('tileDisplay');
-            display.innerHTML = '<div class="bg-white rounded-xl shadow-md p-6 text-center"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div><p class="mt-4 text-slate-600">Loading data...</p></div>';
+    <!-- Quick Notes Sidebar -->
+    <div class="fixed left-4 bottom-4 w-80 z-40 hidden">
+        <div class="bg-white border-2 border-amber-300 rounded-xl shadow-lg">
+            <div class="bg-amber-100 text-amber-900 px-4 py-2 rounded-t-xl font-semibold flex justify-between items-center border-b border-amber-300">
+                <span>📝 Quick Notes</span>
+                <button onclick="viewAllNotes()" class="text-xs hover:underline">View All</button>
+            </div>
+            <div class="p-3">
+                <textarea id="quickNotes" placeholder="Type your note here..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:ring-2 focus:ring-amber-400" rows="3"></textarea>
+                <button onclick="saveNote()" class="mt-2 w-full bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-lg text-sm font-semibold transition shadow-sm">
+                    Save Note
+                </button>
+                <div id="savedNotes" class="mt-3 space-y-2 max-h-40 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
 
-            try {
-                const response = await fetch(`${API_BASE}/api/dashboard/tiles/${tileName}`);
-                const result = await response.json();
+    <div class="max-w-full mx-auto px-6 py-6 pb-32">
+        <!-- Dashboard Tab -->
+        <div id="content-overview" class="tab-content fade-in">
+            <!-- Interactive KPI Charts with Time Period Toggles -->
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <!-- Orders Chart -->
+                <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">📈 Orders</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('orders', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartOrders"></canvas></div>
+                </div>
 
-                if (result.success) {
-                    renderTile(tileName, result.data);
-                } else {
-                    showError('Failed to load tile data');
-                }
-            } catch (error) {
-                showError(`Error: ${error.message}. Make sure API server is running on port 8000.`);
-            }
-        }
+                <!-- Reimbursement Chart -->
+                <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">💵 Reimbursement</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
+                </div>
 
-        // Render tile based on type
-        function renderTile(tileName, data) {
-            const display = document.getElementById('tileDisplay');
+                <!-- Compliance Chart -->
+                <div class="bg-white border border-green-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">✅ Compliance</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('compliance', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartCompliance"></canvas></div>
+                </div>
+            </div>
 
-            if (tileName === 'products') {
-                display.innerHTML = `
-                    <div class="bg-white rounded-xl shadow-md p-6 fade-in">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                            Products & Orders (October 2025)
-                        </h2>
-                        <div class="grid grid-cols-4 gap-4">
-                            ${data.products.map(p => `
-                                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-200 tile-hover">
-                                    <h3 class="font-bold text-slate-800 mb-3 text-lg">${p.name}</h3>
-                                    <div class="space-y-3">
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <!-- Lab TAT Chart -->
+                <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">🔬 Lab TAT</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('lab', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartLab"></canvas></div>
+                </div>
+
+                <!-- Costs Chart -->
+                <div class="bg-white border border-red-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">💰 Operating Costs</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('costs', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartCosts"></canvas></div>
+                </div>
+
+                <!-- Forecast Chart -->
+                <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">🔮 Forecast</h3>
+                        <div class="flex gap-1">
+                            <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('forecast', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="year">Y</button>
+                        </div>
+                    </div>
+                    <div class="h-48"><canvas id="chartForecast"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Quick Widgets Row - Email, Calendar, Notes -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <!-- Email Widget -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('email')">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">📧 Inbox</h3>
+                        <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
+                    </div>
+                    <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">JD</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Q4 Financial Review</p>
+                                <p class="text-gray-500 truncate">Meeting scheduled for tomorrow...</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-bold text-green-600">SK</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Board Presentation</p>
+                                <p class="text-gray-500 truncate">Slides attached for review...</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-bold text-purple-600">MJ</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Regulatory Update</p>
+                                <p class="text-gray-500 truncate">FDA submission timeline...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Widget -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('calendar')">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">📅 Today's Schedule</h3>
+                    <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                        <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-500">
+                            <div class="font-semibold text-gray-600 whitespace-nowrap">9:00 AM</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Executive Team Meeting</p>
+                                <p class="text-gray-500">Conference Room A</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 p-2 bg-green-50 rounded border-l-4 border-green-500">
+                            <div class="font-semibold text-gray-600 whitespace-nowrap">11:30 AM</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Investor Call</p>
+                                <p class="text-gray-500">Virtual</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 p-2 bg-purple-50 rounded border-l-4 border-purple-500">
+                            <div class="font-semibold text-gray-600 whitespace-nowrap">2:00 PM</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">Strategy Review</p>
+                                <p class="text-gray-500">Office</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Notes Widget -->
+                <div class="bg-white border border-amber-300 rounded-xl shadow-sm p-4 tile">
+                    <h3 class="text-sm font-bold text-amber-900 mb-3">📝 Quick Notes</h3>
+                    <textarea id="quickNoteInput" placeholder="Type a quick note..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+                    <button onclick="saveQuickNote()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-1 rounded text-xs font-semibold">Save Note</button>
+                    <div id="quickNotesDisplay" class="mt-3 space-y-1 max-h-16 overflow-y-auto text-xs"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-3 gap-6 mb-6">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Order Volume Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="overviewOrdersChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Operating Costs</h3>
+                    <div class="chart-container">
+                        <canvas id="overviewFinancialsChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Stock Performance</h3>
+                    <div id="overview-stock-summary" class="space-y-3">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Grid -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Top Territories</h3>
+                    <div id="overview-regional" class="space-y-2">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Projects Status</h3>
+                    <div id="overview-projects" class="space-y-2">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🚨 Critical Alerts</h3>
+                    <div id="overview-alerts" class="space-y-2">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Operations</h3>
+                    <div id="overview-stats" class="space-y-3">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Intelligence -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📰 Market News</h3>
+                    <div id="overview-market" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Competitor Activity</h3>
+                    <div id="overview-competitors" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Tab -->
+        <div id="content-email" class="tab-content hidden fade-in">
+            <div class="grid grid-cols-4 gap-6">
+                <!-- Email Sidebar -->
+                <div class="col-span-1 space-y-4">
+                    <button onclick="composeEmail()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-sm transition">
+                        ✉️ Compose Email
+                    </button>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <h3 class="font-bold text-gray-800 mb-3">📥 Folders</h3>
+                        <div class="space-y-2">
+                            <button onclick="loadEmails('inbox')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">
+                                <span class="font-semibold">Inbox</span>
+                                <span class="float-right bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
+                            </button>
+                            <button onclick="loadEmails('sent')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">Sent</button>
+                            <button onclick="loadEmails('drafts')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">
+                                Drafts
+                                <span class="float-right text-gray-500 text-xs">3</span>
+                            </button>
+                            <button onclick="loadEmails('starred')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">⭐ Starred</button>
+                            <button onclick="loadEmails('archive')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">📦 Archive</button>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">🤖 AI Email Assistant</h4>
+                        <p class="text-xs text-gray-600 mb-3">Let AI help you manage emails</p>
+                        <button onclick="aiSummarizeEmails()" class="w-full bg-white hover:bg-gray-50 text-blue-600 py-2 rounded text-sm font-semibold border border-blue-200 mb-2">
+                            Summarize Inbox
+                        </button>
+                        <button onclick="aiPriorityEmails()" class="w-full bg-white hover:bg-gray-50 text-blue-600 py-2 rounded text-sm font-semibold border border-blue-200">
+                            Find Priority Emails
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Email List -->
+                <div class="col-span-3">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">📨 Inbox (24 unread)</h3>
+                            <button onclick="refreshEmails()" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        <div id="emailList" class="divide-y divide-gray-100">
+                            <!-- Sample Emails -->
+                            <div class="p-4 email-item cursor-pointer transition">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-semibold text-blue-600">JD</div>
                                         <div>
-                                            <p class="text-xs text-slate-600">Orders Received</p>
-                                            <p class="text-2xl font-bold text-blue-600">${p.orders_received.toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-slate-600">Returned</p>
-                                            <p class="text-lg font-semibold text-red-600">${p.orders_returned}</p>
-                                            <p class="text-xs text-slate-500">(${(p.orders_returned/p.orders_received*100).toFixed(2)}%)</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-slate-600">Revenue</p>
-                                            <p class="text-lg font-semibold text-green-600">$${(p.revenue/1000000).toFixed(1)}M</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-slate-600">Margin</p>
-                                            <p class="text-sm font-semibold text-purple-600">${p.margin}%</p>
+                                            <p class="font-semibold text-gray-900">John Doe</p>
+                                            <p class="text-sm text-gray-600">Q4 Financial Review Meeting</p>
                                         </div>
                                     </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="mt-6 grid grid-cols-2 gap-4">
-                            <div class="bg-slate-50 rounded-lg p-4">
-                                <p class="text-sm text-slate-600">Total Orders</p>
-                                <p class="text-3xl font-bold text-slate-800">${data.total_orders.toLocaleString()}</p>
-                            </div>
-                            <div class="bg-slate-50 rounded-lg p-4">
-                                <p class="text-sm text-slate-600">Total Revenue</p>
-                                <p class="text-3xl font-bold text-green-600">$${(data.total_revenue/1000000).toFixed(1)}M</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (tileName === 'revenue') {
-                display.innerHTML = `
-                    <div class="bg-white rounded-xl shadow-md p-6 fade-in">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
-                            <svg class="w-7 h-7 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Revenue Performance
-                        </h2>
-                        <div class="grid grid-cols-3 gap-6">
-                            ${data.records.map(r => `
-                                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
-                                    <h3 class="font-bold text-slate-800 mb-4 text-lg">${r.period}</h3>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <p class="text-sm text-slate-600">Actual Revenue</p>
-                                            <p class="text-3xl font-bold text-green-600">
-                                                ${r.actual > 0 ? '$' + (r.actual/1000000).toFixed(0) + 'M' : '—'}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-slate-600">Projected</p>
-                                            <p class="text-2xl font-semibold text-slate-700">$${(r.projected/1000000).toFixed(0)}M</p>
-                                        </div>
-                                        ${r.actual > 0 ? `
-                                            <div class="flex items-center gap-2 ${r.actual >= r.projected ? 'text-green-600' : 'text-orange-600'}">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${r.actual >= r.projected ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}"></path>
-                                                </svg>
-                                                <span class="text-sm font-semibold">${(r.actual/r.projected*100).toFixed(1)}% of target</span>
-                                            </div>
-                                        ` : ''}
+                                    <div class="text-right">
+                                        <p class="text-xs text-gray-500">9:30 AM</p>
+                                        <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">Urgent</span>
                                     </div>
                                 </div>
-                            `).join('')}
-                        </div>
-                        <div class="mt-6 bg-blue-50 rounded-lg p-6 border border-blue-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm text-slate-600">Overall Performance</p>
-                                    <p class="text-4xl font-bold text-blue-600">${data.overall_performance.toFixed(1)}%</p>
+                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Please review the attached Q4 financial projections before tomorrow's board meeting...</p>
+                            </div>
+                            <div class="p-4 email-item cursor-pointer transition bg-blue-50">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-semibold text-green-600">SM</div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900">Sarah Miller - VP Operations</p>
+                                            <p class="text-sm text-gray-600">Lab Capacity Update</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500">8:15 AM</p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-sm text-slate-600">Total Actual</p>
-                                    <p class="text-2xl font-bold text-green-600">$${(data.total_actual/1000000).toFixed(0)}M</p>
+                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Great news! We've successfully increased lab capacity by 15%. Processing times are down...</p>
+                            </div>
+                            <div class="p-4 email-item cursor-pointer transition">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center font-semibold text-purple-600">RJ</div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900">Robert Johnson - CFO</p>
+                                            <p class="text-sm text-gray-600">Budget Approval Request</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Yesterday</p>
                                 </div>
+                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Requesting approval for additional $2.5M investment in new sequencing equipment...</p>
                             </div>
                         </div>
                     </div>
-                `;
-            } else {
-                display.innerHTML = `
-                    <div class="bg-white rounded-xl shadow-md p-6 fade-in text-center">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <h3 class="text-xl font-bold text-slate-700 mb-2">${tileName.charAt(0).toUpperCase() + tileName.slice(1)} Tile</h3>
-                        <p class="text-slate-600">This tile is coming soon. Build the agent first!</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Ask AI question
-        async function askQuestion() {
-            const input = document.getElementById('queryInput');
-            const query = input.value.trim();
-            if (!query) return;
-
-            const chatMessages = document.getElementById('chatMessages');
-            
-            // Add user message
-            chatMessages.innerHTML += `
-                <div class="chat-message bg-blue-500 rounded-lg p-3 mb-2">
-                    <p class="text-xs font-semibold mb-1">You:</p>
-                    <p class="text-sm">${query}</p>
                 </div>
-            `;
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            input.value = '';
+            </div>
+        </div>
 
-            // Add loading indicator
-            chatMessages.innerHTML += `
-                <div id="loading" class="chat-message bg-white/30 rounded-lg p-3 mb-2">
-                    <p class="text-xs">AI is thinking...</p>
-                </div>
-            `;
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            try {
-                const response = await fetch(`${API_BASE}/api/query/ask`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query, context: {} })
-                });
-                
-                const result = await response.json();
-                
-                // Remove loading
-                document.getElementById('loading').remove();
-
-                if (result.success) {
-                    chatMessages.innerHTML += `
-                        <div class="chat-message bg-white/30 rounded-lg p-3 mb-2">
-                            <p class="text-xs font-semibold mb-1">AI Assistant:</p>
-                            <p class="text-sm">${result.response}</p>
+        <!-- Calendar Tab -->
+        <div id="content-calendar" class="tab-content hidden fade-in">
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Calendar View -->
+                <div class="col-span-2">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">October 2025</h2>
+                            <div class="flex gap-2">
+                                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">Today</button>
+                                <button class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-semibold">Week</button>
+                                <button class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg text-sm font-semibold">Month</button>
+                            </div>
                         </div>
-                    `;
-                } else {
-                    showChatError('Failed to get response');
-                }
-            } catch (error) {
-                document.getElementById('loading').remove();
-                showChatError(`Error: ${error.message}. Make sure API is running.`);
-            }
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function showChatError(message) {
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML += `
-                <div class="chat-message bg-red-500/80 rounded-lg p-3 mb-2">
-                    <p class="text-xs">Error: ${message}</p>
+                        <!-- Mini Calendar Grid -->
+                        <div class="grid grid-cols-7 gap-2 text-center mb-2">
+                            <div class="text-xs font-semibold text-gray-600">Sun</div>
+                            <div class="text-xs font-semibold text-gray-600">Mon</div>
+                            <div class="text-xs font-semibold text-gray-600">Tue</div>
+                            <div class="text-xs font-semibold text-gray-600">Wed</div>
+                            <div class="text-xs font-semibold text-gray-600">Thu</div>
+                            <div class="text-xs font-semibold text-gray-600">Fri</div>
+                            <div class="text-xs font-semibold text-gray-600">Sat</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2" id="calendarGrid">
+                            <!-- Calendar days will be populated here -->
+                        </div>
+                    </div>
                 </div>
-            `;
-        }
 
-        function showError(message) {
-            document.getElementById('tileDisplay').innerHTML = `
-                <div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-                    <svg class="w-12 h-12 mx-auto mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <p class="text-red-800 font-medium">${message}</p>
+                <!-- Upcoming Events -->
+                <div class="space-y-4">
+                    <button onclick="scheduleNewMeeting()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-sm">
+                        ➕ Schedule Meeting
+                    </button>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <h3 class="font-bold text-gray-800 mb-4">📅 Today's Schedule</h3>
+                        <div class="space-y-3">
+                            <div class="calendar-event bg-blue-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">9:00 AM - 10:00 AM</p>
+                                <p class="font-semibold text-gray-900">Executive Team Meeting</p>
+                                <p class="text-xs text-gray-600 mt-1">📍 Conference Room A</p>
+                            </div>
+                            <div class="calendar-event bg-green-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">11:30 AM - 12:30 PM</p>
+                                <p class="font-semibold text-gray-900">Investor Call - Q3 Results</p>
+                                <p class="text-xs text-gray-600 mt-1">📞 Virtual</p>
+                            </div>
+                            <div class="calendar-event bg-purple-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">2:00 PM - 3:00 PM</p>
+                                <p class="font-semibold text-gray-900">Product Strategy Review</p>
+                                <p class="text-xs text-gray-600 mt-1">👥 With VP Product</p>
+                            </div>
+                            <div class="calendar-event bg-orange-50 p-3 rounded-lg">
+                                <p class="text-xs text-gray-600">4:00 PM - 5:00 PM</p>
+                                <p class="font-semibold text-gray-900">Board Prep Session</p>
+                                <p class="text-xs text-gray-600 mt-1">📍 Office</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">⏰ Time Management</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Meetings Today:</span>
+                                <span class="font-semibold">4 (6 hours)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Focus Time:</span>
+                                <span class="font-semibold text-green-600">2 hours</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">This Week:</span>
+                                <span class="font-semibold">18 meetings</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            `;
-        }
+            </div>
+        </div>
 
-        // Allow Enter key to submit
-        document.getElementById('queryInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                askQuestion();
-            }
-        });
+        <!-- Personal Assistant Tab -->
+        <div id="content-personal" class="tab-content hidden fade-in">
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Health & Wellness -->
+                <div class="space-y-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">💪 Health & Fitness</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Steps Today</span>
+                                    <span class="font-bold text-blue-600">8,432 / 10,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 84%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Exercise This Week</span>
+                                    <span class="font-bold text-green-600">4 / 5 days</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Water Intake</span>
+                                    <span class="font-bold text-cyan-600">6 / 8 glasses</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-cyan-500 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-semibold">
+                            Log Exercise
+                        </button>
+                    </div>
 
-        // Load products by default
-        window.addEventListener('load', () => {
-            setTimeout(() => loadTile('products'), 500);
-        });
-    </script>
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-800 mb-3">🏃 Today's Exercise</h4>
+                        <div class="space-y-2">
+                            <div class="bg-white rounded-lg p-3">
+                                <p class="text-sm font-semibold text-gray-800">Morning Run</p>
+                                <p class="text-xs text-gray-600">6:30 AM - 30 minutes</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-3">
+                                <p class="text-sm font-semibold text-gray-800">Lunch Yoga</p>
+                                <p class="text-xs text-gray-600">12:30 PM - 20 minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Tasks & Goals -->
+                <div class="space-y-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">✅ Personal Tasks</h3>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" checked class="w-4 h-4 text-blue-600">
+                                <span class="text-sm text-gray-400 line-through">Review quarterly goals</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600">
+                                <span class="text-sm text-gray-800">Schedule annual physical</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600">
+                                <span class="text-sm text-gray-800">Plan family vacation</span>
+                            </div>
+                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="w-4 h-4 text-blue-600">
+                                <span class="text-sm text-gray-800">Update will and estate plan</span>
+                            </div>
+                        </div>
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold">
+                            + Add Task
+                        </button>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Goals & Habits</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-1">Read 30 min/day</p>
+                                <div class="flex gap-1">
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">5 day streak</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700 mb-1">Meditate daily</p>
+                                <div class="flex gap-1">
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">3 day streak</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Reminders -->
+                <div class="space-y-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-semibold border border-blue-200">
+                                📞 Call Assistant
+                            </button>
+                            <button class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm font-semibold border border-green-200">
+                                🚗 Book Car
+                            </button>
+                            <button class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-semibold border border-purple-200">
+                                ✈️ Travel Plans
+                            </button>
+                            <button class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm font-semibold border border-orange-200">
+                                🍽️ Reservations
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔔 Reminders</h3>
+                        <div class="space-y-3">
+                            <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                                <p class="text-sm font-semibold text-red-900">Annual physical exam</p>
+                                <p class="text-xs text-red-700">Tomorrow, 2:00 PM</p>
+                            </div>
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                                <p class="text-sm font-semibold text-blue-900">Submit expense reports</p>
+                                <p class="text-xs text-blue-700">Due Friday</p>
+                            </div>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+                                <p class="text-sm font-semibold text-green-900">Family dinner reservation</p>
+                                <p class="text-xs text-green-700">Saturday, 7:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">📊 Life Balance</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Work:</span>
+                                <span class="font-semibold">60%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Family:</span>
+                                <span class="font-semibold">25%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Personal:</span>
+                                <span class="font-semibold">15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Business Tabs (Orders, Compliance, etc.) -->
+        <div id="content-orders" class="tab-content hidden fade-in">
+            <div id="orders-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading order volume data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-compliance" class="tab-content hidden fade-in">
+            <div id="compliance-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading compliance data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-reimbursement" class="tab-content hidden fade-in">
+            <div id="reimbursement-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading reimbursement data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-costs" class="tab-content hidden fade-in">
+            <div id="costs-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading costs data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-lab" class="tab-content hidden fade-in">
+            <div id="lab-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading lab metrics...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-regional" class="tab-content hidden fade-in">
+            <div id="regional-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading regional data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-forecasting" class="tab-content hidden fade-in">
+            <div id="forecasting-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading forecast data...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-market" class="tab-content hidden fade-in">
+            <div id="market-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading market intelligence...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-milestones" class="tab-content hidden fade-in">
+            <div id="milestones-content">
+                <div class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-gray-600">Loading project milestones...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
 </body>
 </html>

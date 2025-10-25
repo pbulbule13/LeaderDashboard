@@ -11,7 +11,7 @@ class MarketIntelligenceRepository:
         latest_news = [
             NewsItem(
                 title="FDA Approves New Colorectal Cancer Screening Guidelines",
-                summary="FDA updates screening recommendations for average-risk individuals",
+                summary="FDA updates screening recommendations for average-risk individuals starting at age 45",
                 source="FDA News",
                 category="regulatory",
                 importance="high",
@@ -27,22 +27,136 @@ class MarketIntelligenceRepository:
                 date=(today - timedelta(days=5)).strftime("%Y-%m-%d"),
                 url=""
             ),
+            NewsItem(
+                title="CMS Expands Coverage for Molecular Diagnostic Tests",
+                summary="Medicare announces broader coverage for precision medicine diagnostics",
+                source="CMS.gov",
+                category="reimbursement",
+                importance="high",
+                date=(today - timedelta(days=3)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="Breakthrough in Multi-Cancer Early Detection",
+                summary="New research shows promise in detecting multiple cancer types from single blood test",
+                source="Nature Medicine",
+                category="research",
+                importance="high",
+                date=(today - timedelta(days=7)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="Healthcare Consolidation Accelerates",
+                summary="Major health systems announce merger, impacting diagnostic testing contracts",
+                source="Modern Healthcare",
+                category="market",
+                importance="medium",
+                date=(today - timedelta(days=10)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="New Liquid Biopsy Technology Shows Promise",
+                summary="Clinical trial results demonstrate improved cancer detection sensitivity",
+                source="Journal of Clinical Oncology",
+                category="research",
+                importance="medium",
+                date=(today - timedelta(days=12)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="Digital Health Investment Reaches Record High",
+                summary="Q3 2025 sees unprecedented investment in diagnostic technology companies",
+                source="Rock Health",
+                category="market",
+                importance="medium",
+                date=(today - timedelta(days=14)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="New Quality Standards for Genomic Testing",
+                summary="CAP releases updated accreditation requirements for genomic laboratories",
+                source="CAP Today",
+                category="regulatory",
+                importance="medium",
+                date=(today - timedelta(days=16)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="Telehealth Integration with Diagnostics Expanding",
+                summary="Major telehealth platforms partner with diagnostic companies for home testing",
+                source="Healthcare Dive",
+                category="technology",
+                importance="low",
+                date=(today - timedelta(days=18)).strftime("%Y-%m-%d"),
+                url=""
+            ),
+            NewsItem(
+                title="Patient Access Programs Gain Traction",
+                summary="Industry report shows increasing adoption of financial assistance programs",
+                source="Health Affairs",
+                category="market",
+                importance="low",
+                date=(today - timedelta(days=20)).strftime("%Y-%m-%d"),
+                url=""
+            ),
         ]
 
         competitor_updates = [
             CompetitorUpdate(
                 competitor_name="Grail Bio",
                 update_type="product_launch",
-                description="Launched multi-cancer early detection test expansion",
+                description="Launched multi-cancer early detection test expansion into 15 new markets",
                 impact_level="high",
                 date=(today - timedelta(days=7)).strftime("%Y-%m-%d")
             ),
             CompetitorUpdate(
                 competitor_name="Guardant Health",
                 update_type="regulatory_approval",
-                description="Received FDA breakthrough device designation",
+                description="Received FDA breakthrough device designation for liquid biopsy platform",
                 impact_level="medium",
                 date=(today - timedelta(days=14)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="Tempus Labs",
+                update_type="partnership",
+                description="Announced strategic partnership with major health system for precision oncology",
+                impact_level="medium",
+                date=(today - timedelta(days=9)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="Foundation Medicine",
+                update_type="market_expansion",
+                description="Expanding international presence with new European distribution agreements",
+                impact_level="low",
+                date=(today - timedelta(days=11)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="Natera",
+                update_type="product_launch",
+                description="Introduced new prenatal screening test with enhanced sensitivity",
+                impact_level="medium",
+                date=(today - timedelta(days=13)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="Quest Diagnostics",
+                update_type="acquisition",
+                description="Acquired specialty testing laboratory to expand oncology capabilities",
+                impact_level="high",
+                date=(today - timedelta(days=15)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="LabCorp",
+                update_type="technology",
+                description="Implementing AI-driven test interpretation across core testing menu",
+                impact_level="medium",
+                date=(today - timedelta(days=17)).strftime("%Y-%m-%d")
+            ),
+            CompetitorUpdate(
+                competitor_name="Invitae",
+                update_type="pricing",
+                description="Announced reduced pricing for comprehensive genetic testing panels",
+                impact_level="high",
+                date=(today - timedelta(days=19)).strftime("%Y-%m-%d")
             ),
         ]
 

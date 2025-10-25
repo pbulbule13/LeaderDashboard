@@ -29,6 +29,12 @@ class OrderVolumeRepository:
             OrderVolumePeriod(period="Apr 2025", count=932000, growth=3.0),
             OrderVolumePeriod(period="May 2025", count=978000, growth=4.9),
             OrderVolumePeriod(period="Jun 2025", count=1023000, growth=4.6),
+            OrderVolumePeriod(period="Jul 2025", count=1067000, growth=4.3),
+            OrderVolumePeriod(period="Aug 2025", count=1098000, growth=2.9),
+            OrderVolumePeriod(period="Sep 2025", count=1145000, growth=4.3),
+            OrderVolumePeriod(period="Oct 2025", count=1189000, growth=3.8),
+            OrderVolumePeriod(period="Nov 2025", count=1234000, growth=3.8),
+            OrderVolumePeriod(period="Dec 2025", count=1278000, growth=3.6),
         ]
 
         return OrderVolume(
