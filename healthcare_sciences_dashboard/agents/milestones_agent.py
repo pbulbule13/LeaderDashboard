@@ -1,6 +1,7 @@
 from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.milestones_repository import MilestonesRepository
+from config.prompts_config import get_prompt
 
 class MilestonesAgent(BaseAgent):
     """Agent responsible for Project Milestones tile"""
@@ -18,9 +19,17 @@ class MilestonesAgent(BaseAgent):
         """Process queries about project milestones"""
         tile_data = await self.get_tile_data()
 
+        # Use centralized config for prompts
+        prompt = get_prompt(
+            agent_type='milestones',
+            prompt_type='analysis',
+            query=query,
+            project_data=tile_data
+        )
+
         messages = [
-            {"role": "system", "content": "You are an AI assistant analyzing project milestones and FDA submission status for healthcare products."},
-            {"role": "user", "content": f"Based on this data: {tile_data}\n\nQuestion: {query}"}
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": query}
         ]
 
         response = await self.llm.ainvoke(messages)

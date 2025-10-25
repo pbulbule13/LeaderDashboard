@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from agents.base_agent import BaseAgent
 from data.repositories.stock_repository import StockRepository
-from prompts.stock_prompts import STOCK_ANALYSIS_PROMPT
+from config.prompts_config import get_prompt
 
 class StockAgent(BaseAgent):
     '''Agent for Stock Performance tile'''
@@ -32,8 +32,11 @@ class StockAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         '''Process stock queries'''
         tile_data = await self.get_tile_data()
-        
-        prompt = STOCK_ANALYSIS_PROMPT.format(
+
+        # Use centralized config for prompts
+        prompt = get_prompt(
+            agent_type='stock',
+            prompt_type='analysis',
             query=query,
             stock_data=tile_data
         )

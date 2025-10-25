@@ -370,15 +370,225 @@ const CONFIG = window.location.hostname === 'localhost' ? DEV_CONFIG : PROD_CONF
 
 ---
 
+## AI Prompts and Agent Behaviors
+
+### Customizing AI Prompts (`CONFIG.aiPrompts`)
+
+Change how AI responds by modifying system prompts:
+
+```javascript
+aiPrompts: {
+    system: {
+        executive: `Your custom executive assistant prompt...`,
+        analyst: `Your custom analyst prompt...`
+    },
+    contexts: {
+        emailSummary: `Your custom email summary prompt...`,
+        dataAnalysis: `Your custom analysis prompt...`
+    }
+}
+```
+
+**Use Cases:**
+- Change AI tone and style
+- Add domain-specific knowledge
+- Customize response format
+- Add company-specific context
+
+### Email Behavior Configuration (`CONFIG.emailBehavior`)
+
+Control email categorization and processing:
+
+```javascript
+emailBehavior: {
+    categorization: {
+        urgent: {
+            keywords: ['urgent', 'critical'],  // Add your keywords
+            senders: ['ceo@', 'board@'],       // VIP senders
+            subjectPatterns: ['URGENT:']       // Subject patterns
+        }
+    },
+    draftAssistance: {
+        tone: 'professional',  // Change email tone
+        includeSignature: true,
+        templates: {
+            approval: 'Your custom template...'
+        }
+    }
+}
+```
+
+### Agent Behavior Settings (`CONFIG.agentBehaviors`)
+
+Control how agents analyze and present data:
+
+```javascript
+agentBehaviors: {
+    responseStyle: {
+        defaultTone: 'professional',    // professional, analytical, casual
+        verbosity: 'concise',          // brief, concise, detailed
+        format: 'bullet_points',       // bullet_points, paragraphs, mixed
+        maxResponseLength: 500         // character limit
+    },
+    dataPresentation: {
+        roundDecimals: 2,              // decimal places
+        usePercentages: true,          // show as percentages
+        highlightChanges: true         // highlight deltas
+    }
+}
+```
+
+---
+
+## Python Configuration (Backend)
+
+### Configuring Agent Prompts
+
+All agent prompts are in `config/prompts_config.py`. This Python configuration controls backend AI behavior.
+
+**Location:** `healthcare_sciences_dashboard/config/prompts_config.py`
+
+### Customizing Company Context
+
+```python
+COMPANY_CONTEXT = {
+    'name': 'Your Company Name',
+    'short_name': 'YCN',
+    'industry': 'Your Industry',
+    'focus_areas': ['Area 1', 'Area 2']
+}
+```
+
+### Modifying Agent Prompts
+
+Each agent has customizable prompts:
+
+```python
+STOCK_PROMPTS = {
+    'analysis': """
+    Your custom stock analysis prompt...
+
+    Focus on:
+    1. Custom focus area 1
+    2. Custom focus area 2
+
+    Tone: {tone}
+    """,
+    'performance_summary': """
+    Your custom summary prompt...
+    """
+}
+```
+
+**Available Agent Types:**
+- `stock` - Stock performance analysis
+- `order_volume` - Order volume and growth
+- `compliance` - Compliance and quality
+- `reimbursement` - Reimbursement and revenue
+- `lab` - Lab metrics and operations
+- `regional` - Regional performance
+- `forecasting` - Forecasting and predictions
+- `market` - Market intelligence
+- `milestones` - Project milestones
+- `costs` - Operating costs
+- `assistant` - Executive assistant
+
+### Using Config in Agents
+
+Agents automatically use the centralized config:
+
+```python
+from config.prompts_config import get_prompt
+
+# In your agent:
+prompt = get_prompt(
+    agent_type='stock',
+    prompt_type='analysis',
+    query=query,
+    stock_data=data
+)
+```
+
+### Customizing Agent Behavior
+
+```python
+AGENT_BEHAVIORS = {
+    'default': {
+        'tone': 'professional',
+        'verbosity': 'concise',
+        'format': 'bullet_points',
+        'max_response_length': 500
+    }
+}
+```
+
+---
+
+## Configuration Best Practices
+
+### 1. Version Control
+- Keep config files in version control
+- Document why settings were changed
+- Use branches for experimental configs
+
+### 2. Environment-Specific Configs
+```javascript
+// config.dev.js for development
+// config.prod.js for production
+// config.staging.js for staging
+```
+
+### 3. Prompt Engineering Tips
+- Be specific and clear
+- Include examples if needed
+- Test prompts with various inputs
+- Iterate based on results
+
+### 4. Security Considerations
+- Don't commit API keys in config
+- Use environment variables for secrets
+- Sanitize user inputs
+- Review prompts for injection risks
+
+### 5. Performance Optimization
+- Lower display limits for faster loading
+- Reduce API refresh intervals if needed
+- Disable unused features
+- Optimize prompt lengths
+
+---
+
+## Troubleshooting
+
+### AI Not Responding as Expected?
+1. Check `CONFIG.aiPrompts` settings
+2. Verify prompt templates have required placeholders
+3. Test with simpler prompts first
+4. Check browser console for errors
+
+### Email Categorization Not Working?
+1. Review `CONFIG.emailBehavior.categorization` rules
+2. Verify keywords are lowercase
+3. Check sender and subject patterns
+4. Enable debug logging
+
+### Agent Behavior Issues?
+1. Check `config/prompts_config.py`
+2. Verify prompt formatting
+3. Test `get_prompt()` function directly
+4. Review agent logs
+
+---
+
 ## Support
 
 For questions or issues with configuration:
 1. Check this guide first
-2. Review config.js comments
-3. Check browser console for errors
+2. Review config.js and prompts_config.py comments
+3. Check browser/server console for errors
 4. Refer to the main README.md
 
 ---
 
 **Last Updated:** October 2025
-**Version:** 1.0
+**Version:** 2.0 (AI & Prompts Configurable)

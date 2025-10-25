@@ -442,6 +442,209 @@ const DASHBOARD_CONFIG = {
             symbol: '$',
             locale: 'en-US'
         }
+    },
+
+    // ==================== AI PROMPTS & BEHAVIORS ====================
+    aiPrompts: {
+        // System prompts for AI assistant
+        system: {
+            executive: `You are an AI executive assistant for the CEO of ${this?.branding?.companyName || 'HealthCare Sciences'}.
+Provide concise, actionable insights focused on what executives need to know.
+Be professional, data-driven, and strategic.`,
+
+            analyst: `You are a business analyst for ${this?.branding?.companyName || 'HealthCare Sciences'}.
+Analyze data, identify trends, and provide evidence-based recommendations.
+Focus on metrics, patterns, and strategic implications.`,
+
+            advisor: `You are a strategic advisor for ${this?.branding?.companyName || 'HealthCare Sciences'}.
+Provide high-level guidance, risk assessment, and opportunity identification.
+Think strategically about long-term implications.`
+        },
+
+        // Context-specific prompts
+        contexts: {
+            emailSummary: `Analyze these emails and provide an executive summary:
+- Urgent items requiring immediate attention
+- Important items for today
+- Key decisions needed
+- FYI items for awareness
+
+Keep it scannable and actionable. Focus on business impact.`,
+
+            dataAnalysis: `Analyze the following data and provide insights:
+1. Key trends and patterns
+2. Notable changes or anomalies
+3. Business implications
+4. Recommended actions
+
+Be specific and quantitative where possible.`,
+
+            prioritization: `Review these items and prioritize them:
+Criteria:
+- Urgency x Impact
+- Strategic alignment
+- Resource requirements
+- Dependencies
+
+Provide top 3 priorities with brief rationale.`,
+
+            recommendation: `Based on the data provided, generate recommendations:
+1. Immediate actions (next 24 hours)
+2. Short-term initiatives (next week)
+3. Strategic considerations (next month)
+
+Focus on high-impact, achievable actions.`
+        },
+
+        // Quick action templates
+        quickActions: {
+            summarize: 'Provide a brief executive summary of: ',
+            analyze: 'Analyze the trends and patterns in: ',
+            recommend: 'What actions should I take regarding: ',
+            compare: 'Compare and contrast: ',
+            explain: 'Explain the implications of: ',
+            forecast: 'What can we expect in the future based on: '
+        }
+    },
+
+    // ==================== EMAIL BEHAVIOR SETTINGS ====================
+    emailBehavior: {
+        // Auto-categorization rules
+        categorization: {
+            urgent: {
+                keywords: ['urgent', 'asap', 'immediate', 'critical', 'emergency'],
+                senders: ['board@', 'ceo@', 'cfo@'],
+                subjectPatterns: ['RE: Board', 'URGENT:', 'Action Required']
+            },
+            important: {
+                keywords: ['important', 'review', 'approval', 'decision'],
+                senders: ['vp@', 'director@', 'senior@'],
+                subjectPatterns: ['Approval:', 'Review:', 'Decision:']
+            },
+            lowPriority: {
+                keywords: ['fyi', 'newsletter', 'update', 'notification'],
+                senders: ['noreply@', 'notifications@'],
+                subjectPatterns: ['Newsletter', 'Digest', 'Update']
+            }
+        },
+
+        // Email processing settings
+        processing: {
+            autoArchiveAfterDays: 30,
+            maxInboxSize: 100,
+            groupByThread: true,
+            showPreviewLines: 2,
+            markReadAfterSeconds: 3,
+            enableSmartReply: true
+        },
+
+        // Draft assistance settings
+        draftAssistance: {
+            enabled: true,
+            tone: 'professional',  // professional, casual, formal
+            length: 'medium',      // brief, medium, detailed
+            includeGreeting: true,
+            includeSignature: true,
+            signature: `Best regards,\n${this?.branding?.companyName || 'HealthCare Sciences'} Leadership Team`,
+            templates: {
+                approval: 'I approve the {subject}. Please proceed with {action}.',
+                followup: 'Following up on {subject}. Can you provide an update by {date}?',
+                meeting: 'Let\'s schedule a meeting to discuss {subject}. My availability: {times}.',
+                thanks: 'Thank you for {action}. This will help us {benefit}.'
+            }
+        },
+
+        // Notification settings
+        notifications: {
+            enabled: true,
+            urgentOnly: false,
+            playSound: true,
+            showDesktop: true,
+            groupByTime: 5  // minutes
+        }
+    },
+
+    // ==================== AGENT BEHAVIOR SETTINGS ====================
+    agentBehaviors: {
+        // Response style settings
+        responseStyle: {
+            defaultTone: 'professional',  // professional, analytical, casual, formal
+            verbosity: 'concise',         // brief, concise, detailed
+            format: 'bullet_points',      // bullet_points, paragraphs, mixed
+            includeMetrics: true,
+            includeTrends: true,
+            includeRecommendations: true,
+            maxResponseLength: 500        // characters
+        },
+
+        // Data presentation settings
+        dataPresentation: {
+            showRawData: false,
+            roundDecimals: 2,
+            usePercentages: true,
+            useThousandsSeparator: true,
+            highlightChanges: true,
+            compareWithPrevious: true
+        },
+
+        // Analysis depth
+        analysisDepth: {
+            quickSummary: {
+                context: 'minimal',
+                recommendations: 'top3',
+                dataPoints: 5
+            },
+            standard: {
+                context: 'medium',
+                recommendations: 'top5',
+                dataPoints: 10
+            },
+            detailed: {
+                context: 'full',
+                recommendations: 'comprehensive',
+                dataPoints: 20
+            }
+        },
+
+        // Error handling
+        errorHandling: {
+            showTechnicalDetails: false,
+            suggestAlternatives: true,
+            provideFallback: true,
+            logErrors: true
+        }
+    },
+
+    // ==================== USER PREFERENCES ====================
+    userPreferences: {
+        // Dashboard personalization
+        dashboard: {
+            defaultView: 'overview',
+            favoriteMetrics: ['orders', 'reimbursement', 'compliance'],
+            pinnedWidgets: ['email', 'calendar'],
+            theme: 'light',  // light, dark, auto
+            compactMode: false
+        },
+
+        // Notification preferences
+        notifications: {
+            email: true,
+            push: false,
+            sms: false,
+            digest: {
+                enabled: true,
+                frequency: 'daily',  // hourly, daily, weekly
+                time: '08:00'
+            }
+        },
+
+        // AI interaction preferences
+        aiInteraction: {
+            proactive: true,      // AI suggests insights proactively
+            contextual: true,     // AI considers current page context
+            learning: true,       // AI learns from user interactions
+            suggestions: true     // AI provides quick action suggestions
+        }
     }
 };
 
