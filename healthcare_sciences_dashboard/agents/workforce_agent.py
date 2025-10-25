@@ -34,12 +34,12 @@ class WorkforceAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         '''Process workforce queries'''
         tile_data = await self.get_tile_data()
-        
+
         prompt = get_prompt(
-            agent_type='regional',
+            agent_type='workforce',
             prompt_type='analysis',
             query=query,
-            regional_data=tile_data
+            workforce_data=tile_data
         )
         
         messages = [

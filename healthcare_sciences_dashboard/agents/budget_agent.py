@@ -40,12 +40,12 @@ class BudgetAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         '''Process budget queries'''
         tile_data = await self.get_tile_data()
-        
+
         prompt = get_prompt(
-            agent_type='costs',
+            agent_type='budget',
             prompt_type='analysis',
             query=query,
-            cost_data=tile_data
+            budget_data=tile_data
         )
         
         messages = [

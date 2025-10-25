@@ -25,12 +25,12 @@ class ProductsAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Process queries about products"""
         tile_data = await self.get_tile_data()
-        
+
         prompt = get_prompt(
-            agent_type='order_volume',
+            agent_type='products',
             prompt_type='analysis',
             query=query,
-            order_data=tile_data
+            products_data=tile_data
         )
         
         messages = [

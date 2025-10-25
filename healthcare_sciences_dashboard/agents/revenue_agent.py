@@ -34,12 +34,12 @@ class RevenueAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         '''Process queries about revenue'''
         tile_data = await self.get_tile_data()
-        
+
         prompt = get_prompt(
-            agent_type='reimbursement',
+            agent_type='revenue',
             prompt_type='analysis',
             query=query,
-            reimbursement_data=tile_data
+            revenue_data=tile_data
         )
         
         messages = [

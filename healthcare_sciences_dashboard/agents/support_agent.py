@@ -33,12 +33,12 @@ class SupportAgent(BaseAgent):
     async def process_query(self, query: str, context: Dict[str, Any]) -> Dict[str, Any]:
         '''Process support queries'''
         tile_data = await self.get_tile_data()
-        
+
         prompt = get_prompt(
-            agent_type='compliance',
+            agent_type='support',
             prompt_type='analysis',
             query=query,
-            compliance_data=tile_data
+            support_data=tile_data
         )
         
         messages = [
