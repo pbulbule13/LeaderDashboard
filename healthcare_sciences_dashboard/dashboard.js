@@ -483,41 +483,1235 @@ function generateCalendar() {
     grid.innerHTML = html;
 }
 
-// Placeholder load functions for other tabs
+// ==================== BUSINESS TAB LOAD FUNCTIONS ====================
+
 async function loadOrdersData() {
-    // Will be implemented with charts
+    const container = document.getElementById('orders-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load order data</div>';
+            return;
+        }
+
+        const data = result.data.order_volume;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Monthly Orders</h3>
+                        <p class="text-3xl font-bold text-blue-600">${data.monthly_orders.toLocaleString()}</p>
+                        <p class="text-xs text-green-600 mt-2">↑ ${data.growth_metrics.mom}% MoM</p>
+                    </div>
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">YoY Growth</h3>
+                        <p class="text-3xl font-bold text-green-600">${data.growth_metrics.yoy}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Year over year</p>
+                    </div>
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Average Daily</h3>
+                        <p class="text-3xl font-bold text-purple-600">${data.average_daily_orders.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">Orders per day</p>
+                    </div>
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Peak Day</h3>
+                        <p class="text-3xl font-bold text-orange-600">${data.peak_day_orders.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">Highest single day</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Order Volume Trend</h3>
+                        <div class="h-80"><canvas id="ordersDetailChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Orders by Category</h3>
+                        <div class="h-80"><canvas id="ordersCategoryChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Detailed Stats -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📋 Monthly Breakdown</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Period</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Orders</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Growth</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.trend_data.slice(-6).map(t => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2">${t.period}</td>
+                                        <td class="px-4 py-2 text-right font-semibold">${t.count.toLocaleString()}</td>
+                                        <td class="px-4 py-2 text-right ${t.growth >= 0 ? 'text-green-600' : 'text-red-600'}">${t.growth >= 0 ? '↑' : '↓'} ${Math.abs(t.growth)}%</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const trendCtx = document.getElementById('ordersDetailChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: data.trend_data.map(t => t.period),
+                datasets: [{
+                    label: 'Orders',
+                    data: data.trend_data.map(t => t.count),
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        const categoryCtx = document.getElementById('ordersCategoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: data.by_category.map(c => c.category),
+                datasets: [{
+                    data: data.by_category.map(c => c.count),
+                    backgroundColor: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading orders data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadComplianceData() {
-    // Will be implemented with charts
+    const container = document.getElementById('compliance-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load compliance data</div>';
+            return;
+        }
+
+        const data = result.data.compliance;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Compliance Rate</h3>
+                        <p class="text-3xl font-bold text-green-600">${(100 - data.overall_return_rate).toFixed(1)}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Overall compliance</p>
+                    </div>
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Total Returns</h3>
+                        <p class="text-3xl font-bold text-orange-600">${data.total_returns.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">This month</p>
+                    </div>
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Total Claims</h3>
+                        <p class="text-3xl font-bold text-blue-600">${data.total_claims.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">Processed</p>
+                    </div>
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Rejection Rate</h3>
+                        <p class="text-3xl font-bold text-purple-600">${data.rejection_rate.toFixed(1)}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Needs improvement</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">✅ Compliance Trend</h3>
+                        <div class="h-80"><canvas id="complianceTrendChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Return Reasons</h3>
+                        <div class="h-80"><canvas id="complianceReasonsChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Top Issues -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚠️ Top Compliance Issues</h3>
+                    <div class="space-y-3">
+                        ${data.top_return_reasons.map(reason => `
+                            <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${reason.reason}</p>
+                                    <p class="text-sm text-gray-600">${reason.count} instances</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-orange-600">${reason.percentage.toFixed(1)}%</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const trendCtx = document.getElementById('complianceTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: data.monthly_trend.map(t => t.month),
+                datasets: [{
+                    label: 'Compliance Rate',
+                    data: data.monthly_trend.map(t => 100 - t.return_rate),
+                    borderColor: '#22C55E',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 95,
+                        max: 100,
+                        ticks: {
+                            callback: (value) => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+
+        const reasonsCtx = document.getElementById('complianceReasonsChart').getContext('2d');
+        new Chart(reasonsCtx, {
+            type: 'bar',
+            data: {
+                labels: data.top_return_reasons.map(r => r.reason),
+                datasets: [{
+                    label: 'Count',
+                    data: data.top_return_reasons.map(r => r.count),
+                    backgroundColor: '#F97316'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading compliance data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadReimbursementData() {
-    // Will be implemented with charts
+    const container = document.getElementById('reimbursement-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load reimbursement data</div>';
+            return;
+        }
+
+        const data = result.data.reimbursement;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Reimbursement Rate</h3>
+                        <p class="text-3xl font-bold text-purple-600">${data.reimbursement_percentage.toFixed(1)}%</p>
+                        <p class="text-xs text-green-600 mt-2">↑ ${data.growth_rate}% vs last month</p>
+                    </div>
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Claims Reimbursed</h3>
+                        <p class="text-3xl font-bold text-green-600">${data.claims_reimbursed.toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-2">This month</p>
+                    </div>
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Total Amount</h3>
+                        <p class="text-3xl font-bold text-blue-600">$${(data.total_reimbursed_amount / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">Reimbursed</p>
+                    </div>
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Avg Turnaround</h3>
+                        <p class="text-3xl font-bold text-orange-600">${data.average_turnaround_days}</p>
+                        <p class="text-xs text-gray-500 mt-2">Days to reimburse</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">💵 Reimbursement Trend</h3>
+                        <div class="h-80"><canvas id="reimbursementTrendChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 By Payer Type</h3>
+                        <div class="h-80"><canvas id="reimbursementPayerChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Payer Breakdown -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏥 Payer Performance</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Payer</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Claims</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Reimbursement %</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Avg Days</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.by_payer.map(payer => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">${payer.payer_name}</td>
+                                        <td class="px-4 py-2 text-right">${payer.claims.toLocaleString()}</td>
+                                        <td class="px-4 py-2 text-right">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${payer.reimbursement_rate >= 95 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                                ${payer.reimbursement_rate.toFixed(1)}%
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2 text-right">${payer.avg_turnaround_days} days</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const trendCtx = document.getElementById('reimbursementTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: data.monthly_trend.map(t => t.month),
+                datasets: [{
+                    label: 'Reimbursement Rate',
+                    data: data.monthly_trend.map(t => t.reimbursement_percentage),
+                    borderColor: '#A855F7',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: (value) => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+
+        const payerCtx = document.getElementById('reimbursementPayerChart').getContext('2d');
+        new Chart(payerCtx, {
+            type: 'doughnut',
+            data: {
+                labels: data.by_payer.map(p => p.payer_name),
+                datasets: [{
+                    data: data.by_payer.map(p => p.claims),
+                    backgroundColor: ['#A855F7', '#3B82F6', '#10B981', '#F59E0B', '#EF4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading reimbursement data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadCostsData() {
-    // Will be implemented with charts
+    const container = document.getElementById('costs-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load costs data</div>';
+            return;
+        }
+
+        const data = result.data.operating_costs;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-red-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Total Operating Costs</h3>
+                        <p class="text-3xl font-bold text-red-600">$${(data.total_operating_costs / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">This month</p>
+                    </div>
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Labor Costs</h3>
+                        <p class="text-3xl font-bold text-blue-600">$${(data.breakdown.labor / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">${((data.breakdown.labor / data.total_operating_costs) * 100).toFixed(0)}% of total</p>
+                    </div>
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Equipment</h3>
+                        <p class="text-3xl font-bold text-purple-600">$${(data.breakdown.equipment / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">${((data.breakdown.equipment / data.total_operating_costs) * 100).toFixed(0)}% of total</p>
+                    </div>
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Supplies</h3>
+                        <p class="text-3xl font-bold text-orange-600">$${(data.breakdown.supplies / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">${((data.breakdown.supplies / data.total_operating_costs) * 100).toFixed(0)}% of total</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Cost Trend</h3>
+                        <div class="h-80"><canvas id="costsTrendChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Cost Breakdown</h3>
+                        <div class="h-80"><canvas id="costsBreakdownChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Monthly Breakdown -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📅 Monthly Cost Analysis</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Month</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Total Cost</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Labor</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Equipment</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Supplies</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Overhead</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.monthly_trend.slice(-6).map(month => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">${month.month}</td>
+                                        <td class="px-4 py-2 text-right font-semibold">$${(month.total_cost / 1000000).toFixed(2)}M</td>
+                                        <td class="px-4 py-2 text-right">$${(month.labor / 1000000).toFixed(2)}M</td>
+                                        <td class="px-4 py-2 text-right">$${(month.equipment / 1000000).toFixed(2)}M</td>
+                                        <td class="px-4 py-2 text-right">$${(month.supplies / 1000000).toFixed(2)}M</td>
+                                        <td class="px-4 py-2 text-right">$${(month.overhead / 1000000).toFixed(2)}M</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const trendCtx = document.getElementById('costsTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: data.monthly_trend.map(t => t.month),
+                datasets: [{
+                    label: 'Operating Costs',
+                    data: data.monthly_trend.map(t => t.total_cost / 1000000),
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => '$' + value + 'M'
+                        }
+                    }
+                }
+            }
+        });
+
+        const breakdownCtx = document.getElementById('costsBreakdownChart').getContext('2d');
+        new Chart(breakdownCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Labor', 'Equipment', 'Supplies', 'Overhead'],
+                datasets: [{
+                    data: [
+                        data.breakdown.labor,
+                        data.breakdown.equipment,
+                        data.breakdown.supplies,
+                        data.breakdown.overhead
+                    ],
+                    backgroundColor: ['#3B82F6', '#A855F7', '#F59E0B', '#EF4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading costs data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadLabData() {
-    // Will be implemented with charts
+    const container = document.getElementById('lab-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load lab data</div>';
+            return;
+        }
+
+        const data = result.data.lab_metrics;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Average TAT</h3>
+                        <p class="text-3xl font-bold text-orange-600">${data.average_turnaround_hours.toFixed(1)}h</p>
+                        <p class="text-xs text-gray-500 mt-2">Target: ${data.target_turnaround_hours}h</p>
+                    </div>
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Lab Capacity</h3>
+                        <p class="text-3xl font-bold text-blue-600">${data.lab_capacity.utilization_percentage.toFixed(0)}%</p>
+                        <p class="text-xs text-gray-500 mt-2">${data.lab_capacity.current_load.toLocaleString()} / ${data.lab_capacity.max_capacity.toLocaleString()}</p>
+                    </div>
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Efficiency Score</h3>
+                        <p class="text-3xl font-bold text-green-600">${data.efficiency_score}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Overall efficiency</p>
+                    </div>
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Error Rate</h3>
+                        <p class="text-3xl font-bold ${data.error_rate < 1 ? 'text-green-600' : 'text-red-600'}">${data.error_rate}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Quality metric</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔬 TAT Trend</h3>
+                        <div class="h-80"><canvas id="labTatChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Tests by Type</h3>
+                        <div class="h-80"><canvas id="labTestsChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Capacity Metrics -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ Lab Capacity Utilization</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Current Utilization</span>
+                                    <span class="font-bold">${data.lab_capacity.utilization_percentage.toFixed(1)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4">
+                                    <div class="bg-blue-500 h-4 rounded-full" style="width: ${data.lab_capacity.utilization_percentage}%"></div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+                                <div>
+                                    <p class="text-sm text-gray-600">Current Load</p>
+                                    <p class="text-2xl font-bold text-blue-600">${data.lab_capacity.current_load.toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Max Capacity</p>
+                                    <p class="text-2xl font-bold text-gray-800">${data.lab_capacity.max_capacity.toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Performance Metrics</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Efficiency Score</span>
+                                <span class="text-xl font-bold text-green-600">${data.efficiency_score}%</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                                <span class="text-sm text-gray-700">Average TAT</span>
+                                <span class="text-xl font-bold text-orange-600">${data.average_turnaround_hours.toFixed(1)}h</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 ${data.error_rate < 1 ? 'bg-green-50' : 'bg-red-50'} rounded-lg">
+                                <span class="text-sm text-gray-700">Error Rate</span>
+                                <span class="text-xl font-bold ${data.error_rate < 1 ? 'text-green-600' : 'text-red-600'}">${data.error_rate}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const tatCtx = document.getElementById('labTatChart').getContext('2d');
+        new Chart(tatCtx, {
+            type: 'line',
+            data: {
+                labels: data.turnaround_trend.map(t => t.period),
+                datasets: [{
+                    label: 'Average TAT (hours)',
+                    data: data.turnaround_trend.map(t => t.avg_hours),
+                    borderColor: '#F97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Target',
+                    data: data.turnaround_trend.map(() => data.target_turnaround_hours),
+                    borderColor: '#22C55E',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        const testsCtx = document.getElementById('labTestsChart').getContext('2d');
+        new Chart(testsCtx, {
+            type: 'bar',
+            data: {
+                labels: data.tests_by_type.map(t => t.test_type),
+                datasets: [{
+                    label: 'Test Volume',
+                    data: data.tests_by_type.map(t => t.count),
+                    backgroundColor: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading lab data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadRegionalData() {
-    // Will be implemented with charts
+    const container = document.getElementById('regional-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load regional data</div>';
+            return;
+        }
+
+        const data = result.data.regional;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- Top Territories -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏆 Top Performing Territories</h3>
+                    <div class="grid grid-cols-4 gap-4">
+                        ${data.territories.slice(0, 4).map((territory, index) => `
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-2xl font-bold text-blue-600">#${index + 1}</span>
+                                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">↑ ${territory.growth_percentage}%</span>
+                                </div>
+                                <h4 class="font-bold text-gray-800 mb-1">${territory.territory_name}</h4>
+                                <p class="text-2xl font-bold text-blue-600">${territory.orders.toLocaleString()}</p>
+                                <p class="text-xs text-gray-600 mt-1">orders</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Orders by Territory</h3>
+                        <div class="h-80"><canvas id="regionalOrdersChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Growth Comparison</h3>
+                        <div class="h-80"><canvas id="regionalGrowthChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Detailed Territory Table -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 All Territories Performance</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Rank</th>
+                                    <th class="px-4 py-2 text-left font-semibold">Territory</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Orders</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Revenue</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Growth</th>
+                                    <th class="px-4 py-2 text-center font-semibold">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.territories.map((territory, index) => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-bold text-gray-600">#${index + 1}</td>
+                                        <td class="px-4 py-2 font-medium">${territory.territory_name}</td>
+                                        <td class="px-4 py-2 text-right font-semibold">${territory.orders.toLocaleString()}</td>
+                                        <td class="px-4 py-2 text-right">$${(territory.revenue / 1000000).toFixed(1)}M</td>
+                                        <td class="px-4 py-2 text-right">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${territory.growth_percentage >= 10 ? 'bg-green-100 text-green-700' : territory.growth_percentage >= 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}">
+                                                ${territory.growth_percentage >= 0 ? '↑' : '↓'} ${Math.abs(territory.growth_percentage)}%
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2 text-center">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${index < 3 ? 'bg-green-100 text-green-700' : index < 7 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}">
+                                                ${index < 3 ? 'Excellent' : index < 7 ? 'Good' : 'Average'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const ordersCtx = document.getElementById('regionalOrdersChart').getContext('2d');
+        new Chart(ordersCtx, {
+            type: 'bar',
+            data: {
+                labels: data.territories.map(t => t.territory_name),
+                datasets: [{
+                    label: 'Orders',
+                    data: data.territories.map(t => t.orders),
+                    backgroundColor: '#3B82F6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        const growthCtx = document.getElementById('regionalGrowthChart').getContext('2d');
+        new Chart(growthCtx, {
+            type: 'bar',
+            data: {
+                labels: data.territories.map(t => t.territory_name),
+                datasets: [{
+                    label: 'Growth %',
+                    data: data.territories.map(t => t.growth_percentage),
+                    backgroundColor: data.territories.map(t => t.growth_percentage >= 0 ? '#22C55E' : '#EF4444')
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => value + '%'
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading regional data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadForecastingData() {
-    // Will be implemented with charts
+    const container = document.getElementById('forecasting-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load forecasting data</div>';
+            return;
+        }
+
+        const data = result.data.forecasting;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Next Quarter Forecast</h3>
+                        <p class="text-3xl font-bold text-indigo-600">${(data.next_quarter_orders / 1000).toFixed(0)}K</p>
+                        <p class="text-xs text-green-600 mt-2">↑ ${data.forecast_growth}% projected</p>
+                    </div>
+                    <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Revenue Forecast</h3>
+                        <p class="text-3xl font-bold text-purple-600">$${(data.revenue_forecast / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">Next quarter</p>
+                    </div>
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Confidence Level</h3>
+                        <p class="text-3xl font-bold text-blue-600">${data.confidence_level}%</p>
+                        <p class="text-xs text-gray-500 mt-2">Forecast accuracy</p>
+                    </div>
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Year-End Projection</h3>
+                        <p class="text-3xl font-bold text-green-600">${(data.year_end_projection / 1000000).toFixed(1)}M</p>
+                        <p class="text-xs text-gray-500 mt-2">Total orders</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔮 Order Forecast</h3>
+                        <div class="h-80"><canvas id="forecastOrdersChart"></canvas></div>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Revenue Forecast</h3>
+                        <div class="h-80"><canvas id="forecastRevenueChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Forecast Details -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Quarterly Forecast Breakdown</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold">Quarter</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Orders</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Revenue</th>
+                                    <th class="px-4 py-2 text-right font-semibold">Growth</th>
+                                    <th class="px-4 py-2 text-center font-semibold">Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.quarterly_forecast.map(quarter => `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">${quarter.quarter}</td>
+                                        <td class="px-4 py-2 text-right font-semibold">${quarter.orders.toLocaleString()}</td>
+                                        <td class="px-4 py-2 text-right">$${(quarter.revenue / 1000000).toFixed(2)}M</td>
+                                        <td class="px-4 py-2 text-right">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${quarter.growth >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                                                ${quarter.growth >= 0 ? '↑' : '↓'} ${Math.abs(quarter.growth)}%
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2 text-center">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${quarter.confidence >= 85 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                                ${quarter.confidence}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Key Assumptions -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📝 Key Assumptions</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">Market Growth Rate</p>
+                            <p class="text-xl font-bold text-indigo-600">${data.assumptions.market_growth_rate}%</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4">
+                            <p class="text-sm text-gray-600 mb-2">Seasonality Factor</p>
+                            <p class="text-xl font-bold text-purple-600">${data.assumptions.seasonality_factor}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Create charts
+        const ordersCtx = document.getElementById('forecastOrdersChart').getContext('2d');
+        new Chart(ordersCtx, {
+            type: 'line',
+            data: {
+                labels: data.quarterly_forecast.map(q => q.quarter),
+                datasets: [{
+                    label: 'Forecast',
+                    data: data.quarterly_forecast.map(q => q.orders),
+                    borderColor: '#6366F1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        const revenueCtx = document.getElementById('forecastRevenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: data.quarterly_forecast.map(q => q.quarter),
+                datasets: [{
+                    label: 'Revenue Forecast',
+                    data: data.quarterly_forecast.map(q => q.revenue / 1000000),
+                    backgroundColor: '#A855F7'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => '$' + value + 'M'
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading forecasting data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadMarketData() {
-    // Will be implemented with charts
+    const container = document.getElementById('market-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load market data</div>';
+            return;
+        }
+
+        const data = result.data.market_intelligence;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- Critical Alerts -->
+                ${data.critical_alerts.length > 0 ? `
+                    <div class="bg-red-50 border-2 border-red-500 rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-red-900 mb-4 flex items-center gap-2">
+                            <span class="text-2xl">🚨</span> Critical Market Alerts
+                        </h3>
+                        <div class="space-y-3">
+                            ${data.critical_alerts.map(alert => `
+                                <div class="bg-white border-l-4 border-red-500 p-4 rounded">
+                                    <p class="font-semibold text-red-900">${alert}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Latest News -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">📰 Latest Market News</h3>
+                    <div class="space-y-4">
+                        ${data.latest_news.map(news => `
+                            <div class="border-l-4 ${news.importance === 'high' ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50'} p-4 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-gray-900">${news.title}</h4>
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${news.importance === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">
+                                        ${news.importance.toUpperCase()}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-700 mb-2">${news.summary}</p>
+                                <div class="flex justify-between text-xs text-gray-500">
+                                    <span>${news.source}</span>
+                                    <span>${news.date}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Competitor Updates -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏢 Competitor Activity</h3>
+                    <div class="space-y-4">
+                        ${data.competitor_updates.map(update => `
+                            <div class="border-l-4 ${update.impact_level === 'high' ? 'border-red-500 bg-red-50' : 'border-orange-500 bg-orange-50'} p-4 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-gray-900">${update.competitor_name}</h4>
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${update.impact_level === 'high' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}">
+                                        ${update.impact_level.toUpperCase()} IMPACT
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-700">${update.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Market Trends -->
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Market Share Trends</h3>
+                        <div class="space-y-3">
+                            ${data.market_trends.market_share.map(share => `
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="font-medium">${share.company}</span>
+                                        <span class="font-bold">${share.percentage}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: ${share.percentage}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Industry Insights</h3>
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p class="text-sm text-gray-700"><strong>Market Size:</strong> $${data.market_trends.market_size_billions}B</p>
+                            </div>
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                                <p class="text-sm text-gray-700"><strong>Growth Rate:</strong> ${data.market_trends.growth_rate}% YoY</p>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                <p class="text-sm text-gray-700"><strong>Emerging Trend:</strong> ${data.market_trends.emerging_trend}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Error loading market data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 async function loadMilestonesData() {
-    // Will be implemented with charts
+    const container = document.getElementById('milestones-content');
+
+    try {
+        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        const result = await response.json();
+
+        if (!result.success) {
+            container.innerHTML = '<div class="text-center py-12 text-red-600">Failed to load milestones data</div>';
+            return;
+        }
+
+        const data = result.data.milestones;
+
+        container.innerHTML = `
+            <div class="space-y-6">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-4 gap-6">
+                    <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Total Projects</h3>
+                        <p class="text-3xl font-bold text-blue-600">${data.total_projects}</p>
+                        <p class="text-xs text-gray-500 mt-2">Active projects</p>
+                    </div>
+                    <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">On Track</h3>
+                        <p class="text-3xl font-bold text-green-600">${data.projects_on_track}</p>
+                        <p class="text-xs text-gray-500 mt-2">${((data.projects_on_track / data.total_projects) * 100).toFixed(0)}% of total</p>
+                    </div>
+                    <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">At Risk</h3>
+                        <p class="text-3xl font-bold text-orange-600">${data.projects_at_risk}</p>
+                        <p class="text-xs text-gray-500 mt-2">Need attention</p>
+                    </div>
+                    <div class="bg-white border border-red-200 rounded-xl shadow-sm p-6">
+                        <h3 class="text-sm text-gray-600 mb-2">Delayed</h3>
+                        <p class="text-3xl font-bold text-red-600">${data.projects_delayed}</p>
+                        <p class="text-xs text-gray-500 mt-2">Behind schedule</p>
+                    </div>
+                </div>
+
+                <!-- Critical Items -->
+                ${data.critical_items.length > 0 ? `
+                    <div class="bg-orange-50 border-2 border-orange-500 rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
+                            <span class="text-2xl">⚠️</span> Critical Items Requiring Attention
+                        </h3>
+                        <div class="space-y-2">
+                            ${data.critical_items.map(item => `
+                                <div class="bg-white border-l-4 border-orange-500 p-3 rounded">
+                                    <p class="text-sm font-semibold text-gray-800">${item}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- Active Projects -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Active Projects</h3>
+                    <div class="space-y-4">
+                        ${data.active_projects.map(project => `
+                            <div class="border rounded-lg p-4 ${
+                                project.overall_status === 'on_track' ? 'border-green-200 bg-green-50' :
+                                project.overall_status === 'at_risk' ? 'border-orange-200 bg-orange-50' :
+                                'border-red-200 bg-red-50'
+                            }">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-gray-900">${project.project_name}</h4>
+                                        <p class="text-sm text-gray-600 mt-1">${project.description}</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                                        project.overall_status === 'on_track' ? 'bg-green-100 text-green-700' :
+                                        project.overall_status === 'at_risk' ? 'bg-orange-100 text-orange-700' :
+                                        'bg-red-100 text-red-700'
+                                    }">
+                                        ${project.overall_status.replace('_', ' ').toUpperCase()}
+                                    </span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-600">Progress</span>
+                                        <span class="font-bold">${project.completion_percentage}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="${
+                                            project.overall_status === 'on_track' ? 'bg-green-500' :
+                                            project.overall_status === 'at_risk' ? 'bg-orange-500' :
+                                            'bg-red-500'
+                                        } h-2 rounded-full" style="width: ${project.completion_percentage}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-3 mb-3">
+                                    <div class="text-sm">
+                                        <p class="text-gray-600">Start Date</p>
+                                        <p class="font-semibold">${project.start_date}</p>
+                                    </div>
+                                    <div class="text-sm">
+                                        <p class="text-gray-600">Target End</p>
+                                        <p class="font-semibold">${project.target_end_date}</p>
+                                    </div>
+                                    <div class="text-sm">
+                                        <p class="text-gray-600">Owner</p>
+                                        <p class="font-semibold">${project.project_owner}</p>
+                                    </div>
+                                </div>
+
+                                <div class="border-t pt-3">
+                                    <p class="text-sm font-semibold text-gray-700 mb-2">Key Milestones:</p>
+                                    <div class="space-y-2">
+                                        ${project.key_milestones.map(milestone => `
+                                            <div class="flex items-center gap-2 text-sm">
+                                                <span class="${milestone.status === 'completed' ? 'text-green-600' : milestone.status === 'in_progress' ? 'text-blue-600' : 'text-gray-400'}">
+                                                    ${milestone.status === 'completed' ? '✓' : milestone.status === 'in_progress' ? '◐' : '○'}
+                                                </span>
+                                                <span class="flex-1">${milestone.milestone_name}</span>
+                                                <span class="text-xs text-gray-500">${milestone.target_date}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        console.error('Error loading milestones data:', error);
+        container.innerHTML = '<div class="text-center py-12 text-red-600">Error loading data</div>';
+    }
 }
 
 // ==================== INTERACTIVE METRIC CHARTS ====================
