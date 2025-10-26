@@ -157,7 +157,7 @@ graph TB
 
     subgraph "External Services"
         OpenAI[OpenAI API]
-        []
+        Claude[Anthropic Claude API]
         AlphaVantage[Alpha Vantage API]
     end
 
@@ -201,7 +201,7 @@ graph TB
     StockAgent --> StockRepo
 
     BaseAgent --> OpenAI
-    BaseAgent --> 
+    BaseAgent --> Claude
     StockAgent --> AlphaVantage
 
     style UI fill:#e1f5ff
@@ -495,7 +495,7 @@ graph LR
 
     subgraph "External APIs"
         OpenAI[OpenAI API]
-        []
+        Claude[Anthropic Claude API]
         AlphaVantage[Alpha Vantage]
     end
 
@@ -518,7 +518,7 @@ graph LR
     Orchestrator --> Agents
 
     Agents --> OpenAI
-    Agents --> 
+    Agents --> Claude
     Agents --> AlphaVantage
 
     API1 --> Redis
@@ -576,7 +576,7 @@ mindmap
             LangChain
             LangGraph
             OpenAI
-            
+            Anthropic Claude
         Data
             Repositories
             Mock Data
