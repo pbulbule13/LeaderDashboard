@@ -118,16 +118,16 @@
         <div class="mermaid">
 graph TB
     subgraph "Frontend Layer"
-        UI[CEO Dashboard HTML/JS]
-        Charts[Chart.js Visualizations]
-        Chat[AI Chat Interface]
+        UI["CEO Dashboard HTML/JS"]
+        Charts["Chart.js Visualizations"]
+        Chat["AI Chat Interface"]
     end
 
     subgraph "API Layer"
-        FastAPI[FastAPI Server :8000]
-        Health[/health endpoint]
-        Tiles[/api/dashboard/tiles/*]
-        Query[/api/query/ask]
+        FastAPI["FastAPI Server :8000"]
+        Health["Health Endpoint"]
+        Tiles["Dashboard Tiles API"]
+        Query["Query API"]
     end
 
     subgraph "Orchestration Layer"
