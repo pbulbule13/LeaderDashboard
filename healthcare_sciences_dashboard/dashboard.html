@@ -23,12 +23,11 @@
         .ai-sidebar {
             position: fixed;
             left: 0;
-            top: 0;
+            top: 145px;
             width: 20%;
-            height: 100vh;
+            height: calc(100vh - 145px);
             overflow-y: auto;
             z-index: 30;
-            padding-top: 120px;
         }
 
         /* Main content adjusted for sidebar - 80% width */
@@ -72,7 +71,7 @@
             </div>
             <div class="flex gap-1 mt-4 border-b overflow-x-auto">
                 <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">📊 Dashboard</button>
-                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📧📅 Email & Calendar</button>
+                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📬 Communications</button>
                 <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💼 Personal</button>
                 <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📈 Orders</button>
                 <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">✅ Compliance</button>
@@ -164,7 +163,7 @@
                             <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('orders', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartOrders"></canvas></div>
@@ -178,7 +177,7 @@
                             <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
@@ -192,7 +191,7 @@
                             <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('compliance', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartCompliance"></canvas></div>
@@ -208,7 +207,7 @@
                             <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('lab', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartLab"></canvas></div>
@@ -222,7 +221,7 @@
                             <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('costs', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartCosts"></canvas></div>
@@ -236,7 +235,7 @@
                             <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('forecast', 'year')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="year">Y</button>
+                            <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartForecast"></canvas></div>
@@ -330,7 +329,26 @@
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Stock Performance</h3>
                     <div id="overview-stock-summary" class="space-y-3">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-semibold text-gray-700">Current Price</span>
+                            <span class="text-lg font-bold text-green-600">$127.45</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Change</span>
+                            <span class="text-sm font-semibold text-green-600">+$3.21 (+2.58%)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">52-Week High</span>
+                            <span class="text-sm text-gray-700">$142.18</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">52-Week Low</span>
+                            <span class="text-sm text-gray-700">$98.32</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Market Cap</span>
+                            <span class="text-sm text-gray-700">$12.4B</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -340,25 +358,92 @@
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Top Territories</h3>
                     <div id="overview-regional" class="space-y-2">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Northeast</span>
+                            <span class="font-semibold text-blue-600">$42.3M</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">West Coast</span>
+                            <span class="font-semibold text-blue-600">$38.7M</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Southeast</span>
+                            <span class="font-semibold text-blue-600">$35.2M</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-700">Midwest</span>
+                            <span class="font-semibold text-blue-600">$31.8M</span>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Projects Status</h3>
                     <div id="overview-projects" class="space-y-2">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span class="text-sm text-gray-700">FDA Submission</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                            <span class="text-sm text-gray-700">Lab Expansion</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                            <span class="text-sm text-gray-700">New Product Launch</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span class="text-sm text-gray-700">AI Integration</span>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🚨 Critical Alerts</h3>
                     <div id="overview-alerts" class="space-y-2">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="bg-red-50 border-l-4 border-red-500 p-2 rounded">
+                            <p class="text-xs font-semibold text-red-900">Lab Equipment Alert</p>
+                            <p class="text-xs text-red-700">Maintenance needed</p>
+                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-2 rounded">
+                            <p class="text-xs font-semibold text-yellow-900">Inventory Low</p>
+                            <p class="text-xs text-yellow-700">Reagents below threshold</p>
+                        </div>
+                        <div class="bg-orange-50 border-l-4 border-orange-500 p-2 rounded">
+                            <p class="text-xs font-semibold text-orange-900">Compliance Due</p>
+                            <p class="text-xs text-orange-700">Q4 audit in 2 weeks</p>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Operations</h3>
                     <div id="overview-stats" class="space-y-3">
-                        <p class="text-gray-600">Loading...</p>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Lab Capacity</span>
+                                <span class="font-semibold text-green-600">87%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 87%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Order Processing</span>
+                                <span class="font-semibold text-blue-600">92%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Staff Utilization</span>
+                                <span class="font-semibold text-purple-600">78%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: 78%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -368,106 +453,260 @@
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">📰 Market News</h3>
                     <div id="overview-market" class="space-y-2 max-h-96 overflow-y-auto">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="border-b border-gray-200 pb-2">
+                            <p class="text-sm font-semibold text-gray-900">FDA Approves New Genetic Testing Protocol</p>
+                            <p class="text-xs text-gray-600 mt-1">Genomics News • 2 hours ago</p>
+                        </div>
+                        <div class="border-b border-gray-200 pb-2">
+                            <p class="text-sm font-semibold text-gray-900">Healthcare Spending Projected to Increase 15%</p>
+                            <p class="text-xs text-gray-600 mt-1">Healthcare Finance • 5 hours ago</p>
+                        </div>
+                        <div class="border-b border-gray-200 pb-2">
+                            <p class="text-sm font-semibold text-gray-900">AI in Diagnostics Market Reaches $2.1B</p>
+                            <p class="text-xs text-gray-600 mt-1">MedTech Daily • 1 day ago</p>
+                        </div>
+                        <div class="border-b border-gray-200 pb-2">
+                            <p class="text-sm font-semibold text-gray-900">Medicare Reimbursement Changes for 2026</p>
+                            <p class="text-xs text-gray-600 mt-1">CMS Updates • 2 days ago</p>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Competitor Activity</h3>
                     <div id="overview-competitors" class="space-y-2 max-h-96 overflow-y-auto">
-                        <p class="text-gray-600">Loading...</p>
+                        <div class="border-l-4 border-red-500 pl-3 py-2">
+                            <p class="text-sm font-semibold text-gray-900">GenomaCorp</p>
+                            <p class="text-xs text-gray-600">Launched AI-powered test analysis platform</p>
+                        </div>
+                        <div class="border-l-4 border-orange-500 pl-3 py-2">
+                            <p class="text-sm font-semibold text-gray-900">BioTest Systems</p>
+                            <p class="text-xs text-gray-600">Acquired regional lab network for $450M</p>
+                        </div>
+                        <div class="border-l-4 border-yellow-500 pl-3 py-2">
+                            <p class="text-sm font-semibold text-gray-900">HealthDx Inc</p>
+                            <p class="text-xs text-gray-600">Expanded into European markets</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-3 py-2">
+                            <p class="text-sm font-semibold text-gray-900">MediLabs Pro</p>
+                            <p class="text-xs text-gray-600">Announced partnership with major hospital chain</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Email Tab -->
+        <!-- Communications Tab (Email, Calendar, Travel) -->
         <div id="content-email" class="tab-content hidden fade-in">
-            <div class="grid grid-cols-4 gap-6">
-                <!-- Email Sidebar -->
-                <div class="col-span-1 space-y-4">
-                    <button onclick="composeEmail()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold shadow-sm transition">
-                        ✉️ Compose Email
-                    </button>
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                        <h3 class="font-bold text-gray-800 mb-3">📥 Folders</h3>
-                        <div class="space-y-2">
-                            <button onclick="loadEmails('inbox')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">
-                                <span class="font-semibold">Inbox</span>
-                                <span class="float-right bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
-                            </button>
-                            <button onclick="loadEmails('sent')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">Sent</button>
-                            <button onclick="loadEmails('drafts')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">
-                                Drafts
-                                <span class="float-right text-gray-500 text-xs">3</span>
-                            </button>
-                            <button onclick="loadEmails('starred')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">⭐ Starred</button>
-                            <button onclick="loadEmails('archive')" class="w-full text-left px-3 py-2 rounded hover:bg-blue-50 text-gray-700">📦 Archive</button>
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Email Section -->
+                <div class="col-span-5">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">📨 Inbox (24)</h3>
+                            <button onclick="composeEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">Compose</button>
                         </div>
-                    </div>
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">🤖 AI Email Assistant</h4>
-                        <p class="text-xs text-gray-600 mb-3">Let AI help you manage emails</p>
-                        <button onclick="aiSummarizeEmails()" class="w-full bg-white hover:bg-gray-50 text-blue-600 py-2 rounded text-sm font-semibold border border-blue-200 mb-2">
-                            Summarize Inbox
-                        </button>
-                        <button onclick="aiPriorityEmails()" class="w-full bg-white hover:bg-gray-50 text-blue-600 py-2 rounded text-sm font-semibold border border-blue-200">
-                            Find Priority Emails
-                        </button>
+                        <div class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-semibold text-sm">John Doe - CEO</p>
+                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">Urgent</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mb-1">Q4 Financial Review</p>
+                                <p class="text-xs text-gray-500">9:30 AM</p>
+                            </div>
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-semibold text-sm">Sarah Miller - VP Ops</p>
+                                    <span class="text-xs text-gray-500">8:15 AM</span>
+                                </div>
+                                <p class="text-xs text-gray-600">Lab Capacity +15% Update</p>
+                            </div>
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-semibold text-sm">Robert Johnson - CFO</p>
+                                    <span class="text-xs text-gray-500">Yesterday</span>
+                                </div>
+                                <p class="text-xs text-gray-600">Budget Approval $2.5M</p>
+                            </div>
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-semibold text-sm">Lisa Chen - Compliance</p>
+                                    <span class="text-xs text-gray-500">Yesterday</span>
+                                </div>
+                                <p class="text-xs text-gray-600">FDA Submission Update</p>
+                            </div>
+                            <div class="p-3 hover:bg-blue-50 cursor-pointer">
+                                <div class="flex justify-between mb-1">
+                                    <p class="font-semibold text-sm">Mike Thompson - Sales</p>
+                                    <span class="text-xs text-gray-500">2 days ago</span>
+                                </div>
+                                <p class="text-xs text-gray-600">Q4 Sales Forecast</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Email List -->
-                <div class="col-span-3">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-800">📨 Inbox (24 unread)</h3>
-                            <button onclick="refreshEmails()" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
-                                🔄 Refresh
-                            </button>
+                <!-- Calendar & Schedule Section -->
+                <div class="col-span-4">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <h3 class="font-bold text-gray-800 mb-4">📅 This Week</h3>
+                        <div class="space-y-2 max-h-[600px] overflow-y-auto">
+                            <!-- Today -->
+                            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                                <p class="text-xs font-semibold text-blue-900">TODAY - Monday, Oct 27</p>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-blue-700 w-16">9:00 AM</span>
+                                        <div>
+                                            <p class="text-xs font-semibold">Executive Team Sync</p>
+                                            <p class="text-xs text-gray-600">Conference Room A</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-blue-700 w-16">11:30 AM</span>
+                                        <div>
+                                            <p class="text-xs font-semibold">Investor Call - Q3</p>
+                                            <p class="text-xs text-gray-600">Virtual (Zoom)</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-blue-700 w-16">2:00 PM</span>
+                                        <div>
+                                            <p class="text-xs font-semibold">Product Strategy</p>
+                                            <p class="text-xs text-gray-600">Office - 1 hour</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tuesday -->
+                            <div class="border-l-4 border-green-500 p-3 rounded bg-green-50">
+                                <p class="text-xs font-semibold text-green-900">TUESDAY - Oct 28</p>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-green-700 w-16">10:00 AM</span>
+                                        <p class="text-xs font-semibold">Board Prep Session</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-green-700 w-16">3:00 PM</span>
+                                        <p class="text-xs font-semibold">Lab Tour & Review</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Wednesday -->
+                            <div class="border-l-4 border-purple-500 p-3 rounded bg-purple-50">
+                                <p class="text-xs font-semibold text-purple-900">WEDNESDAY - Oct 29</p>
+                                <div class="mt-2">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-purple-700 w-16">All Day</span>
+                                        <p class="text-xs font-semibold">Board Meeting</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thursday -->
+                            <div class="border-l-4 border-orange-500 p-3 rounded bg-orange-50">
+                                <p class="text-xs font-semibold text-orange-900">THURSDAY - Oct 30</p>
+                                <div class="mt-2 space-y-2">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-orange-700 w-16">9:00 AM</span>
+                                        <p class="text-xs font-semibold">Compliance Review</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-orange-700 w-16">1:00 PM</span>
+                                        <p class="text-xs font-semibold">Partner Negotiations</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Friday -->
+                            <div class="border-l-4 border-indigo-500 p-3 rounded bg-indigo-50">
+                                <p class="text-xs font-semibold text-indigo-900">FRIDAY - Oct 31</p>
+                                <div class="mt-2">
+                                    <div class="flex gap-2">
+                                        <span class="text-xs font-semibold text-indigo-700 w-16">2:00 PM</span>
+                                        <p class="text-xs font-semibold">All Hands Meeting</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div id="emailList" class="divide-y divide-gray-100">
-                            <!-- Sample Emails -->
-                            <div class="p-4 email-item cursor-pointer transition">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-semibold text-blue-600">JD</div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">John Doe</p>
-                                            <p class="text-sm text-gray-600">Q4 Financial Review Meeting</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xs text-gray-500">9:30 AM</p>
-                                        <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">Urgent</span>
+                    </div>
+                </div>
+
+                <!-- Travel Plans Section -->
+                <div class="col-span-3">
+                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm p-4">
+                        <h3 class="font-bold text-amber-900 mb-4">✈️ Upcoming Travel</h3>
+                        <div class="space-y-3 max-h-[450px] overflow-y-auto">
+                            <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                <div class="flex items-start gap-2 mb-2">
+                                    <span class="text-lg">🛫</span>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-sm text-gray-900">San Francisco, CA</p>
+                                        <p class="text-xs text-gray-600">Nov 5-7 • 3 days</p>
                                     </div>
                                 </div>
-                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Please review the attached Q4 financial projections before tomorrow's board meeting...</p>
+                                <p class="text-xs text-gray-700 mb-2">• Healthcare Innovation Conference</p>
+                                <p class="text-xs text-gray-700">• Investor Meetings</p>
+                                <div class="mt-2 pt-2 border-t border-amber-100">
+                                    <p class="text-xs text-gray-600">✓ Flight booked</p>
+                                    <p class="text-xs text-gray-600">✓ Hotel: Marriott Union Square</p>
+                                </div>
                             </div>
-                            <div class="p-4 email-item cursor-pointer transition bg-blue-50">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-semibold text-green-600">SM</div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Sarah Miller - VP Operations</p>
-                                            <p class="text-sm text-gray-600">Lab Capacity Update</p>
-                                        </div>
+
+                            <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                <div class="flex items-start gap-2 mb-2">
+                                    <span class="text-lg">🛬</span>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-sm text-gray-900">Boston, MA</p>
+                                        <p class="text-xs text-gray-600">Nov 12-14 • 3 days</p>
                                     </div>
-                                    <p class="text-xs text-gray-500">8:15 AM</p>
                                 </div>
-                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Great news! We've successfully increased lab capacity by 15%. Processing times are down...</p>
+                                <p class="text-xs text-gray-700 mb-2">• FDA Meeting</p>
+                                <p class="text-xs text-gray-700">• Lab Partner Visit</p>
+                                <div class="mt-2 pt-2 border-t border-amber-100">
+                                    <p class="text-xs text-gray-600">⏳ Flight pending</p>
+                                    <p class="text-xs text-gray-600">✓ Hotel: Hyatt Regency</p>
+                                </div>
                             </div>
-                            <div class="p-4 email-item cursor-pointer transition">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center font-semibold text-purple-600">RJ</div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900">Robert Johnson - CFO</p>
-                                            <p class="text-sm text-gray-600">Budget Approval Request</p>
-                                        </div>
+
+                            <div class="bg-white rounded-lg p-3 border border-amber-200">
+                                <div class="flex items-start gap-2 mb-2">
+                                    <span class="text-lg">🌎</span>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-sm text-gray-900">London, UK</p>
+                                        <p class="text-xs text-gray-600">Nov 20-24 • 5 days</p>
                                     </div>
-                                    <p class="text-xs text-gray-500">Yesterday</p>
                                 </div>
-                                <p class="text-sm text-gray-600 ml-13 line-clamp-2">Requesting approval for additional $2.5M investment in new sequencing equipment...</p>
+                                <p class="text-xs text-gray-700 mb-2">• Global Summit</p>
+                                <p class="text-xs text-gray-700">• European Partners</p>
+                                <div class="mt-2 pt-2 border-t border-amber-100">
+                                    <p class="text-xs text-amber-700">⚠️ Needs booking</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-xs font-semibold">
+                            + Add Travel Plan
+                        </button>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="mt-4 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">📊 This Month</h4>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Meetings:</span>
+                                <span class="font-semibold">32</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Travel Days:</span>
+                                <span class="font-semibold text-amber-600">11</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Emails Processed:</span>
+                                <span class="font-semibold text-green-600">248</span>
                             </div>
                         </div>
                     </div>

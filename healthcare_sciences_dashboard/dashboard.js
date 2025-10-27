@@ -1727,21 +1727,19 @@ Object.keys(CONFIG.metrics).forEach(metricKey => {
     currentPeriods[metricKey] = CONFIG.metrics[metricKey].defaultPeriod;
 });
 
-// Generate sample data for different time periods
+// Generate sample data for doughnut charts (all periods combined)
 function generateMetricData(metric, period) {
-    const periods = CONFIG.charts.periods;
-    const config = periods[period];
-    const data = [];
-
     const metricConfig = CONFIG.metrics[metric];
-    const baseValue = metricConfig.baseValues[period];
 
-    for (let i = 0; i < config.count; i++) {
-        const variance = (Math.random() - 0.5) * 0.2; // ±10% variance
-        data.push(baseValue * (1 + variance));
-    }
+    // For doughnut charts, return data for all periods
+    const labels = CONFIG.charts.doughnutLabels;
+    const data = metricConfig.periods.map(p => {
+        const baseValue = metricConfig.baseValues[p];
+        const variance = (Math.random() - 0.5) * 0.1; // ±5% variance
+        return baseValue * (1 + variance);
+    });
 
-    return { labels: config.labels, data };
+    return { labels, data };
 }
 
 // Update metric chart when period button is clicked
@@ -1794,6 +1792,8 @@ function createMetricCharts() {
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
 
+        const isDoughnut = metricConfig.chartType === 'doughnut';
+
         metricCharts[metric] = new Chart(canvas.getContext('2d'), {
             type: metricConfig.chartType,
             data: {
@@ -1801,25 +1801,42 @@ function createMetricCharts() {
                 datasets: [{
                     label: metricConfig.label,
                     data,
-                    borderColor: hexToRgba(metricConfig.color, 1),
-                    backgroundColor: hexToRgba(metricConfig.color, CONFIG.charts.fillOpacity),
+                    backgroundColor: isDoughnut ? [
+                        hexToRgba(metricConfig.color, 0.9),
+                        hexToRgba(metricConfig.color, 0.7),
+                        hexToRgba(metricConfig.color, 0.5),
+                        hexToRgba(metricConfig.color, 0.3)
+                    ] : hexToRgba(metricConfig.color, CONFIG.charts.fillOpacity),
+                    borderColor: isDoughnut ? '#ffffff' : hexToRgba(metricConfig.color, 1),
+                    borderWidth: isDoughnut ? 2 : CONFIG.charts.borderWidth,
                     tension: CONFIG.charts.tension,
-                    fill: true,
-                    borderWidth: CONFIG.charts.borderWidth
+                    fill: !isDoughnut
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: isDoughnut,
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 9 },
+                            padding: 8,
+                            boxWidth: 12
+                        }
+                    },
                     tooltip: {
                         callbacks: {
-                            label: (context) => metricConfig.format(context.parsed.y)
+                            label: (context) => {
+                                const label = context.label || '';
+                                const value = isDoughnut ? context.parsed : context.parsed.y;
+                                return `${label}: ${metricConfig.format(value)}`;
+                            }
                         }
                     }
                 },
-                scales: {
+                scales: isDoughnut ? {} : {
                     y: {
                         beginAtZero: metric === 'reimbursement' || metric === 'compliance' ? false : true,
                         ticks: {

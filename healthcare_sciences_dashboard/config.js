@@ -62,14 +62,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#2563EB',      // blue-600
             borderColor: '#93C5FD',    // blue-200
             format: (value) => (value / 1000).toFixed(0) + 'K',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 1500,
                 week: 35000,
                 month: 250000,
-                year: 1000000
+                quarter: 750000
             }
         },
         reimbursement: {
@@ -81,14 +81,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#9333EA',      // purple-600
             borderColor: '#E9D5FF',    // purple-200
             format: (value) => value.toFixed(1) + '%',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 97,
                 week: 98,
                 month: 99,
-                year: 98.5
+                quarter: 98.5
             }
         },
         compliance: {
@@ -100,14 +100,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#16A34A',      // green-600
             borderColor: '#BBF7D0',    // green-200
             format: (value) => value.toFixed(1) + '%',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 99.2,
                 week: 99.4,
                 month: 99.3,
-                year: 99.5
+                quarter: 99.5
             }
         },
         lab: {
@@ -119,14 +119,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#EA580C',      // orange-600
             borderColor: '#FED7AA',    // orange-200
             format: (value) => value.toFixed(1) + 'h',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 38,
                 week: 39,
                 month: 40,
-                year: 39
+                quarter: 39
             }
         },
         costs: {
@@ -138,14 +138,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#DC2626',      // red-600
             borderColor: '#FECACA',    // red-200
             format: (value) => '$' + (value / 1000000).toFixed(1) + 'M',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 3500000,
                 week: 24500000,
                 month: 103500000,
-                year: 1242000000
+                quarter: 310500000
             }
         },
         forecast: {
@@ -157,14 +157,14 @@ const DASHBOARD_CONFIG = {
             textColor: '#4F46E5',      // indigo-600
             borderColor: '#C7D2FE',    // indigo-200
             format: (value) => (value / 1000).toFixed(0) + 'K',
-            chartType: 'line',
-            periods: ['day', 'week', 'month', 'year'],
+            chartType: 'doughnut',
+            periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
                 day: 45000,
                 week: 315000,
                 month: 1350000,
-                year: 16200000
+                quarter: 4050000
             }
         }
     },
@@ -177,11 +177,12 @@ const DASHBOARD_CONFIG = {
         borderWidth: 2,
         fillOpacity: 0.1,
         periods: {
-            day: { labels: ['12AM', '4AM', '8AM', '12PM', '4PM', '8PM'], count: 6 },
-            week: { labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], count: 7 },
-            month: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], count: 4 },
-            year: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], count: 12 }
-        }
+            day: { labels: ['Day'], count: 1 },
+            week: { labels: ['Week'], count: 1 },
+            month: { labels: ['Month'], count: 1 },
+            quarter: { labels: ['Quarter'], count: 1 }
+        },
+        doughnutLabels: ['Day', 'Week', 'Month', 'Quarter']
     },
 
     // ==================== OVERVIEW PAGE CONFIG ====================
