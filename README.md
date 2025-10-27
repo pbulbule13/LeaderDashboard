@@ -70,9 +70,79 @@ LeaderDashboard is an intelligent executive command center for **HealthCare Scie
 Python 3.9+
 Node.js 16+ (for frontend dependencies)
 Anthropic API Key
+uv (recommended) or pip
 ```
 
 ### Installation
+
+#### Option A: Using uv (Recommended - Fast & Modern)
+
+1. **Install uv** (if not already installed)
+```bash
+# On macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# On Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+2. **Clone the repository**
+```bash
+git clone https://github.com/pbulbule13/LeaderDashboard.git
+cd LeaderDashboard
+```
+
+3. **Create virtual environment and install dependencies**
+```bash
+cd healthcare_sciences_dashboard
+
+# Create virtual environment with uv
+uv venv
+
+# Activate virtual environment
+# On Windows:
+.venv\Scripts\activate
+
+# On macOS/Linux:
+source .venv/bin/activate
+
+# Install dependencies with uv (much faster than pip)
+uv pip install -r requirements.txt
+```
+
+4. **Set up environment**
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env and add your Anthropic API key
+# Windows: notepad .env
+# macOS/Linux: nano .env
+ANTHROPIC_API_KEY=your_key_here
+```
+
+5. **Run the API server**
+```bash
+# Make sure you're in healthcare_sciences_dashboard directory
+python api/server.py
+```
+
+6. **Open dashboard in another terminal**
+```bash
+# Navigate to healthcare_sciences_dashboard directory
+cd healthcare_sciences_dashboard
+
+# Start HTTP server for frontend
+python -m http.server 3000
+```
+
+7. **Access the dashboard**
+```
+API Server: http://localhost:8000
+Dashboard: http://localhost:3000/dashboard.html
+```
+
+#### Option B: Using Traditional pip
 
 1. **Clone the repository**
 ```bash
@@ -80,45 +150,83 @@ git clone https://github.com/pbulbule13/LeaderDashboard.git
 cd LeaderDashboard
 ```
 
-2. **Set up environment**
+2. **Create and activate virtual environment**
+```bash
+cd healthcare_sciences_dashboard
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+3. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Set up environment**
 ```bash
 # Copy environment template
-cp healthcare_sciences_dashboard/.env.example healthcare_sciences_dashboard/.env
+cp .env.example .env
 
 # Edit .env and add your Anthropic API key
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-3. **Install dependencies**
+5. **Run the servers**
 ```bash
-# Python dependencies
-cd healthcare_sciences_dashboard
-pip install -r requirements.txt
+# Terminal 1: Start API server
+python api/server.py
 
-# Frontend dependencies (optional)
-npm install
+# Terminal 2: Start HTTP server for frontend
+python -m http.server 3000
 ```
 
-4. **Run the server**
-```bash
-python run_server.py
+6. **Open dashboard**
 ```
-
-5. **Open dashboard**
-```
-Navigate to: http://localhost:8000/dashboard.html
+API Server: http://localhost:8000
+Dashboard: http://localhost:3000/dashboard.html
 ```
 
 ### Running Tests
 
 ```bash
+# Make sure virtual environment is activated first
+# Then run tests from healthcare_sciences_dashboard directory
 python run_tests.py
+
+# Or with pytest directly
+pytest tests/
 ```
 
 ### Running Demo
 
 ```bash
+# Make sure virtual environment is activated first
+# Then run demo from healthcare_sciences_dashboard directory
 python run_demo.py
+```
+
+### Environment Activation Reminder
+
+Always activate your virtual environment before running commands:
+
+```bash
+# Windows
+.venv\Scripts\activate   # if using uv
+# or
+venv\Scripts\activate    # if using pip
+
+# macOS/Linux
+source .venv/bin/activate   # if using uv
+# or
+source venv/bin/activate    # if using pip
 ```
 
 ---
@@ -361,14 +469,30 @@ pytest --cov=healthcare_sciences_dashboard
 ### Development
 
 ```bash
-python run_server.py
+# Activate virtual environment first
+source .venv/bin/activate  # macOS/Linux
+# or
+.venv\Scripts\activate     # Windows
+
+# Start API server
+cd healthcare_sciences_dashboard
+python api/server.py
+
+# In another terminal, start frontend server
+python -m http.server 3000
 ```
 
 ### Production
 
 ```bash
-# Using Uvicorn
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+# or
+.venv\Scripts\activate     # Windows
+
+# Using Uvicorn directly
+cd healthcare_sciences_dashboard
+uvicorn api.server:app --host 0.0.0.0 --port 8000 --workers 4
 
 # Using Docker (future)
 docker-compose up -d
@@ -377,9 +501,14 @@ docker-compose up -d
 ### Environment Variables
 
 ```bash
+# Required
 ANTHROPIC_API_KEY=your_key
+
+# Optional
 ENVIRONMENT=production
 LOG_LEVEL=info
+DEBUG=false
+PORT=8000
 ```
 
 ---
