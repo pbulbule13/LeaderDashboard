@@ -44,6 +44,58 @@
             from { transform: translateX(-20px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Circular Progress Charts */
+        .circular-chart {
+            display: block;
+            margin: 10px auto;
+            max-width: 100%;
+            max-height: 180px;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 3.8;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 2.8;
+            stroke-linecap: round;
+            animation: progress 1.5s ease-out forwards;
+        }
+
+        @keyframes progress {
+            0% { stroke-dasharray: 0 100; }
+        }
+
+        .percentage {
+            fill: #666;
+            font-family: sans-serif;
+            font-size: 0.5em;
+            text-anchor: middle;
+        }
+
+        .pulse-dot {
+            animation: pulse-grow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-grow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* USA Heat Map */
+        .state {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .state:hover {
+            stroke: #000;
+            stroke-width: 2;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -120,30 +172,43 @@
         </div>
     </div>
 
-    <!-- AI Analytics & Reasoning - Left Sidebar (20% width, persistent) -->
+    <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
     <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
         <div class="p-4">
             <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
-                <span class="text-lg">🧠 AI Analytics</span>
-                <p class="text-xs mt-1 opacity-90">Real-time insights</p>
+                <span class="text-lg">👔 CEO Executive Assistant</span>
+                <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
             </div>
             <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze Page</button>
-                <button onclick="askQuick('Compare trends')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Compare Trends</button>
-                <button onclick="askQuick('Critical alerts')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Alerts</button>
+                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
+                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
+                <button onclick="askQuick('What opportunities should I focus on?')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">💡 Opportunities</button>
+                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
-                <input type="text" id="reasoningInput" placeholder="Ask about data..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" onkeypress="if(event.key==='Enter') askReasoning()">
+                <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
+                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-purple-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
+                <button onclick="askReasoning()" class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+                    🚀 Ask AI Assistant
+                </button>
             </div>
-            <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-450px)] overflow-y-auto">
-                <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm">
-                    <p class="font-semibold text-indigo-900 text-xs">🎯 Orders up 12% this week</p>
+            <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-520px)] overflow-y-auto">
+                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
+                    <p class="text-xs text-purple-900 mb-2">
+                        <span class="font-bold">👔 Executive Assistant:</span>
+                    </p>
+                    <p class="text-xs text-gray-700">
+                        I can help you with questions about Orders, Compliance, Lab Operations, Finance, Regional Performance, and more. Just ask!
+                    </p>
                 </div>
-                <div class="bg-white border border-amber-200 rounded-lg p-3 shadow-sm">
-                    <p class="font-semibold text-amber-900 text-xs">⚠️ Reimbursement claims +8%</p>
-                </div>
-                <div class="bg-white border border-green-200 rounded-lg p-3 shadow-sm">
-                    <p class="font-semibold text-green-900 text-xs">📈 Compliance at 98.5%</p>
+                <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm ai-insight-card">
+                    <div class="flex items-start gap-2">
+                        <span class="text-sm">🎯</span>
+                        <div>
+                            <p class="font-semibold text-indigo-900 text-xs">Real-time Insight</p>
+                            <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -356,23 +421,82 @@
             <!-- Data Grid -->
             <div class="grid grid-cols-4 gap-4 mb-6">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Top Territories</h3>
-                    <div id="overview-regional" class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-700">Northeast</span>
-                            <span class="font-semibold text-blue-600">$42.3M</span>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ USA Regional Performance</h3>
+                    <div id="overview-regional">
+                        <svg viewBox="0 0 960 600" class="w-full h-auto">
+                            <!-- Simplified USA Map with heat map coloring -->
+                            <g id="states">
+                                <!-- West Coast (High) -->
+                                <path d="M50,200 L80,180 L90,220 L85,280 L60,290 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="CA" data-revenue="38.7M">
+                                    <title>California: $38.7M</title>
+                                </path>
+                                <path d="M60,140 L90,130 L95,170 L85,180 L65,175 Z" class="state" fill="#34d399" stroke="#fff" stroke-width="1" data-state="WA">
+                                    <title>Washington: $15.2M</title>
+                                </path>
+
+                                <!-- Northeast (Highest) -->
+                                <path d="M800,120 L830,110 L850,130 L840,160 L810,155 Z" class="state" fill="#059669" stroke="#fff" stroke-width="1" data-state="NY">
+                                    <title>New York: $42.3M</title>
+                                </path>
+                                <path d="M850,140 L870,135 L880,150 L865,165 L850,160 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="MA">
+                                    <title>Massachusetts: $18.5M</title>
+                                </path>
+
+                                <!-- Southeast (Medium-High) -->
+                                <path d="M700,350 L750,340 L780,380 L760,420 L720,415 Z" class="state" fill="#22c55e" stroke="#fff" stroke-width="1" data-state="FL">
+                                    <title>Florida: $35.2M</title>
+                                </path>
+                                <path d="M650,280 L700,270 L720,310 L695,340 L665,330 Z" class="state" fill="#4ade80" stroke="#fff" stroke-width="1" data-state="GA">
+                                    <title>Georgia: $22.1M</title>
+                                </path>
+
+                                <!-- Midwest (Medium) -->
+                                <path d="M450,180 L500,170 L520,210 L505,250 L465,245 Z" class="state" fill="#86efac" stroke="#fff" stroke-width="1" data-state="IL">
+                                    <title>Illinois: $31.8M</title>
+                                </path>
+                                <path d="M400,150 L450,145 L465,180 L450,210 L410,205 Z" class="state" fill="#bbf7d0" stroke="#fff" stroke-width="1" data-state="MI">
+                                    <title>Michigan: $19.3M</title>
+                                </path>
+
+                                <!-- Texas (High) -->
+                                <path d="M350,350 L450,340 L480,400 L450,460 L370,450 L340,400 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="TX">
+                                    <title>Texas: $38.1M</title>
+                                </path>
+
+                                <!-- Other states (Lower performance) -->
+                                <path d="M200,250 L280,245 L300,290 L285,330 L220,325 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="CO">
+                                    <title>Colorado: $12.4M</title>
+                                </path>
+                                <path d="M120,300 L180,290 L195,340 L175,380 L130,370 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="NV">
+                                    <title>Nevada: $10.2M</title>
+                                </path>
+                            </g>
+                        </svg>
+                        <div class="mt-3 flex justify-between items-center text-xs">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-900 rounded"></div>
+                                <span class="text-gray-600">High</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-400 rounded"></div>
+                                <span class="text-gray-600">Medium</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 bg-green-100 rounded"></div>
+                                <span class="text-gray-600">Low</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-700">West Coast</span>
-                            <span class="font-semibold text-blue-600">$38.7M</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-700">Southeast</span>
-                            <span class="font-semibold text-blue-600">$35.2M</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-700">Midwest</span>
-                            <span class="font-semibold text-blue-600">$31.8M</span>
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">Top: NY</span>
+                                    <span class="font-semibold text-green-700">$42.3M</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">CA</span>
+                                    <span class="font-semibold text-green-600">$38.7M</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

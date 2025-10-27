@@ -1792,7 +1792,7 @@ function createMetricCharts() {
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         };
 
-        const isDoughnut = metricConfig.chartType === 'doughnut';
+        const isPolar = metricConfig.chartType === 'polarArea';
 
         metricCharts[metric] = new Chart(canvas.getContext('2d'), {
             type: metricConfig.chartType,
@@ -1801,24 +1801,30 @@ function createMetricCharts() {
                 datasets: [{
                     label: metricConfig.label,
                     data,
-                    backgroundColor: isDoughnut ? [
+                    backgroundColor: isPolar ? [
                         hexToRgba(metricConfig.color, 0.9),
                         hexToRgba(metricConfig.color, 0.7),
                         hexToRgba(metricConfig.color, 0.5),
                         hexToRgba(metricConfig.color, 0.3)
                     ] : hexToRgba(metricConfig.color, CONFIG.charts.fillOpacity),
-                    borderColor: isDoughnut ? '#ffffff' : hexToRgba(metricConfig.color, 1),
-                    borderWidth: isDoughnut ? 2 : CONFIG.charts.borderWidth,
+                    borderColor: isPolar ? '#ffffff' : hexToRgba(metricConfig.color, 1),
+                    borderWidth: isPolar ? 2 : CONFIG.charts.borderWidth,
                     tension: CONFIG.charts.tension,
-                    fill: !isDoughnut
+                    fill: !isPolar
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                },
                 plugins: {
                     legend: {
-                        display: isDoughnut,
+                        display: isPolar,
                         position: 'bottom',
                         labels: {
                             font: { size: 9 },
@@ -1830,13 +1836,23 @@ function createMetricCharts() {
                         callbacks: {
                             label: (context) => {
                                 const label = context.label || '';
-                                const value = isDoughnut ? context.parsed : context.parsed.y;
+                                const value = isPolar ? context.parsed.r : context.parsed.y;
                                 return `${label}: ${metricConfig.format(value)}`;
                             }
                         }
                     }
                 },
-                scales: isDoughnut ? {} : {
+                scales: isPolar ? {
+                    r: {
+                        beginAtZero: true,
+                        ticks: {
+                            display: false
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                } : {
                     y: {
                         beginAtZero: metric === 'reimbursement' || metric === 'compliance' ? false : true,
                         ticks: {
@@ -1851,6 +1867,21 @@ function createMetricCharts() {
                 }
             }
         });
+
+        // Add real-time update effect
+        if (isPolar) {
+            setInterval(() => {
+                const chart = metricCharts[metric];
+                if (chart && chart.data.datasets[0]) {
+                    // Slightly vary the data to simulate real-time updates
+                    chart.data.datasets[0].data = chart.data.datasets[0].data.map(val => {
+                        const variance = (Math.random() - 0.5) * 0.02; // ±1% variance
+                        return val * (1 + variance);
+                    });
+                    chart.update('none'); // Update without animation for smooth effect
+                }
+            }, 3000); // Update every 3 seconds
+        }
     });
 }
 
@@ -1881,40 +1912,95 @@ async function askReasoning() {
 
     const messages = document.getElementById('reasoningMessages');
 
+    // Add user message
     messages.innerHTML += `
-        <div class="bg-purple-50 border border-purple-200 rounded p-2 text-xs">
-            <strong>You:</strong> ${query}
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 text-xs">
+            <p class="font-semibold text-blue-900 mb-1">👤 You asked:</p>
+            <p class="text-gray-700">${query}</p>
         </div>
     `;
     messages.scrollTop = messages.scrollHeight;
     input.value = '';
 
+    // Show loading indicator
+    const loadingId = 'loading-' + Date.now();
+    messages.innerHTML += `
+        <div id="${loadingId}" class="bg-white border border-gray-200 rounded-lg p-3 text-xs">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <span class="text-gray-600 ml-2">Analyzing your request...</span>
+            </div>
+        </div>
+    `;
+    messages.scrollTop = messages.scrollHeight;
+
     try {
         const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.aiQuery}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, context: { page: getCurrentTab() } })
+            body: JSON.stringify({
+                query,
+                context: {
+                    page: getCurrentTab(),
+                    timestamp: new Date().toISOString()
+                }
+            })
         });
+
+        // Remove loading indicator
+        document.getElementById(loadingId)?.remove();
 
         const result = await response.json();
 
         if (result.success) {
+            // Determine which agent/department is handling this
+            const agentInfo = result.agent_used || 'General Assistant';
+            const departmentEmoji = {
+                'orders': '📈',
+                'compliance': '✅',
+                'lab': '🔬',
+                'finance': '💰',
+                'operations': '⚙️',
+                'reimbursement': '💵'
+            }[agentInfo.toLowerCase()] || '👔';
+
             messages.innerHTML += `
-                <div class="bg-white border border-gray-200 rounded p-2 text-xs">
-                    <strong>AI:</strong> ${result.response}
+                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 text-xs shadow-sm ai-insight-card">
+                    <div class="flex items-start gap-2 mb-2">
+                        <span class="text-lg">${departmentEmoji}</span>
+                        <div class="flex-1">
+                            <p class="font-semibold text-purple-900 text-xs mb-1">
+                                CEO Executive Assistant ${agentInfo !== 'General Assistant' ? `(${agentInfo} Dept.)` : ''}
+                            </p>
+                            <p class="text-gray-700 leading-relaxed">${result.response}</p>
+                        </div>
+                    </div>
+                    ${result.confidence ? `
+                        <div class="mt-2 pt-2 border-t border-purple-100">
+                            <p class="text-xs text-purple-600">Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         } else {
             messages.innerHTML += `
-                <div class="bg-red-50 border border-red-200 rounded p-2 text-xs">
-                    Error: Failed to analyze
+                <div class="bg-red-50 border border-red-300 rounded-lg p-3 text-xs">
+                    <p class="font-semibold text-red-900">⚠️ Error</p>
+                    <p class="text-red-700 mt-1">Failed to get response from AI assistant.</p>
                 </div>
             `;
         }
     } catch (error) {
+        // Remove loading indicator
+        document.getElementById(loadingId)?.remove();
+
         messages.innerHTML += `
-            <div class="bg-red-50 border border-red-200 rounded p-2 text-xs">
-                Error: ${error.message}
+            <div class="bg-red-50 border border-red-300 rounded-lg p-3 text-xs">
+                <p class="font-semibold text-red-900">⚠️ Connection Error</p>
+                <p class="text-red-700 mt-1">${error.message}</p>
+                <p class="text-gray-600 mt-2 text-xs">Make sure the API server is running on port 8000.</p>
             </div>
         `;
     }
