@@ -155,11 +155,12 @@ cd LeaderDashboard
 cd healthcare_sciences_dashboard
 
 # Create virtual environment
-python -m venv venv
+# python -m venv venv
+python -m venv leadershipdashboard
 
 # Activate virtual environment
 # On Windows:
-venv\Scripts\activate
+leadershipdashboard\Scripts\activate
 
 # On macOS/Linux:
 source venv/bin/activate
