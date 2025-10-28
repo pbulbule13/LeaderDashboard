@@ -33,6 +33,7 @@ async def root():
         'status': 'running',
         'endpoints': {
             'health': '/health',
+            'docs': '/docs',
             'overview': '/api/dashboard/overview',
             'order_volume': '/api/dashboard/tiles/order-volume',
             'compliance': '/api/dashboard/tiles/compliance',
@@ -46,7 +47,11 @@ async def root():
             'products': '/api/dashboard/tiles/products',
             'stock': '/api/dashboard/tiles/stock',
             'all_tiles': '/api/dashboard/tiles/all',
-            'query': '/api/query/ask'
+            'query': '/api/query/ask',
+            'voice_agent': '/voice-agent/query',
+            'inbox_summary': '/voice-agent/inbox/summary',
+            'calendar_check': '/voice-agent/calendar/check',
+            'voice_websocket': '/voice-agent/ws'
         }
     }
 
@@ -58,14 +63,29 @@ async def health_check():
 try:
     from api.routes.dashboard import router as dashboard_router
     from api.routes.query import router as query_router
-    
+
     app.include_router(dashboard_router, prefix='/api/dashboard', tags=['dashboard'])
     app.include_router(query_router, prefix='/api/query', tags=['query'])
-    
-    print('[OK] Routes loaded successfully')
+
+    print('[OK] Dashboard and Query routes loaded successfully')
 except Exception as e:
-    print(f'[WARNING] Could not load routes: {e}')
+    print(f'[WARNING] Could not load dashboard routes: {e}')
     print('API running with basic endpoints only')
+
+# Import and register voice agent routes
+try:
+    from voice_agent.api.routes import router as voice_agent_router
+
+    app.include_router(voice_agent_router, tags=['voice-agent'])
+
+    print('[OK] Voice Agent routes loaded successfully')
+    print('     • Voice Agent API: /voice-agent/query')
+    print('     • Inbox Summary: /voice-agent/inbox/summary')
+    print('     • Calendar Check: /voice-agent/calendar/check')
+    print('     • WebSocket: /voice-agent/ws')
+except Exception as e:
+    print(f'[WARNING] Could not load voice agent routes: {e}')
+    print('Voice Agent endpoints not available')
 
 if __name__ == '__main__':
     print(f'Starting HealthCare Sciences Dashboard API on port {config.PORT}...')
