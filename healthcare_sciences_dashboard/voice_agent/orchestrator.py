@@ -7,7 +7,7 @@ from typing import Dict, Any
 from .graph.graph_builder import create_voice_agent_graph
 from .graph.state import VoiceAgentState
 from .models.settings import SystemSettings
-from .adapters.email.gmail_adapter import GmailAdapter
+from .adapters.email.factory import EmailAdapterFactory
 from .adapters.calendar.google_calendar_adapter import GoogleCalendarAdapter
 import uuid
 from datetime import datetime
@@ -31,12 +31,20 @@ class VoiceAgentOrchestrator:
         self.sessions: Dict[str, Dict[str, Any]] = {}
 
     def _create_email_adapter(self):
-        """Create email adapter based on settings"""
-        provider = self.settings.email_provider
-        if provider == "gmail_api":
-            return GmailAdapter(credentials_path=self.settings.gmail_credentials_path)
-        # TODO: Add other providers (IMAP/SMTP, Outlook Graph)
-        return None
+        """Create email adapter based on settings using factory pattern"""
+        try:
+            return EmailAdapterFactory.create(
+                provider=self.settings.email_provider,
+                credentials_path=self.settings.gmail_credentials_path,
+                use_mock=False  # Set to True for testing without real email
+            )
+        except Exception as e:
+            print(f"⚠️  Failed to create email adapter: {e}")
+            print("⚠️  Using mock mode for testing")
+            return EmailAdapterFactory.create(
+                provider="gmail_api",
+                use_mock=True  # Fall back to mock mode
+            )
 
     def _create_calendar_adapter(self):
         """Create calendar adapter based on settings"""
