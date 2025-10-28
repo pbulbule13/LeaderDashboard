@@ -4,7 +4,7 @@ Full implementation with all email operations
 """
 
 from .base import BaseEmailAdapter
-from .gmail_oauth import GmailOAuthHandler
+from .gmail_oauth_env import GmailOAuthEnvHandler
 from .gmail_adapter_helpers import (
     get_message_body,
     format_message,
@@ -30,11 +30,8 @@ class GmailAdapter(BaseEmailAdapter):
         self.token_path = token_path or "./config/gmail_token.pickle"
         self.use_mock = use_mock  # For testing without real Gmail
 
-        # Initialize OAuth handler
-        self.oauth_handler = GmailOAuthHandler(
-            credentials_path=self.credentials_path,
-            token_path=self.token_path
-        )
+        # Initialize OAuth handler (using environment variables)
+        self.oauth_handler = GmailOAuthEnvHandler()
 
         # Gmail API service (lazy initialization)
         self._service = None
@@ -48,14 +45,14 @@ class GmailAdapter(BaseEmailAdapter):
         if self._service is None:
             try:
                 self._service = self.oauth_handler.get_gmail_service()
-                print("✅ Gmail API service initialized")
-            except FileNotFoundError as e:
-                print(f"⚠️  Gmail credentials not configured: {e}")
-                print("⚠️  Using mock data instead")
+                print("SUCCESS: Gmail API service initialized")
+            except ValueError as e:
+                print(f"WARNING: Gmail credentials not configured: {e}")
+                print("WARNING: Using mock data instead")
                 self.use_mock = True
             except Exception as e:
-                print(f"❌ Failed to initialize Gmail service: {e}")
-                print("⚠️  Using mock data instead")
+                print(f"ERROR: Failed to initialize Gmail service: {e}")
+                print("WARNING: Using mock data instead")
                 self.use_mock = True
 
         return self._service

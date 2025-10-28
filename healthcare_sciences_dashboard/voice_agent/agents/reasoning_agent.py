@@ -3,10 +3,13 @@ Reasoning Agent
 Analyzes context and decides the best course of action
 """
 
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
 from ..graph.state import VoiceAgentState
 import json
+import os
 
 
 class ReasoningAgent:
@@ -16,10 +19,28 @@ class ReasoningAgent:
     - Whether to accept/decline meetings
     - What actions to take
     - Tone and approach for communications
+
+    Supports cascading fallback through multiple models when token limits are exceeded.
     """
 
-    def __init__(self, model_name: str = "gpt-4"):
-        self.llm = ChatOpenAI(model=model_name, temperature=0.7)
+    def __init__(self, model_name: str = "gpt-4", fallback_models: list = None):
+        """
+        Initialize ReasoningAgent with cascading fallback models.
+
+        Args:
+            model_name: Primary model to use
+            fallback_models: List of model names to try in order if token limit exceeded
+        """
+        self.model_name = model_name
+        self.primary_llm = self._create_llm_client(model_name)
+
+        # Parse fallback models from environment or use provided list
+        if fallback_models is None:
+            fallback_models_str = os.getenv("FALLBACK_MODELS", "gpt-4o-mini")
+            fallback_models = [m.strip() for m in fallback_models_str.split(",")]
+
+        self.fallback_models = fallback_models
+        self.fallback_llms = [self._create_llm_client(model) for model in fallback_models]
 
         self.prompt = ChatPromptTemplate.from_messages([
             ("system", """You are the reasoning engine for an executive assistant AI named {agent_name}.
@@ -50,8 +71,58 @@ Analyze this and provide:
 3. Reasoning""")
         ])
 
+    def _create_llm_client(self, model_name: str):
+        """
+        Create appropriate LLM client based on model name.
+
+        Supports:
+        - OpenAI models (gpt-*, deepseek-*, grok-*)
+        - Anthropic models (claude-*)
+        - Google models (gemini-*)
+        """
+        model_lower = model_name.lower()
+
+        try:
+            # Anthropic models
+            if "claude" in model_lower or "anthropic" in model_lower:
+                return ChatAnthropic(model=model_name, temperature=0.7)
+
+            # Google Gemini models
+            elif "gemini" in model_lower:
+                return ChatGoogleGenerativeAI(model=model_name, temperature=0.7)
+
+            # OpenAI and OpenAI-compatible models (GPT, DeepSeek, Grok, etc.)
+            else:
+                # For DeepSeek and Grok, they use OpenAI-compatible APIs
+                # DeepSeek uses base_url="https://api.deepseek.com"
+                # Grok uses base_url="https://api.x.ai/v1"
+                if "deepseek" in model_lower:
+                    # DeepSeek uses OpenAI-compatible API
+                    return ChatOpenAI(
+                        model=model_name,
+                        temperature=0.7,
+                        openai_api_base=os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1"),
+                        openai_api_key=os.getenv("DEEPSEEK_API_KEY", os.getenv("OPENAI_API_KEY"))
+                    )
+                elif "grok" in model_lower:
+                    # Grok uses OpenAI-compatible API
+                    return ChatOpenAI(
+                        model=model_name,
+                        temperature=0.7,
+                        openai_api_base=os.getenv("GROK_API_BASE", "https://api.x.ai/v1"),
+                        openai_api_key=os.getenv("GROK_API_KEY", os.getenv("OPENAI_API_KEY"))
+                    )
+                else:
+                    # Standard OpenAI models
+                    return ChatOpenAI(model=model_name, temperature=0.7)
+
+        except Exception as e:
+            print(f"[WARNING] Failed to create LLM client for {model_name}: {e}")
+            # Fallback to standard OpenAI client
+            return ChatOpenAI(model=model_name, temperature=0.7)
+
     async def run(self, state: VoiceAgentState) -> VoiceAgentState:
-        """Run reasoning analysis"""
+        """Run reasoning analysis with cascading fallback"""
         intent = state["intent"]
         query = state["user_query"]
 
@@ -61,7 +132,7 @@ Analyze this and provide:
         sender_history = json.dumps(state.get("sender_history", {}), indent=2)
 
         # Get settings (in real implementation, load from config)
-        agent_name = "Vinegar"  # This would come from SystemSettings
+        agent_name = os.getenv("VOICE_AGENT_voice_agent_name", "Vinegar")
         vip_domains = ["partner.com", "investor.org"]
 
         # Prepare prompt
@@ -75,20 +146,50 @@ Analyze this and provide:
             sender_history=sender_history
         )
 
-        # Get LLM reasoning
-        try:
-            response = await self.llm.ainvoke(prompt_value)
-            reasoning_text = response.content
+        # Try primary model first, then cascade through fallbacks
+        models_to_try = [(self.model_name, self.primary_llm)] + list(zip(self.fallback_models, self.fallback_llms))
 
-            # Parse the reasoning (in production, use structured output)
-            state["reasoning"] = reasoning_text
-            state["priority_assessment"] = self._extract_priority(reasoning_text)
-            state["recommended_action"] = self._extract_action(reasoning_text)
+        last_error = None
+        for model_name, llm_client in models_to_try:
+            try:
+                print(f"[LLM] Attempting reasoning with model: {model_name}")
+                response = await llm_client.ainvoke(prompt_value)
+                reasoning_text = response.content
 
-        except Exception as e:
-            state["error"] = f"Reasoning error: {str(e)}"
-            state["reasoning"] = "Unable to analyze context"
-            state["recommended_action"] = "manual_review"
+                # Parse the reasoning (in production, use structured output)
+                state["reasoning"] = reasoning_text
+                state["priority_assessment"] = self._extract_priority(reasoning_text)
+                state["recommended_action"] = self._extract_action(reasoning_text)
+                state["model_used"] = model_name
+
+                print(f"[SUCCESS] Completed reasoning with model: {model_name}")
+                return state
+
+            except Exception as e:
+                error_str = str(e)
+                last_error = e
+
+                # Check if it's a context length error that we should retry
+                is_token_error = (
+                    "context_length_exceeded" in error_str or
+                    "maximum context length" in error_str.lower() or
+                    "token limit" in error_str.lower() or
+                    "too many tokens" in error_str.lower()
+                )
+
+                if is_token_error:
+                    print(f"[WARNING] Token limit exceeded on {model_name}, trying next fallback model...")
+                    continue  # Try next model
+                else:
+                    # Non-token error, still try fallback but log it
+                    print(f"[WARNING] Error with {model_name}: {error_str}")
+                    continue  # Try next model anyway
+
+        # If we get here, all models failed
+        print(f"[ERROR] All models failed. Last error: {str(last_error)}")
+        state["error"] = f"All models failed. Last error: {str(last_error)}"
+        state["reasoning"] = "Unable to analyze context - all models exhausted"
+        state["recommended_action"] = "manual_review"
 
         return state
 

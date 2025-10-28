@@ -14,7 +14,7 @@ from ..agents.execution_agent import ExecutionAgent
 from ..agents.logging_agent import LoggingAgent
 
 
-def create_voice_agent_graph() -> StateGraph:
+def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> StateGraph:
     """
     Creates the LangGraph for the voice-enabled email & calendar automation system.
 
@@ -33,13 +33,22 @@ def create_voice_agent_graph() -> StateGraph:
     # Initialize the graph
     workflow = StateGraph(VoiceAgentState)
 
-    # Initialize agents
+    # Initialize agents with adapters
     intent_agent = IntentClassificationAgent()
-    context_agent = ContextRetrievalAgent()
-    reasoning_agent = ReasoningAgent()
+    context_agent = ContextRetrievalAgent(email_adapter=email_adapter, calendar_adapter=calendar_adapter)
+
+    # Get model configuration from environment
+    # ReasoningAgent will automatically load FALLBACK_MODELS from .env
+    import os
+    model_name = os.getenv("MODEL_NAME", "gpt-4")
+
+    # Initialize reasoning agent with cascading fallback support
+    # It will automatically parse FALLBACK_MODELS env var (e.g., "deepseek-chat,grok-2,gpt-4o-mini,gemini-1.5-pro")
+    reasoning_agent = ReasoningAgent(model_name=model_name)
+
     draft_agent = DraftGenerationAgent()
     auth_agent = AuthorizationAgent()
-    execution_agent = ExecutionAgent()
+    execution_agent = ExecutionAgent(email_adapter=email_adapter, calendar_adapter=calendar_adapter)
     logging_agent = LoggingAgent()
 
     # Add nodes to the graph

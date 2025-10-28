@@ -57,31 +57,40 @@ class ContextRetrievalAgent:
         return state
 
     async def _fetch_email_context(self, state: VoiceAgentState) -> list[dict]:
-        """Fetch relevant email threads"""
-        # TODO: Implement actual email fetching
-        # For now, return mock data
-        return [
-            {
-                "thread_id": "thread_1",
-                "subject": "Q4 Financial Review Meeting",
-                "from": "john.doe@partner.com",
-                "preview": "Can we schedule time next week to discuss Q4 numbers?",
-                "unread": True,
-                "timestamp": "2025-10-27T10:30:00Z"
-            }
-        ]
+        """Fetch relevant email threads from Gmail"""
+        if not self.email_adapter:
+            return []
+
+        try:
+            # Fetch recent email threads (last 20)
+            email_threads = await self.email_adapter.fetch_threads(max_results=20)
+            return email_threads
+        except Exception as e:
+            print(f"Error fetching emails: {e}")
+            # Return empty list instead of failing
+            return []
 
     async def _fetch_sender_history(self, state: VoiceAgentState) -> Dict[str, Any]:
-        """Fetch historical context about senders"""
-        # TODO: Implement actual sender history lookup
-        return {
-            "john.doe@partner.com": {
-                "interaction_count": 47,
-                "avg_response_time_hours": 2.5,
-                "relationship": "key_partner",
-                "last_interaction": "2025-10-20T14:00:00Z"
-            }
-        }
+        """Fetch historical context about senders from Gmail"""
+        if not self.email_adapter:
+            return {}
+
+        try:
+            # Get sender history from email adapter
+            email_threads = state.get("email_threads", [])
+            sender_history = {}
+
+            for thread in email_threads[:10]:  # Analyze top 10 senders
+                sender = thread.get("from", "")
+                if sender and sender not in sender_history:
+                    history = await self.email_adapter.get_sender_history(sender)
+                    if history:
+                        sender_history[sender] = history
+
+            return sender_history
+        except Exception as e:
+            print(f"Error fetching sender history: {e}")
+            return {}
 
     async def _fetch_calendar_events(self, state: VoiceAgentState) -> list[dict]:
         """Fetch upcoming calendar events"""

@@ -97,6 +97,44 @@ async def summarize_inbox(user_id: str | None = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/emails")
+async def get_emails(max_results: int = 10):
+    """
+    Get a simple list of emails from Gmail.
+
+    Returns a clean list of email threads for display in the dashboard.
+    """
+    try:
+        from ..adapters.email.gmail_adapter import GmailAdapter
+        from ...app_config import config
+
+        # Initialize Gmail adapter
+        gmail = GmailAdapter(config=config)
+
+        # Get recent email threads
+        threads = await gmail.get_recent_threads(max_results=max_results)
+
+        # Format for dashboard
+        emails = []
+        for thread in threads:
+            emails.append({
+                "id": thread.get("thread_id", ""),
+                "from": thread.get("sender", "Unknown"),
+                "subject": thread.get("subject", "No Subject"),
+                "preview": thread.get("preview", "")[:200],
+                "date": thread.get("date", ""),
+                "unread": thread.get("unread", False)
+            })
+
+        return {
+            "emails": emails,
+            "count": len(emails)
+        }
+    except Exception as e:
+        print(f"Error fetching emails: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/calendar/check")
 async def check_calendar(
     timeframe: str = "today",
@@ -147,6 +185,62 @@ async def get_config():
         "stt_provider": settings.stt_provider,
         "cloud_provider": settings.cloud_provider
     }
+
+
+@router.post("/tts")
+async def text_to_speech(request: dict):
+    """
+    Convert text to speech using ElevenLabs API.
+
+    Args:
+        text: The text to convert to speech
+
+    Returns:
+        Audio file as bytes (MP3 format)
+    """
+    import os
+    from elevenlabs.client import ElevenLabs
+    from fastapi.responses import Response
+
+    try:
+        text = request.get("text", "")
+        if not text:
+            raise HTTPException(status_code=400, detail="No text provided")
+
+        # Get API key and voice ID from environment
+        api_key = os.getenv("ELEVENLABS_API_KEY")
+        voice_id = os.getenv("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+
+        if not api_key:
+            raise HTTPException(
+                status_code=500,
+                detail="ElevenLabs API key not configured"
+            )
+
+        # Initialize ElevenLabs client
+        client = ElevenLabs(api_key=api_key)
+
+        # Generate speech using the new API
+        audio_generator = client.text_to_speech.convert(
+            text=text,
+            voice_id=voice_id,
+            model_id="eleven_monolingual_v1"
+        )
+
+        # Convert generator to bytes
+        audio_bytes = b"".join(audio_generator)
+
+        # Return audio as MP3
+        return Response(
+            content=audio_bytes,
+            media_type="audio/mpeg",
+            headers={
+                "Content-Disposition": "inline; filename=speech.mp3"
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS error: {str(e)}")
 
 
 @router.websocket("/ws")

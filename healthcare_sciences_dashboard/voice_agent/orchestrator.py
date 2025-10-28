@@ -21,11 +21,16 @@ class VoiceAgentOrchestrator:
 
     def __init__(self, settings: SystemSettings | None = None):
         self.settings = settings or SystemSettings()
-        self.graph = create_voice_agent_graph()
 
-        # Initialize adapters based on settings
+        # Initialize adapters FIRST (before creating graph)
         self.email_adapter = self._create_email_adapter()
         self.calendar_adapter = self._create_calendar_adapter()
+
+        # Create graph WITH adapters so they're passed to Context and Execution agents
+        self.graph = create_voice_agent_graph(
+            email_adapter=self.email_adapter,
+            calendar_adapter=self.calendar_adapter
+        )
 
         # Session management (in production, use Redis or database)
         self.sessions: Dict[str, Dict[str, Any]] = {}

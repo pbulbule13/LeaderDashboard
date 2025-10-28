@@ -3,8 +3,8 @@ Draft Generation Agent
 Generates email drafts and calendar action proposals
 """
 
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
 from ..graph.state import VoiceAgentState
 from ..models.email_models import EmailDraft
 from ..models.calendar_models import CalendarAction
