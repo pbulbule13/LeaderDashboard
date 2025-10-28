@@ -105,24 +105,32 @@ async def get_emails(max_results: int = 10):
     Returns a clean list of email threads for display in the dashboard.
     """
     try:
-        from ..adapters.email.gmail_adapter import GmailAdapter
-        from ...app_config import config
+        import sys
+        import os
+        from pathlib import Path
 
-        # Initialize Gmail adapter
-        gmail = GmailAdapter(config=config)
+        # Add parent directory to path for imports
+        current_dir = Path(__file__).parent.parent.parent
+        if str(current_dir) not in sys.path:
+            sys.path.insert(0, str(current_dir))
+
+        from voice_agent.adapters.email.gmail_adapter import GmailAdapter
+
+        # Initialize Gmail adapter (uses environment variables internally)
+        gmail = GmailAdapter()
 
         # Get recent email threads
-        threads = await gmail.get_recent_threads(max_results=max_results)
+        threads = await gmail.fetch_threads(max_results=max_results)
 
         # Format for dashboard
         emails = []
         for thread in threads:
             emails.append({
                 "id": thread.get("thread_id", ""),
-                "from": thread.get("sender", "Unknown"),
+                "from": thread.get("from", "Unknown"),
                 "subject": thread.get("subject", "No Subject"),
                 "preview": thread.get("preview", "")[:200],
-                "date": thread.get("date", ""),
+                "date": thread.get("timestamp", ""),
                 "unread": thread.get("unread", False)
             })
 
@@ -131,7 +139,9 @@ async def get_emails(max_results: int = 10):
             "count": len(emails)
         }
     except Exception as e:
+        import traceback
         print(f"Error fetching emails: {e}")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 
