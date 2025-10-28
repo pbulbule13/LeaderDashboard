@@ -23,3 +23,19 @@ prometheus-client
 pytest
 pytest-asyncio
 httpx
+
+# Voice Agent System - Email & Calendar Integration
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+# Voice Agent System - Voice I/O
+elevenlabs
+openai-whisper
+SpeechRecognition
+pyaudio
+
+# Additional utilities
+aiofiles
+python-multipart
