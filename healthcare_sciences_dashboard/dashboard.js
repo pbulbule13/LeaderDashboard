@@ -534,6 +534,11 @@ async function loadOverviewData() {
             </div>
         `).join('');
 
+        // Update current tab data for AI context
+        if (currentTab === 'overview') {
+            currentTabData = data;
+        }
+
     } catch (error) {
         console.error('Error loading overview:', error);
     }
@@ -763,6 +768,11 @@ async function loadOrdersData() {
             }
         });
 
+        // Update current tab data for AI context
+        if (currentTab === 'orders') {
+            currentTabData = data;
+        }
+
     } catch (error) {
         console.error('Error rendering orders data:', error);
     }
@@ -899,6 +909,11 @@ async function loadComplianceData() {
                 plugins: { legend: { display: false } }
             }
         });
+
+        // Update current tab data for AI context
+        if (currentTab === 'compliance') {
+            currentTabData = data;
+        }
 
     } catch (error) {
         console.error('Error rendering compliance data:', error);
@@ -1055,6 +1070,11 @@ async function loadReimbursementData() {
             }
         });
 
+        // Update current tab data for AI context
+        if (currentTab === 'reimbursement') {
+            currentTabData = data;
+        }
+
     } catch (error) {
         console.error('Error rendering reimbursement data:', error);
     }
@@ -1207,6 +1227,11 @@ async function loadCostsData() {
                 maintainAspectRatio: false
             }
         });
+
+        // Update current tab data for AI context
+        if (currentTab === 'costs') {
+            currentTabData = data;
+        }
 
     } catch (error) {
         console.error('Error rendering costs data:', error);
@@ -1375,6 +1400,11 @@ async function loadLabData() {
             }
         });
 
+        // Update current tab data for AI context
+        if (currentTab === 'lab') {
+            currentTabData = data;
+        }
+
     } catch (error) {
         console.error('Error rendering lab data:', error);
     }
@@ -1521,6 +1551,11 @@ async function loadRegionalData() {
                 }
             }
         });
+
+        // Update current tab data for AI context
+        if (currentTab === 'regional') {
+            currentTabData = data;
+        }
 
     } catch (error) {
         console.error('Error rendering regional data:', error);
@@ -1693,6 +1728,11 @@ async function loadForecastingData() {
             }
         });
 
+        // Update current tab data for AI context
+        if (currentTab === 'forecasting') {
+            currentTabData = data;
+        }
+
     } catch (error) {
         console.error('Error rendering forecasting data:', error);
     }
@@ -1825,6 +1865,11 @@ async function loadMarketData() {
                 </div>
             </div>
         `;
+
+        // Update current tab data for AI context
+        if (currentTab === 'market') {
+            currentTabData = data;
+        }
 
     } catch (error) {
         console.error('Error rendering market data:', error);
@@ -1973,6 +2018,11 @@ async function loadMilestonesData() {
                 </div>
             </div>
         `;
+
+        // Update current tab data for AI context
+        if (currentTab === 'milestones') {
+            currentTabData = data;
+        }
 
     } catch (error) {
         console.error('Error rendering milestones data:', error);
@@ -2334,26 +2384,6 @@ function renderQuickNotes() {
 }
 
 // ==================== AI ASSISTANT FUNCTIONS ====================
-
-async function askAI() {
-    const input = document.getElementById('aiQueryInput');
-    const question = input.value.trim();
-    if (!question) return;
-
-    try {
-        const response = await fetch('http://localhost:8000/voice-agent/query', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: question, mode: 'text' })
-        });
-
-        const data = await response.json();
-        alert(`AI Response: ${data.text}`);
-        input.value = '';
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
-}
 
 async function askReasoning() {
     const input = document.getElementById('reasoningInput');
