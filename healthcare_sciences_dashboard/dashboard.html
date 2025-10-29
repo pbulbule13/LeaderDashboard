@@ -116,9 +116,6 @@
                     <div id="stockPrice" class="text-right bg-blue-50 px-4 py-2 rounded-lg">
                         <p class="text-xs text-gray-600">Loading...</p>
                     </div>
-                    <button onclick="toggleAIPanel()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition text-sm font-semibold">
-                        🤖 AI Assistant
-                    </button>
                 </div>
             </div>
             <div class="flex gap-1 mt-4 border-b overflow-x-auto">
@@ -138,40 +135,6 @@
         </div>
     </nav>
 
-    <!-- AI Assistant Sidebar -->
-    <div id="aiPanel" class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 border-l border-gray-200">
-        <div class="h-full flex flex-col">
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 flex justify-between items-center">
-                <h2 class="text-xl font-bold">AI Executive Assistant</h2>
-                <button onclick="toggleAIPanel()" class="text-white hover:bg-white/20 rounded p-1">✕</button>
-            </div>
-            <div id="aiChatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-                <div class="text-center text-gray-500 text-sm">
-                    <p class="mb-2">👋 Hello! I'm your AI Executive Assistant.</p>
-                    <p>I can help you with emails, schedule, analytics, and strategic insights.</p>
-                </div>
-            </div>
-            <div class="p-4 border-t bg-white">
-                <div class="flex gap-2 mb-3 flex-wrap">
-                    <button onclick="askQuick('Summarize my unread emails')" class="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full hover:bg-blue-100">📧 Emails</button>
-                    <button onclick="askQuick('What meetings do I have today?')" class="text-xs bg-green-50 text-green-600 px-3 py-1 rounded-full hover:bg-green-100">📅 Schedule</button>
-                    <button onclick="askQuick('Top priorities for today')" class="text-xs bg-purple-50 text-purple-600 px-3 py-1 rounded-full hover:bg-purple-100">🎯 Priorities</button>
-                    <button onclick="askQuick('What needs my attention?')" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full hover:bg-red-100">⚠️ Alerts</button>
-                </div>
-                <div class="flex gap-2">
-                    <input type="text" id="aiQueryInput" placeholder="Ask me anything..."
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        onkeypress="if(event.key==='Enter') askAI()">
-                    <button onclick="askAI()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-sm transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
     <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
         <div class="p-4">
@@ -182,7 +145,7 @@
             <div class="space-y-2 mb-4">
                 <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
                 <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
-                <button onclick="askQuick('What opportunities should I focus on?')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">💡 Opportunities</button>
+                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
                 <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
@@ -192,7 +155,7 @@
                     🚀 Ask AI Assistant
                 </button>
             </div>
-            <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-520px)] overflow-y-auto">
+            <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
                 <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
                     <p class="text-xs text-purple-900 mb-2">
                         <span class="font-bold">👔 Executive Assistant:</span>
@@ -209,6 +172,45 @@
                             <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div id="daySummarySection" class="mt-4 space-y-2 max-h-[calc(100vh-650px)] overflow-y-auto">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-blue-900 mb-2">📊 Today's Executive Summary</h3>
+                    <div id="daySummaryContent" class="space-y-1 text-xs">
+                        <div class="flex justify-between py-1 border-b border-blue-100">
+                            <span class="text-gray-600">📈 Orders:</span>
+                            <span class="font-semibold text-blue-900">24.5K (+15.2%)</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-blue-100">
+                            <span class="text-gray-600">✅ Compliance:</span>
+                            <span class="font-semibold text-green-900">94.5% (+0.3%)</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-blue-100">
+                            <span class="text-gray-600">💵 Reimbursement:</span>
+                            <span class="font-semibold text-purple-900">98.5% (↑)</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-blue-100">
+                            <span class="text-gray-600">🔬 Lab TAT:</span>
+                            <span class="font-semibold text-orange-900">38.2hrs (target: 42hrs)</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-blue-100">
+                            <span class="text-gray-600">💰 Costs:</span>
+                            <span class="font-semibold text-red-900">$2.8M (-2.1%)</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-gray-600">🔮 Forecast:</span>
+                            <span class="font-semibold text-indigo-900">26.8K next month</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-green-900 mb-2">💡 Key Highlights</h3>
+                    <ul class="space-y-1 text-xs text-gray-700">
+                        <li>• Orders up 15.2% - Strong regional performance</li>
+                        <li>• Lab efficiency improved - TAT under target</li>
+                        <li>• Cost optimization working - $60K saved</li>
+                    </ul>
                 </div>
             </div>
         </div>

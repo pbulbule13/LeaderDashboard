@@ -2234,115 +2234,6 @@ function toggleReasoningWidget() {
     }
 }
 
-async function askReasoning() {
-    const input = document.getElementById('reasoningInput');
-    const query = input.value.trim();
-    if (!query) return;
-
-    const messages = document.getElementById('reasoningMessages');
-
-    // Add user message
-    messages.innerHTML += `
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 text-xs">
-            <p class="font-semibold text-blue-900 mb-1">👤 You asked:</p>
-            <p class="text-gray-700">${query}</p>
-        </div>
-    `;
-    messages.scrollTop = messages.scrollHeight;
-    input.value = '';
-
-    // Show loading indicator
-    const loadingId = 'loading-' + Date.now();
-    messages.innerHTML += `
-        <div id="${loadingId}" class="bg-white border border-gray-200 rounded-lg p-3 text-xs">
-            <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                <div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <span class="text-gray-600 ml-2">Analyzing your request...</span>
-            </div>
-        </div>
-    `;
-    messages.scrollTop = messages.scrollHeight;
-
-    let result;
-    try {
-        const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.aiQuery}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                query,
-                context: {
-                    page: getCurrentTab(),
-                    timestamp: new Date().toISOString()
-                }
-            })
-        });
-
-        result = await response.json();
-
-        if (!result.success) {
-            // API returned error, use local AI
-            console.log('API returned error, using local AI response');
-            result = generateAIResponse(query);
-        }
-    } catch (error) {
-        // API unavailable, use local AI response generator
-        console.log('API unavailable, using local AI response');
-        result = generateAIResponse(query);
-    }
-
-    // Remove loading indicator
-    document.getElementById(loadingId)?.remove();
-
-    try {
-        // Determine which agent/department is handling this
-        const agentInfo = result.agent_used || 'General Assistant';
-        const departmentEmoji = {
-            'orders': '📈',
-            'compliance': '✅',
-            'lab': '🔬',
-            'finance': '💰',
-            'operations': '⚙️',
-            'reimbursement': '💵',
-            'regional': '🗺️',
-            'forecasting': '📊',
-            'market': '📰',
-            'risk': '⚠️',
-            'opportunity': '💡'
-        }[agentInfo.toLowerCase()] || '👔';
-
-        messages.innerHTML += `
-            <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 text-xs shadow-sm ai-insight-card">
-                <div class="flex items-start gap-2 mb-2">
-                    <span class="text-lg">${departmentEmoji}</span>
-                    <div class="flex-1">
-                        <p class="font-semibold text-purple-900 text-xs mb-1">
-                            CEO Executive Assistant ${agentInfo !== 'General Assistant' ? `(${agentInfo} Dept.)` : ''}
-                        </p>
-                        <p class="text-gray-700 leading-relaxed">${result.response}</p>
-                    </div>
-                </div>
-                ${result.confidence ? `
-                    <div class="mt-2 pt-2 border-t border-purple-100">
-                        <p class="text-xs text-purple-600">Confidence: ${(result.confidence * 100).toFixed(0)}%</p>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-    } catch (error) {
-        console.error('Error rendering AI response:', error);
-        messages.innerHTML += `
-            <div class="bg-red-50 border border-red-300 rounded-lg p-3 text-xs">
-                <p class="font-semibold text-red-900">⚠️ Error</p>
-                <p class="text-red-700 mt-1">Failed to render AI response.</p>
-            </div>
-        `;
-    }
-
-    messages.scrollTop = messages.scrollHeight;
-}
-
 function analyzeCurrentPage() {
     const currentTab = getCurrentTab();
     document.getElementById('reasoningInput').value = `Analyze all metrics on the ${currentTab} page and provide insights`;
@@ -2406,88 +2297,154 @@ async function askReasoning() {
 
     const messagesDiv = document.getElementById('reasoningMessages');
 
-    // Add user question
+    // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3';
-    userMsg.innerHTML = `<p class="text-sm font-semibold text-blue-800">You:</p><p class="text-sm text-gray-800">${question}</p>`;
-    messagesDiv.appendChild(userMsg);
+    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2';
+    userMsg.innerHTML = `<p class="text-xs font-semibold text-blue-800">You:</p><p class="text-xs text-gray-800">${question}</p>`;
+    messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
-    // Add loading
+    // Add loading at the TOP
     const loadingMsg = document.createElement('div');
-    loadingMsg.className = 'bg-gray-50 rounded-lg p-3';
-    loadingMsg.innerHTML = '<p class="text-sm text-gray-600">AI is thinking...</p>';
-    messagesDiv.appendChild(loadingMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
+    loadingMsg.id = 'loading-reasoning';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
+
+    input.value = '';
 
     try {
-        const response = await fetch('http://localhost:8000/voice-agent/query', {
+        // Use tab-specific Q&A endpoint with context
+        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: question, mode: 'text' })
+            body: JSON.stringify({
+                question: question,
+                tab: currentTab,
+                tab_data: currentTabData
+            })
         });
 
-        const data = await response.json();
+        const result = await response.json();
+
+        console.log('Ask Reasoning Response:', result);
 
         // Remove loading
-        messagesDiv.removeChild(loadingMsg);
+        document.getElementById('loading-reasoning')?.remove();
 
-        // Add AI response
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3';
-        aiMsg.innerHTML = `<p class="text-sm font-semibold text-purple-800">AI Assistant:</p><p class="text-sm text-gray-800">${data.text}</p>`;
-        messagesDiv.appendChild(aiMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        if (result.success) {
+            // Add AI response at the TOP
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 mb-2';
 
-        input.value = '';
+            const answer = result.answer || result.text || 'No response received';
+
+            // Escape HTML and convert newlines
+            const escapedAnswer = answer
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+
+            aiMsg.innerHTML = `
+                <div class="flex items-start gap-2 mb-2">
+                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
+                </div>
+                <div class="text-xs text-gray-700">${escapedAnswer}</div>
+                ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
+            `;
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
+        } else {
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
+            errorMsg.innerHTML = `<p class="text-xs text-red-800">Error: ${result.error || 'Failed to get response'}</p>`;
+            messagesDiv.insertBefore(errorMsg, messagesDiv.firstChild);
+        }
     } catch (error) {
-        messagesDiv.removeChild(loadingMsg);
+        document.getElementById('loading-reasoning')?.remove();
         const errorMsg = document.createElement('div');
-        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3';
-        errorMsg.innerHTML = `<p class="text-sm text-red-800">Error: ${error.message}</p>`;
-        messagesDiv.appendChild(errorMsg);
+        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
+        errorMsg.innerHTML = `<p class="text-xs text-red-800">Error: ${error.message}</p>`;
+        messagesDiv.insertBefore(errorMsg, messagesDiv.firstChild);
+        console.error('Ask Reasoning Error:', error);
     }
 }
 
 async function askQuick(question) {
     const messagesDiv = document.getElementById('reasoningMessages');
 
-    // Add user question
+    // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3';
-    userMsg.innerHTML = `<p class="text-sm font-semibold text-blue-800">You:</p><p class="text-sm text-gray-800">${question}</p>`;
-    messagesDiv.appendChild(userMsg);
+    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2';
+    userMsg.innerHTML = `<p class="text-xs font-semibold text-blue-800">You:</p><p class="text-xs text-gray-800">${question}</p>`;
+    messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
-    // Add loading
+    // Add loading at the TOP
     const loadingMsg = document.createElement('div');
-    loadingMsg.className = 'bg-gray-50 rounded-lg p-3';
-    loadingMsg.innerHTML = '<p class="text-sm text-gray-600">AI is thinking...</p>';
-    messagesDiv.appendChild(loadingMsg);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
+    loadingMsg.id = 'loading-quick';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
 
     try {
-        const response = await fetch('http://localhost:8000/voice-agent/query', {
+        // Use tab-specific Q&A endpoint with context
+        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: question, mode: 'text' })
+            body: JSON.stringify({
+                question: question,
+                tab: currentTab,
+                tab_data: currentTabData
+            })
         });
 
-        const data = await response.json();
+        const result = await response.json();
+
+        console.log('Ask Quick Response:', result);
 
         // Remove loading
-        messagesDiv.removeChild(loadingMsg);
+        document.getElementById('loading-quick')?.remove();
 
-        // Add AI response
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3';
-        aiMsg.innerHTML = `<p class="text-sm font-semibold text-purple-800">AI Assistant:</p><p class="text-sm text-gray-800">${data.text}</p>`;
-        messagesDiv.appendChild(aiMsg);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        if (result.success) {
+            // Add AI response at the TOP
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 mb-2';
+
+            const answer = result.answer || result.text || 'No response received';
+
+            // Escape HTML and convert newlines
+            const escapedAnswer = answer
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+
+            aiMsg.innerHTML = `
+                <div class="flex items-start gap-2 mb-2">
+                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
+                </div>
+                <div class="text-xs text-gray-700">${escapedAnswer}</div>
+                ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
+            `;
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
+        } else {
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
+            errorMsg.innerHTML = `<p class="text-xs text-red-800">Error: ${result.error || 'Failed to get response'}</p>`;
+            messagesDiv.insertBefore(errorMsg, messagesDiv.firstChild);
+        }
     } catch (error) {
-        messagesDiv.removeChild(loadingMsg);
+        document.getElementById('loading-quick')?.remove();
         const errorMsg = document.createElement('div');
-        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3';
-        errorMsg.innerHTML = `<p class="text-sm text-red-800">Error: ${error.message}</p>`;
-        messagesDiv.appendChild(errorMsg);
+        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
+        errorMsg.innerHTML = `<p class="text-xs text-red-800">Error: ${error.message}</p>`;
+        messagesDiv.insertBefore(errorMsg, messagesDiv.firstChild);
+        console.error('Ask Quick Error:', error);
     }
 }
 
