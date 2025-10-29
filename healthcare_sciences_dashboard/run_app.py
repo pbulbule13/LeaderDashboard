@@ -19,12 +19,10 @@ def start_api_server():
     # Get the script's directory (healthcare_sciences_dashboard)
     script_dir = Path(__file__).parent.absolute()
 
-    # Start API server
+    # Start API server (don't capture output so we can see errors)
     process = subprocess.Popen(
         [sys.executable, "api/server.py"],
         cwd=str(script_dir),  # Explicitly set working directory
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
         text=True
     )
 
@@ -35,8 +33,8 @@ def start_api_server():
         print("✅ API server running at http://localhost:8000")
         return process
     else:
-        stdout, stderr = process.communicate()
-        print(f"❌ API server failed: {stderr}")
+        print("❌ API server failed to start!")
+        print("   Check the error messages above for details")
         return None
 
 def start_frontend_server():
@@ -46,12 +44,10 @@ def start_frontend_server():
     # Get the script's directory (healthcare_sciences_dashboard)
     script_dir = Path(__file__).parent.absolute()
 
-    # Start HTTP server for frontend in the script's directory
+    # Start HTTP server for frontend in the script's directory (don't capture output)
     process = subprocess.Popen(
         [sys.executable, "-m", "http.server", "3000"],
         cwd=str(script_dir),  # Explicitly set working directory
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
         text=True
     )
 
@@ -63,8 +59,8 @@ def start_frontend_server():
         print(f"   Serving files from: {script_dir}")
         return process
     else:
-        stdout, stderr = process.communicate()
-        print(f"❌ Frontend server failed: {stderr}")
+        print("❌ Frontend server failed to start!")
+        print("   Check the error messages above for details")
         return None
 
 def open_dashboard():
