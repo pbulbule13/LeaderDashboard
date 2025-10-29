@@ -18,6 +18,9 @@ calendar_token.json
 gmail_token.json
 credentials.json
 *_credentials.json
+config/secret_key
+*.pickle
+healthcare_sciences_dashboard/config/gmail_token.pickle
 
 # ===================================================================
 # Python

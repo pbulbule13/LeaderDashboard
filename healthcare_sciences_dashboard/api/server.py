@@ -63,9 +63,11 @@ async def health_check():
 try:
     from api.routes.dashboard import router as dashboard_router
     from api.routes.query import router as query_router
+    from ui.routes import router as ui_router
 
     app.include_router(dashboard_router, prefix='/api/dashboard', tags=['dashboard'])
     app.include_router(query_router, prefix='/api/query', tags=['query'])
+    app.include_router(ui_router)
 
     print('[OK] Dashboard and Query routes loaded successfully')
 except Exception as e:
