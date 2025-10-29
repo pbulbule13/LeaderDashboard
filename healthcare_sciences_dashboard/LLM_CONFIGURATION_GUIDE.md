@@ -7,11 +7,11 @@ This guide explains how to configure the dashboard to use different LLM provider
 
 ## 🎯 Supported LLM Providers
 
-The dashboard now supports **THREE** major LLM providers:
+The dashboard now supports **THREE** major LLM providers with **DeepSeek as primary**:
 
-1. **OpenAI** - GPT-4, GPT-4-Turbo, GPT-3.5-Turbo, GPT-4o
-2. **Google Gemini** - Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini Pro
-3. **DeepSeek** - DeepSeek Chat, DeepSeek Coder
+1. **DeepSeek** (Primary) - DeepSeek Chat, DeepSeek Coder - Most affordable
+2. **Google Gemini** (Secondary) - Gemini 1.5 Pro, Gemini 1.5 Flash - Good balance
+3. **OpenAI** (Tertiary) - GPT-4, GPT-4-Turbo, GPT-3.5-Turbo, GPT-4o - Most capable
 
 All AI features work with any of these providers!
 
@@ -21,14 +21,16 @@ All AI features work with any of these providers!
 
 ### Current .env File
 
-Your `.env` file already has OpenAI configured! You're ready to go.
+Your `.env` file is configured with **DeepSeek as primary** model! You're ready to go.
 
 **Current configuration:**
 ```bash
-OPENAI_API_KEY=sk-proj-...
-MODEL_NAME=gpt-4o
-TAB_QA_MODEL=gpt-4o
-RESPONSE_MODEL=gpt-4o
+# Priority: DeepSeek → Gemini → OpenAI
+DEEPSEEK_API_KEY=sk-...
+MODEL_NAME=deepseek-chat
+TAB_QA_MODEL=deepseek-chat
+RESPONSE_MODEL=deepseek-chat
+FALLBACK_MODELS=gemini-1.5-flash,gpt-4o,gpt-3.5-turbo
 ```
 
 ### Model Selection
@@ -300,9 +302,11 @@ RESPONSE_MODEL=deepseek-chat  # Affordable for responses
 
 Based on your `.env` file, you have:
 
-✅ **OpenAI configured with GPT-4o**
+✅ **DeepSeek configured as primary (deepseek-chat)**
+✅ **Gemini as secondary fallback (gemini-1.5-flash)**
+✅ **OpenAI as tertiary fallback (gpt-4o)**
 ✅ **Ready to use immediately**
-✅ **Good balance of performance and cost**
+✅ **Most cost-effective configuration**
 
 ### To Use Your Current Setup
 
@@ -385,9 +389,9 @@ TAB_QA_MODEL=gemini-1.5-pro
 
 ## ✅ Summary
 
-1. **You're already configured with OpenAI GPT-4o** ✓
-2. **To switch to Gemini**: Add `GOOGLE_API_KEY`, update MODEL_NAME
-3. **To switch to DeepSeek**: Add `DEEPSEEK_API_KEY`, update MODEL_NAME
+1. **You're already configured with DeepSeek as primary** ✓
+2. **Fallback chain**: DeepSeek → Gemini → OpenAI
+3. **To switch to different primary**: Update MODEL_NAME in .env
 4. **Restart server** after .env changes
 5. **Test with the dashboard** - it should work immediately!
 
