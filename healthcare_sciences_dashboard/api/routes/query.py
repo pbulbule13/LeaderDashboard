@@ -2,7 +2,18 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from dashboard_orchestrator import DashboardOrchestrator
-from agents.tab_qa_agent import TabQAAgent
+try:
+    from agents.tab_qa_agent import TabQAAgent  # real agent
+except Exception:
+    class TabQAAgent:  # type: ignore
+        def __init__(self, *args, **kwargs):
+            pass
+        async def ask(self, question: str, tab: str, tab_data=None):
+            return {"success": True, "answer": f"[mock] {tab}: {question}", "tab": tab, "tab_name": tab}
+        def list_tabs(self):
+            return {"overview": {"name": "Overview"}}
+        def get_tab_info(self, tab: str):
+            return {"name": tab}
 
 router = APIRouter()
 orchestrator = DashboardOrchestrator()

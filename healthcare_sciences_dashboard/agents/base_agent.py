@@ -1,4 +1,5 @@
 from typing import Dict, Any, List
+import os
 from langchain_openai import ChatOpenAI
 from app_config import config
 from langchain_core.messages import HumanMessage, AIMessage
@@ -13,6 +14,18 @@ class BaseAgent:
 
     def _initialize_llm(self):
         """Initialize the LLM based on configuration"""
+        # Enable lightweight mock for tests/offline environments
+        if os.getenv("TEST_MODE") == "1" or os.getenv("MOCK_LLM") == "1":
+            class _MockLLM:
+                async def ainvoke(self, messages):
+                    class _Resp:
+                        content = (
+                            f"Mock response to: {messages[-1]['content']}"
+                            if messages else "Mock response"
+                        )
+                    return _Resp()
+            return _MockLLM()
+
         return ChatOpenAI(
             model=config.MODEL_NAME,
             temperature=0.1,

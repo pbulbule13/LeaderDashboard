@@ -60,19 +60,28 @@ async def health_check():
     return {'status': 'healthy'}
 
 # Import and register routes
+# Load routers independently so one failure doesn't block others
 try:
     from api.routes.dashboard import router as dashboard_router
-    from api.routes.query import router as query_router
-    from ui.routes import router as ui_router
-
     app.include_router(dashboard_router, prefix='/api/dashboard', tags=['dashboard'])
-    app.include_router(query_router, prefix='/api/query', tags=['query'])
-    app.include_router(ui_router)
-
-    print('[OK] Dashboard and Query routes loaded successfully')
+    print('[OK] Dashboard routes loaded')
 except Exception as e:
     print(f'[WARNING] Could not load dashboard routes: {e}')
-    print('API running with basic endpoints only')
+
+try:
+    from api.routes.query import router as query_router
+    app.include_router(query_router, prefix='/api/query', tags=['query'])
+    print('[OK] Query routes loaded')
+except Exception as e:
+    print(f'[WARNING] Could not load query routes: {e}')
+
+try:
+    from ui.routes import router as ui_router
+    app.include_router(ui_router)
+    print('[OK] UI routes loaded')
+except Exception as e:
+    print(f'[WARNING] Could not load UI routes: {e}')
+    print('Proceeding without /ui endpoints')
 
 # Import and register voice agent routes
 try:
