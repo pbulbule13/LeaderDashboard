@@ -15,18 +15,22 @@ from pathlib import Path
 def start_api_server():
     """Start the FastAPI server"""
     print("🌐 Starting API server on port 8000...")
-    
+
+    # Get the script's directory (healthcare_sciences_dashboard)
+    script_dir = Path(__file__).parent.absolute()
+
     # Start API server
     process = subprocess.Popen(
         [sys.executable, "api/server.py"],
+        cwd=str(script_dir),  # Explicitly set working directory
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    
+
     # Wait a moment for server to start
     time.sleep(3)
-    
+
     if process.poll() is None:
         print("✅ API server running at http://localhost:8000")
         return process
@@ -38,20 +42,25 @@ def start_api_server():
 def start_frontend_server():
     """Start the frontend HTTP server"""
     print("🎨 Starting frontend server on port 3000...")
-    
-    # Start HTTP server for frontend
+
+    # Get the script's directory (healthcare_sciences_dashboard)
+    script_dir = Path(__file__).parent.absolute()
+
+    # Start HTTP server for frontend in the script's directory
     process = subprocess.Popen(
         [sys.executable, "-m", "http.server", "3000"],
+        cwd=str(script_dir),  # Explicitly set working directory
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    
+
     # Wait a moment for server to start
     time.sleep(2)
-    
+
     if process.poll() is None:
         print("✅ Frontend server running at http://localhost:3000")
+        print(f"   Serving files from: {script_dir}")
         return process
     else:
         stdout, stderr = process.communicate()
