@@ -82,10 +82,24 @@ async function askAI() {
 
         // Debug: Log the response
         console.log('AI Response:', result);
+        console.log('Answer text:', result.answer);
+        console.log('Success:', result.success);
 
         if (result.success) {
             // Display AI response with tab context indicator
             const answer = result.answer || result.text || 'No response received';
+
+            // Escape HTML to prevent XSS and formatting issues
+            const escapedAnswer = answer
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>'); // Convert newlines to <br>
+
+            console.log('Displaying answer, length:', answer.length);
+
             chatMessages.innerHTML += `
                 <div class="flex justify-start mb-3">
                     <div class="bg-white border border-gray-200 rounded-lg p-4 max-w-[80%] shadow-sm">
@@ -95,7 +109,7 @@ async function askAI() {
                             </span>
                             ${result.has_reasoning ? '<span class="text-xs text-gray-500">• With Reasoning</span>' : ''}
                         </div>
-                        <div class="text-sm text-gray-700 whitespace-pre-wrap">${answer}</div>
+                        <div class="text-sm text-gray-700">${escapedAnswer}</div>
                     </div>
                 </div>
             `;
