@@ -5,7 +5,7 @@ Implementation for Google Calendar using Google's Calendar API
 
 from .base import BaseCalendarAdapter
 from typing import Any
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class GoogleCalendarAdapter(BaseCalendarAdapter):
@@ -28,26 +28,45 @@ class GoogleCalendarAdapter(BaseCalendarAdapter):
         end_time: datetime,
         calendar_id: str = "primary"
     ) -> list[dict[str, Any]]:
-        """Fetch events from Google Calendar"""
-        # TODO: Implement actual Google Calendar API fetching
-        # service.events().list(
-        #     calendarId=calendar_id,
-        #     timeMin=start_time.isoformat() + 'Z',
-        #     timeMax=end_time.isoformat() + 'Z',
-        #     singleEvents=True,
-        #     orderBy='startTime'
-        # ).execute()
+        """Fetch events from Google Calendar
 
-        return [
-            {
-                "event_id": "gcal_event_1",
-                "title": "Executive Team Meeting",
-                "start": "2025-10-27T09:00:00Z",
-                "end": "2025-10-27T10:00:00Z",
-                "attendees": ["team@company.com"],
-                "status": "confirmed"
-            }
-        ]
+        In mock mode (no API configured), generate a reasonable list of events
+        within the requested time window so the UI can display a full schedule.
+        """
+        # TODO: Implement actual Google Calendar API fetching when creds exist
+        # For now return deterministic mock events across the window
+
+        events: list[dict[str, Any]] = []
+        cur = start_time
+        index = 0
+        # Create up to ~8 events spread over business hours for each day
+        while cur < end_time:
+            # Create some meetings between 9am and 4pm
+            for hour in (9, 11, 14, 16):
+                start = cur.replace(hour=hour, minute=0, second=0, microsecond=0)
+                if not (start_time <= start < end_time):
+                    continue
+                end = start.replace(hour=hour + 1)
+                index += 1
+                events.append({
+                    "event_id": f"gcal_event_{index}",
+                    "title": [
+                        "Executive Team Sync",
+                        "Partner Call",
+                        "Product Review",
+                        "Investor Update",
+                        "Strategy Workshop",
+                    ][index % 5],
+                    "start": start.isoformat(),
+                    "end": end.isoformat(),
+                    "attendees": ["team@company.com"],
+                    "status": "confirmed",
+                    "location": "Conference Room A" if hour in (9, 14) else "Zoom"
+                })
+            cur = cur.replace(hour=0, minute=0, second=0, microsecond=0)
+            cur = cur + timedelta(days=1)  # type: ignore[name-defined]
+
+        return events
 
     async def get_event(self, event_id: str) -> dict[str, Any]:
         """Get event details from Google Calendar"""

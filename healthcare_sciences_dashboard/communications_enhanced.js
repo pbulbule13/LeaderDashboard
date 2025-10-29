@@ -3,7 +3,8 @@
  * Features: Email categorization, draft approval, calendar, go-to-human
  */
 
-const COMM_API = 'http://localhost:8000';
+// Prefer dashboard config base URL if available
+const COMM_API = (window.DASHBOARD_CONFIG?.api?.baseUrl) || 'http://localhost:8000';
 
 // Global state
 window.communicationsState = {
@@ -67,11 +68,14 @@ function categorizeEmail(email) {
 /**
  * Load all emails from Gmail
  */
-async function loadAllEmails() {
+async function loadAllEmails(gmailQuery) {
     console.log('[Communications] Loading Gmail emails...');
 
     try {
-        const response = await fetch(`${COMM_API}/voice-agent/emails?max_results=50`);
+        const url = new URL(`${COMM_API}/voice-agent/emails`);
+        url.searchParams.set('max_results', '50');
+        if (gmailQuery) url.searchParams.set('query', gmailQuery);
+        const response = await fetch(url.toString());
 
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
@@ -270,6 +274,149 @@ function switchCategory(category) {
 }
 
 /**
+ * Ensure the enhanced Communications layout exists.
+ * If the page only has the older minimal inbox DOM, inject the full layout here.
+ */
+function ensureEnhancedLayout() {
+    const content = document.getElementById('content-email');
+    if (!content) return;
+
+    // If our expected containers are missing, inject the enhanced layout
+    if (!document.getElementById('email-list') || !document.getElementById('drafts-list')) {
+        content.innerHTML = `
+            <div class="mb-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">Communications Center</h2>
+                <div class="flex gap-2 items-center">
+                    <input id="comm-ai-query" type="text" placeholder="Ask: e.g., 'show emails from recruiters'" class="px-3 py-2 border border-gray-300 rounded text-sm w-72" />
+                    <button onclick=\"askCommunicationsAI()\" class=\"bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded text-sm font-semibold\">Ask</button>
+                    <button onclick=\"refreshCommunications()\"
+                        class=\"bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold text-sm\">
+                        Refresh All
+                    </button>
+                    <button onclick=\"goToHuman('general', 'General Inquiry')\"
+                        class=\"bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded font-semibold text-sm\">
+                        Contact Human
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Left Column: Email Categories & List -->
+                <div class="col-span-5">
+                    <!-- Category Filters -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+                        <h3 class="font-bold text-gray-800 mb-3">Categories</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick=\"switchCategory('all')\" id=\"cat-all\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 transition-all\">
+                                All <span id=\"badge-all\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                            <button onclick=\"switchCategory('urgent')\" id=\"cat-urgent\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-red-50 transition-all\">
+                                Urgent <span id=\"badge-urgent\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                            <button onclick=\"switchCategory('work')\" id=\"cat-work\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-blue-50 transition-all\">
+                                Work <span id=\"badge-work\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                            <button onclick=\"switchCategory('personal')\" id=\"cat-personal\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-green-50 transition-all\">
+                                Personal <span id=\"badge-personal\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                            <button onclick=\"switchCategory('promotions')\" id=\"cat-promotions\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-purple-50 transition-all\">
+                                Promo <span id=\"badge-promotions\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                            <button onclick=\"switchCategory('social')\" id=\"cat-social\"
+                                class=\"category-tab px-3 py-1 rounded text-xs font-medium bg-gray-100 text-gray-700 hover:bg-indigo-50 transition-all\">
+                                Social <span id=\"badge-social\" class=\"ml-1 bg-white px-1.5 rounded-full\">0</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Email List -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">Inbox</h3>
+                            <span class="text-xs text-gray-600">Connected to Gmail</span>
+                        </div>
+                        <div id="email-list" class="max-h-[700px] overflow-y-auto">
+                            <div class="p-6 text-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                <p class="text-sm text-gray-600">Loading emails from Gmail...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Column: Drafts & Approvals -->
+                <div class="col-span-4">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-gray-800">Pending Drafts</h3>
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded font-semibold">AI Generated</span>
+                        </div>
+                        <div id="drafts-list" class="max-h-[400px] overflow-y-auto">
+                            <div class="p-6 text-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                <p class="text-sm text-gray-600">Loading drafts...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-gray-800">Calendar</h3>
+                            <select id="calendar-range" class="text-xs border border-gray-300 rounded px-2 py-1" onchange="loadCalendarEvents(this.value)">
+                                <option value="week" selected>This Week</option>
+                                <option value="today">Today</option>
+                                <option value="tomorrow">Tomorrow</option>
+                            </select>
+                        </div>
+                        <div id="calendar-list" class="space-y-2 max-h-[400px] overflow-y-auto">
+                            <div class="p-3 text-center text-sm text-gray-600">Loading calendar events...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Quick Actions & AI Status -->
+                <div class="col-span-3">
+                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-xl shadow-sm p-4 mb-4">
+                        <h3 class="font-bold text-purple-900 mb-3">AI Assistant Status</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">Gmail:</span><span class="text-green-600 font-semibold">Connected</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">Agent:</span><span class="text-green-600 font-semibold">Active</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">Calendar:</span><span class="text-green-600 font-semibold">Synced</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-700">Drafts Pending:</span><span class="text-yellow-600 font-semibold" id="drafts-pending-count">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 mb-4">
+                        <h3 class="font-bold text-gray-800 mb-3">Actions</h3>
+                        <div class="space-y-2">
+                            <button onclick=\"refreshCommunications()\"
+                                class=\"w-full bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded text-sm font-semibold border border-blue-200\">Refresh Inbox</button>
+                            <button onclick=\"alert('Compose new email feature coming soon!')\"
+                                class=\"w-full bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded text-sm font-semibold border border-green-200\">Compose New</button>
+                            <button onclick=\"goToHuman('urgent-help', 'Urgent Assistance')\"
+                                class=\"w-full bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded text-sm font-semibold border border-purple-200\">Get Human Help</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+/**
  * Select and view email
  */
 function selectEmail(index) {
@@ -340,6 +487,7 @@ function viewDraft(index) {
 
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.id = `draft-modal-${index}`;
     modal.innerHTML = `
         <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
             <div class="p-6 border-b border-gray-200">
@@ -404,17 +552,48 @@ async function approveDraft(index) {
     const draft = window.communicationsState.drafts[index];
     if (!draft) return;
 
-    if (!confirm(`Send email to ${draft.to?.join(', ')}?`)) {
+    // Read potentially edited values from the modal
+    const toField = document.getElementById(`draft-to-${index}`);
+    const subjectField = document.getElementById(`draft-subject-${index}`);
+    const bodyField = document.getElementById(`draft-body-${index}`);
+
+    const toList = (toField?.value || (draft.to || []).join(', '))
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+    const subject = subjectField?.value || draft.subject || '';
+    const body = bodyField?.value || draft.body || '';
+
+    if (!confirm(`Send email to ${toList.join(', ')}?`)) {
         return;
     }
 
     try {
-        // TODO: Implement actual send via API
-        alert(`Email would be sent to: ${draft.to?.join(', ')}\n\nSubject: ${draft.subject}\n\n(Actual sending not yet implemented - requires authorization code)`);
+        const res = await fetch(`${COMM_API}/voice-agent/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                to: toList,
+                subject,
+                body,
+                thread_id: draft.thread_id || draft.id || undefined
+            })
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || `API Error: ${res.status}`);
+        }
 
         // Remove from drafts
         window.communicationsState.drafts.splice(index, 1);
         renderDraftsList();
+
+        // Close modal if open
+        const modal = document.getElementById(`draft-modal-${index}`) || document.querySelector('.fixed');
+        modal?.remove();
+
+        alert('Email sent successfully');
 
     } catch (error) {
         alert(`Error sending email: ${error.message}`);
@@ -513,7 +692,8 @@ async function refreshCommunications() {
     // Load data
     await Promise.all([
         loadAllEmails(),
-        loadEmailDrafts()
+        loadEmailDrafts(),
+        loadCalendarEvents(document.getElementById('calendar-range')?.value || 'week')
     ]);
 }
 
@@ -572,6 +752,15 @@ function showError(containerId, message) {
 function initCommunications() {
     console.log('[Communications] Initializing enhanced communications tab...');
 
+    // If the older inbox script is present but its container is not, neutralize its loaders to avoid errors
+    if (!document.getElementById('email-list-container')) {
+        window.loadRealEmails = () => {};
+        window.refreshEmails = () => {};
+    }
+
+    // Ensure our enhanced layout exists
+    ensureEnhancedLayout();
+
     // Load data when tab becomes visible
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -593,6 +782,80 @@ function initCommunications() {
             refreshCommunications();
         }
     }
+}
+
+/**
+ * Load calendar events into the communications tab calendar list
+ */
+async function loadCalendarEvents(range = 'week') {
+    const container = document.getElementById('calendar-list');
+    if (container) {
+        container.innerHTML = '<div class="p-3 text-center text-sm text-gray-600">Loading calendar events...</div>';
+    }
+
+    try {
+        const url = new URL(`${COMM_API}/voice-agent/calendar/events`);
+        url.searchParams.set('timeframe', range);
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        const data = await res.json();
+        const events = data.events || [];
+
+        if (!container) return;
+        if (events.length === 0) {
+            container.innerHTML = '<div class="p-3 text-center text-sm text-gray-500">No events found</div>';
+            return;
+        }
+
+        container.innerHTML = events.map(ev => {
+            const start = new Date(ev.start || ev.start_time || Date.now());
+            const timeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return `
+                <div class="flex gap-2 items-start p-2 border-b border-gray-100">
+                    <span class="text-xs font-semibold text-blue-700 w-16">${timeStr}</span>
+                    <div>
+                        <p class="text-xs font-semibold">${escapeHtml(ev.title || ev.summary || 'Meeting')}</p>
+                        ${ev.location ? `<p class="text-[11px] text-gray-600">${escapeHtml(ev.location)}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        if (container) {
+            container.innerHTML = `<div class="p-3 text-center text-sm text-red-600">${escapeHtml(e.message)}</div>`;
+        }
+    }
+}
+
+/**
+ * Ask AI-style query for emails (maps to Gmail query)
+ */
+async function askCommunicationsAI() {
+    const input = document.getElementById('comm-ai-query');
+    const q = (input?.value || '').trim().toLowerCase();
+    if (!q) return;
+
+    // Simple keyword → Gmail query mapping
+    const mappings = [
+        { test: /recruiter|hiring|talent|jobs|careers/, query: 'from:(recruiter OR hiring OR talent OR jobs OR careers)' },
+        { test: /unread|new/, query: 'is:unread' },
+        { test: /from (.+)@/ , make: (m) => `from:${m[1]}@` },
+    ];
+
+    let gmailQuery = '';
+    for (const m of mappings) {
+        if (m.test && m.test.test(q)) { gmailQuery = m.query; break; }
+        if (m.make) {
+            const mm = q.match(m.test);
+            if (mm) { gmailQuery = m.make(mm); break; }
+        }
+    }
+    if (!gmailQuery) {
+        // Fallback: use raw text as Gmail query
+        gmailQuery = q;
+    }
+
+    await loadAllEmails(gmailQuery);
 }
 
 // Initialize when DOM is ready

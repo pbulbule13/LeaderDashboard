@@ -3,6 +3,8 @@ const CONFIG = window.DASHBOARD_CONFIG;
 const API_BASE = CONFIG.api.baseUrl;
 let overviewChartsCreated = false;
 let charts = {};
+let currentTab = 'overview'; // Track current active tab
+let currentTabData = null; // Store current tab's data for context
 
 // Set current date
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,8 +41,9 @@ async function askAI() {
 
     const chatMessages = document.getElementById('aiChatMessages');
 
+    // Display user message
     chatMessages.innerHTML += `
-        <div class="flex justify-end">
+        <div class="flex justify-end mb-3">
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-3 max-w-[80%]">
                 <p class="text-sm">${query}</p>
             </div>
@@ -49,38 +52,58 @@ async function askAI() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
     input.value = '';
 
+    // Show loading indicator
     chatMessages.innerHTML += `
-        <div id="loading" class="flex justify-start">
-            <div class="bg-gray-200 rounded-lg p-3">
-                <p class="text-sm text-gray-600">AI is analyzing...</p>
+        <div id="loading" class="flex justify-start mb-3">
+            <div class="bg-gray-100 rounded-lg p-3">
+                <div class="flex items-center space-x-2">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <p class="text-sm text-gray-600">Analyzing your question...</p>
+                </div>
             </div>
         </div>
     `;
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-        const response = await fetch(`${API_BASE}/api/query/ask`, {
+        // Use tab-specific Q&A endpoint with context
+        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, context: {} })
+            body: JSON.stringify({
+                question: query,
+                tab: currentTab,
+                tab_data: currentTabData
+            })
         });
 
         const result = await response.json();
-        document.getElementById('loading').remove();
+        document.getElementById('loading')?.remove();
+
+        // Debug: Log the response
+        console.log('AI Response:', result);
 
         if (result.success) {
+            // Display AI response with tab context indicator
+            const answer = result.answer || result.text || 'No response received';
             chatMessages.innerHTML += `
-                <div class="flex justify-start">
-                    <div class="bg-white border border-gray-200 rounded-lg p-3 max-w-[80%]">
-                        <p class="text-sm text-gray-700">${result.response}</p>
+                <div class="flex justify-start mb-3">
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 max-w-[80%] shadow-sm">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                ${result.tab_name || currentTab.toUpperCase()}
+                            </span>
+                            ${result.has_reasoning ? '<span class="text-xs text-gray-500">• With Reasoning</span>' : ''}
+                        </div>
+                        <div class="text-sm text-gray-700 whitespace-pre-wrap">${answer}</div>
                     </div>
                 </div>
             `;
         } else {
             chatMessages.innerHTML += `
-                <div class="flex justify-start">
+                <div class="flex justify-start mb-3">
                     <div class="bg-red-50 border border-red-200 rounded-lg p-3 max-w-[80%]">
-                        <p class="text-sm text-red-700">Error: Failed to get response</p>
+                        <p class="text-sm text-red-700">Error: ${result.error || 'Failed to get response'}</p>
                     </div>
                 </div>
             `;
@@ -88,7 +111,7 @@ async function askAI() {
     } catch (error) {
         document.getElementById('loading')?.remove();
         chatMessages.innerHTML += `
-            <div class="flex justify-start">
+            <div class="flex justify-start mb-3">
                 <div class="bg-red-50 border border-red-200 rounded-lg p-3 max-w-[80%]">
                     <p class="text-sm text-red-700">Error: ${error.message}</p>
                 </div>
@@ -160,11 +183,16 @@ function viewAllNotes() {
 
 // Tab Switching
 function switchTab(tabName) {
+    // Update UI
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
     document.getElementById('content-' + tabName).classList.remove('hidden');
     document.getElementById('tab-' + tabName).classList.add('tab-active');
 
+    // Track current tab for context-aware AI
+    currentTab = tabName;
+
+    // Load tab data and update context
     if (tabName === 'orders') loadOrdersData();
     else if (tabName === 'compliance') loadComplianceData();
     else if (tabName === 'reimbursement') loadReimbursementData();
@@ -174,6 +202,32 @@ function switchTab(tabName) {
     else if (tabName === 'forecasting') loadForecastingData();
     else if (tabName === 'market') loadMarketData();
     else if (tabName === 'milestones') loadMilestonesData();
+
+    // Update AI panel header to show current context
+    updateAIPanelContext(tabName);
+}
+
+function updateAIPanelContext(tabName) {
+    // Add visual indicator of which tab AI is contextually aware of
+    const aiTitle = document.querySelector('#aiPanel h2');
+    if (aiTitle) {
+        const tabNames = {
+            'overview': '📊 Dashboard',
+            'email': '📬 Communications',
+            'personal': '💼 Personal',
+            'orders': '📈 Orders',
+            'compliance': '✅ Compliance',
+            'reimbursement': '💵 Reimbursement',
+            'costs': '💰 Costs',
+            'lab': '🔬 Lab',
+            'regional': '🗺️ Regional',
+            'forecasting': '🔮 Forecast',
+            'market': '📰 Market',
+            'milestones': '🎯 Projects'
+        };
+        const displayName = tabNames[tabName] || tabName;
+        aiTitle.innerHTML = `Ask Me Anything <span class="text-xs font-normal text-blue-600 ml-2">(${displayName})</span>`;
+    }
 }
 
 // Create Overview Charts
@@ -2277,6 +2331,120 @@ function renderQuickNotes() {
             <p class="text-gray-400 text-xs mt-1">${note.timestamp}</p>
         </div>
     `).join('');
+}
+
+// ==================== AI ASSISTANT FUNCTIONS ====================
+
+async function askAI() {
+    const input = document.getElementById('aiQueryInput');
+    const question = input.value.trim();
+    if (!question) return;
+
+    try {
+        const response = await fetch('http://localhost:8000/voice-agent/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: question, mode: 'text' })
+        });
+
+        const data = await response.json();
+        alert(`AI Response: ${data.text}`);
+        input.value = '';
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function askReasoning() {
+    const input = document.getElementById('reasoningInput');
+    const question = input.value.trim();
+    if (!question) return;
+
+    const messagesDiv = document.getElementById('reasoningMessages');
+
+    // Add user question
+    const userMsg = document.createElement('div');
+    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3';
+    userMsg.innerHTML = `<p class="text-sm font-semibold text-blue-800">You:</p><p class="text-sm text-gray-800">${question}</p>`;
+    messagesDiv.appendChild(userMsg);
+
+    // Add loading
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'bg-gray-50 rounded-lg p-3';
+    loadingMsg.innerHTML = '<p class="text-sm text-gray-600">AI is thinking...</p>';
+    messagesDiv.appendChild(loadingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+        const response = await fetch('http://localhost:8000/voice-agent/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: question, mode: 'text' })
+        });
+
+        const data = await response.json();
+
+        // Remove loading
+        messagesDiv.removeChild(loadingMsg);
+
+        // Add AI response
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3';
+        aiMsg.innerHTML = `<p class="text-sm font-semibold text-purple-800">AI Assistant:</p><p class="text-sm text-gray-800">${data.text}</p>`;
+        messagesDiv.appendChild(aiMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        input.value = '';
+    } catch (error) {
+        messagesDiv.removeChild(loadingMsg);
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3';
+        errorMsg.innerHTML = `<p class="text-sm text-red-800">Error: ${error.message}</p>`;
+        messagesDiv.appendChild(errorMsg);
+    }
+}
+
+async function askQuick(question) {
+    const messagesDiv = document.getElementById('reasoningMessages');
+
+    // Add user question
+    const userMsg = document.createElement('div');
+    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3';
+    userMsg.innerHTML = `<p class="text-sm font-semibold text-blue-800">You:</p><p class="text-sm text-gray-800">${question}</p>`;
+    messagesDiv.appendChild(userMsg);
+
+    // Add loading
+    const loadingMsg = document.createElement('div');
+    loadingMsg.className = 'bg-gray-50 rounded-lg p-3';
+    loadingMsg.innerHTML = '<p class="text-sm text-gray-600">AI is thinking...</p>';
+    messagesDiv.appendChild(loadingMsg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    try {
+        const response = await fetch('http://localhost:8000/voice-agent/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: question, mode: 'text' })
+        });
+
+        const data = await response.json();
+
+        // Remove loading
+        messagesDiv.removeChild(loadingMsg);
+
+        // Add AI response
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3';
+        aiMsg.innerHTML = `<p class="text-sm font-semibold text-purple-800">AI Assistant:</p><p class="text-sm text-gray-800">${data.text}</p>`;
+        messagesDiv.appendChild(aiMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (error) {
+        messagesDiv.removeChild(loadingMsg);
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3';
+        errorMsg.innerHTML = `<p class="text-sm text-red-800">Error: ${error.message}</p>`;
+        messagesDiv.appendChild(errorMsg);
+    }
 }
 
 // Initialize metric charts and quick notes on load

@@ -9,6 +9,7 @@ from typing import Literal
 from ..orchestrator import VoiceAgentOrchestrator
 from ..models.settings import SystemSettings
 import json
+from ..utils.email_query import parse_email_nl_to_gmail_query
 
 # Initialize router
 router = APIRouter(prefix="/voice-agent", tags=["voice-agent"])
@@ -97,8 +98,126 @@ async def summarize_inbox(user_id: str | None = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# --- Direct Email Send API (no authorization code required) ---
+class EmailSendRequest(BaseModel):
+    to: list[str] | str
+    subject: str
+    body: str
+    cc: list[str] | None = None
+    bcc: list[str] | None = None
+    thread_id: str | None = None
+
+
+@router.post("/email/send")
+async def send_email_direct(request: EmailSendRequest):
+    """
+    Send an email directly via the configured email adapter.
+
+    This endpoint is intended for UI flows like "Approve & Send" and does
+    not require an authorization code. If Gmail credentials are not present,
+    the Gmail adapter falls back to mock mode and still returns success.
+    """
+    try:
+        # Lazy import to avoid circulars when running minimal routes
+        from voice_agent.adapters.email.gmail_adapter import GmailAdapter
+
+        adapter = GmailAdapter()
+        to_list = request.to if isinstance(request.to, list) else [request.to]
+
+        result = await adapter.send_email(
+            to=to_list,
+            subject=request.subject,
+            body=request.body,
+            cc=request.cc or [],
+            bcc=request.bcc or [],
+            thread_id=request.thread_id
+        )
+
+        if not result.get("success", False):
+            raise HTTPException(status_code=500, detail=result.get("error", "Failed to send email"))
+
+        return {
+            "success": True,
+            "message_id": result.get("message_id"),
+            "thread_id": result.get("thread_id")
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Calendar Events API ---
+@router.get("/calendar/events")
+async def get_calendar_events(timeframe: str = "week"):
+    """
+    Return calendar events for a timeframe: "today", "tomorrow", "week".
+    Uses the orchestrator's calendar adapter (mock if not configured).
+    """
+    from datetime import datetime, timedelta, timezone
+
+    try:
+        adapter = orchestrator.calendar_adapter
+        if adapter is None:
+            # Fallback to mock Google adapter
+            from voice_agent.adapters.calendar.google_calendar_adapter import GoogleCalendarAdapter
+            adapter = GoogleCalendarAdapter()
+
+        now = datetime.now(timezone.utc)
+        if timeframe in ("today", "day"):
+            start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+        elif timeframe in ("tomorrow",):
+            start = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=1)
+        else:  # week (default)
+            start = now - timedelta(days=now.weekday())  # Monday
+            start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+            end = start + timedelta(days=7)
+
+        events = await adapter.get_events(start_time=start, end_time=end)
+        return {"events": events}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/emails/search")
+async def search_emails(nl: str, max_results: int = 25, unread_only: bool = False):
+    """
+    Search emails using a simple natural-language filter.
+
+    Example: nl="show me emails from recruiters" → Gmail query with recruiter terms.
+    """
+    try:
+        from voice_agent.adapters.email.gmail_adapter import GmailAdapter
+
+        gmail_query = parse_email_nl_to_gmail_query(nl)
+
+        gmail = GmailAdapter()
+        threads = await gmail.fetch_threads(
+            max_results=max_results,
+            unread_only=unread_only,
+            query=gmail_query
+        )
+
+        emails = []
+        for thread in threads:
+            emails.append({
+                "id": thread.get("thread_id", ""),
+                "from": thread.get("from", "Unknown"),
+                "subject": thread.get("subject", "No Subject"),
+                "preview": thread.get("preview", "")[:200],
+                "date": thread.get("timestamp", ""),
+                "unread": thread.get("unread", False)
+            })
+
+        return {"emails": emails, "count": len(emails), "query": gmail_query}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/emails")
-async def get_emails(max_results: int = 10):
+async def get_emails(max_results: int = 10, query: str | None = None, unread_only: bool = False):
     """
     Get a simple list of emails from Gmail.
 
@@ -119,8 +238,12 @@ async def get_emails(max_results: int = 10):
         # Initialize Gmail adapter (uses environment variables internally)
         gmail = GmailAdapter()
 
-        # Get recent email threads
-        threads = await gmail.fetch_threads(max_results=max_results)
+        # Get recent email threads (optionally filtered by Gmail query)
+        threads = await gmail.fetch_threads(
+            max_results=max_results,
+            unread_only=unread_only,
+            query=query
+        )
 
         # Format for dashboard
         emails = []

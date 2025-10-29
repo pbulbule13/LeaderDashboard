@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Agent - Test Your Gmail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">🎙️ Vinegar - Voice Agent</h1>
+                <p class="text-gray-600">Test your Gmail integration with the voice agent</p>
+            </div>
+
+            <!-- Voice Interface -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Ask Vinegar Anything</h2>
+
+                <!-- Input -->
+                <div class="mb-4">
+                    <textarea id="queryInput" rows="3"
+                        placeholder="Try: 'What emails need my attention?' or 'Show me my inbox' or 'What's on my calendar today?'"
+                        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3 mb-4">
+                    <button onclick="askVinegar()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <span>🚀</span> Ask Vinegar
+                    </button>
+                    <button onclick="getInboxSummary()"
+                        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <span>📧</span> Get Inbox Summary
+                    </button>
+                    <button onclick="checkCalendar()"
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <span>📅</span> Check Calendar
+                    </button>
+                </div>
+
+                <!-- Quick Test Queries -->
+                <div class="bg-white rounded-lg p-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Quick Test Queries:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setQuery('What emails need my attention?')"
+                            class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-full">
+                            What emails need my attention?
+                        </button>
+                        <button onclick="setQuery('Show me urgent emails')"
+                            class="text-xs bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-full">
+                            Show me urgent emails
+                        </button>
+                        <button onclick="setQuery('What is on my calendar today?')"
+                            class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1 rounded-full">
+                            What's on my calendar today?
+                        </button>
+                        <button onclick="setQuery('Draft a reply saying I will review tomorrow')"
+                            class="text-xs bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded-full">
+                            Draft a reply
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Area -->
+            <div id="responseArea" class="bg-white rounded-lg shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Response:</h3>
+                <div id="responseText" class="text-gray-700 mb-4"></div>
+
+                <!-- Emails Section -->
+                <div id="emailsSection" class="hidden">
+                    <h4 class="font-semibold text-gray-800 mb-2">📧 Your Emails:</h4>
+                    <div id="emailsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Drafts Section -->
+                <div id="draftsSection" class="hidden mt-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">✍️ Generated Drafts:</h4>
+                    <div id="draftsList" class="space-y-3"></div>
+                </div>
+
+                <!-- Calendar Section -->
+                <div id="calendarSection" class="hidden mt-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">📅 Calendar Events:</h4>
+                    <div id="calendarList" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden bg-blue-50 rounded-lg p-6 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p class="text-blue-600 font-semibold">Asking Vinegar...</p>
+            </div>
+
+            <!-- Error Area -->
+            <div id="errorArea" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <h3 class="text-red-800 font-bold mb-2">⚠️ Error</h3>
+                <p id="errorText" class="text-red-700"></p>
+            </div>
+
+            <!-- System Status -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">System Status</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-xs text-gray-600">API Server</p>
+                        <p id="serverStatus" class="font-semibold">Checking...</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-xs text-gray-600">Gmail Connection</p>
+                        <p id="gmailStatus" class="font-semibold">Checking...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        // Check server status on load
+        window.addEventListener('load', checkStatus);
+
+        async function checkStatus() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    document.getElementById('serverStatus').textContent = '✅ Online';
+                    document.getElementById('serverStatus').className = 'font-semibold text-green-600';
+
+                    // Check Gmail status
+                    const configResponse = await fetch(`${API_URL}/voice-agent/config`);
+                    if (configResponse.ok) {
+                        document.getElementById('gmailStatus').textContent = '✅ Connected';
+                        document.getElementById('gmailStatus').className = 'font-semibold text-green-600';
+                    }
+                } else {
+                    document.getElementById('serverStatus').textContent = '❌ Offline';
+                    document.getElementById('serverStatus').className = 'font-semibold text-red-600';
+                }
+            } catch (error) {
+                document.getElementById('serverStatus').textContent = '❌ Offline';
+                document.getElementById('serverStatus').className = 'font-semibold text-red-600';
+                document.getElementById('gmailStatus').textContent = '⚠️ Unknown';
+                document.getElementById('gmailStatus').className = 'font-semibold text-yellow-600';
+            }
+        }
+
+        function setQuery(text) {
+            document.getElementById('queryInput').value = text;
+        }
+
+        async function askVinegar() {
+            const query = document.getElementById('queryInput').value;
+            if (!query.trim()) {
+                alert('Please enter a question!');
+                return;
+            }
+
+            showLoading();
+            hideError();
+            hideResponse();
+
+            try {
+                const response = await fetch(`${API_URL}/voice-agent/query`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        query: query,
+                        mode: 'text'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResponse(data);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getInboxSummary() {
+            showLoading();
+            hideError();
+            hideResponse();
+
+            try {
+                const response = await fetch(`${API_URL}/voice-agent/inbox/summary`);
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                const data = await response.json();
+                displayResponse(data);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function checkCalendar() {
+            showLoading();
+            hideError();
+            hideResponse();
+
+            try {
+                const response = await fetch(`${API_URL}/voice-agent/calendar/check?timeframe=today`);
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                const data = await response.json();
+                displayResponse(data);
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayResponse(data) {
+            const responseArea = document.getElementById('responseArea');
+            const responseText = document.getElementById('responseText');
+
+            responseArea.classList.remove('hidden');
+            responseText.textContent = data.text || 'Response received';
+
+            // Display emails if available
+            if (data.email_threads && data.email_threads.length > 0) {
+                displayEmails(data.email_threads);
+            }
+
+            // Display drafts if available
+            if (data.drafts && data.drafts.length > 0) {
+                displayDrafts(data.drafts);
+            }
+
+            // Display calendar if available
+            if (data.calendar_events && data.calendar_events.length > 0) {
+                displayCalendar(data.calendar_events);
+            }
+        }
+
+        function displayEmails(emails) {
+            const section = document.getElementById('emailsSection');
+            const list = document.getElementById('emailsList');
+
+            section.classList.remove('hidden');
+            list.innerHTML = emails.map(email => `
+                <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                    <div class="flex justify-between items-start mb-1">
+                        <p class="font-semibold text-sm">${email.from || 'Unknown'}</p>
+                        <span class="text-xs text-gray-500">${email.date || ''}</span>
+                    </div>
+                    <p class="text-sm font-medium text-gray-800">${email.subject || 'No subject'}</p>
+                    <p class="text-xs text-gray-600 mt-1">${email.preview || ''}</p>
+                </div>
+            `).join('');
+        }
+
+        function displayDrafts(drafts) {
+            const section = document.getElementById('draftsSection');
+            const list = document.getElementById('draftsList');
+
+            section.classList.remove('hidden');
+            list.innerHTML = drafts.map(draft => `
+                <div class="bg-green-50 p-4 rounded border border-green-200">
+                    <p class="text-xs text-green-700 mb-2">To: ${draft.to ? draft.to.join(', ') : 'Unknown'}</p>
+                    <p class="text-sm font-semibold mb-2">${draft.subject || 'No subject'}</p>
+                    <div class="bg-white p-3 rounded text-sm whitespace-pre-wrap">${draft.body || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function displayCalendar(events) {
+            const section = document.getElementById('calendarSection');
+            const list = document.getElementById('calendarList');
+
+            section.classList.remove('hidden');
+            list.innerHTML = events.map(event => `
+                <div class="bg-purple-50 p-3 rounded border border-purple-200">
+                    <p class="font-semibold text-sm">${event.title || 'Untitled'}</p>
+                    <p class="text-xs text-gray-600">${event.start || ''} - ${event.end || ''}</p>
+                    ${event.location ? `<p class="text-xs text-gray-500">📍 ${event.location}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').classList.add('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('errorArea').classList.remove('hidden');
+            document.getElementById('errorText').textContent = message;
+        }
+
+        function hideError() {
+            document.getElementById('errorArea').classList.add('hidden');
+        }
+
+        function hideResponse() {
+            document.getElementById('responseArea').classList.add('hidden');
+            document.getElementById('emailsSection').classList.add('hidden');
+            document.getElementById('draftsSection').classList.add('hidden');
+            document.getElementById('calendarSection').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

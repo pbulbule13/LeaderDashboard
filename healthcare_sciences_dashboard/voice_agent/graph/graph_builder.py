@@ -11,6 +11,7 @@ from ..agents.reasoning_agent import ReasoningAgent
 from ..agents.draft_agent import DraftGenerationAgent
 from ..agents.authorization_agent import AuthorizationAgent
 from ..agents.execution_agent import ExecutionAgent
+from ..agents.response_agent import ResponseGenerationAgent
 from ..agents.logging_agent import LoggingAgent
 
 
@@ -49,6 +50,7 @@ def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> State
     draft_agent = DraftGenerationAgent()
     auth_agent = AuthorizationAgent()
     execution_agent = ExecutionAgent(email_adapter=email_adapter, calendar_adapter=calendar_adapter)
+    response_agent = ResponseGenerationAgent()
     logging_agent = LoggingAgent()
 
     # Add nodes to the graph
@@ -58,6 +60,7 @@ def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> State
     workflow.add_node("generate_drafts", draft_agent.run)
     workflow.add_node("check_authorization", auth_agent.run)
     workflow.add_node("execute_actions", execution_agent.run)
+    workflow.add_node("generate_response", response_agent.run)
     workflow.add_node("log_actions", logging_agent.run)
 
     # Set entry point
@@ -78,7 +81,7 @@ def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> State
             # Otherwise, ask for authorization
             return "check_authorization"
         # No authorization needed (e.g., just generating drafts, reading inbox)
-        return "log_actions"
+        return "generate_response"
 
     workflow.add_conditional_edges(
         "generate_drafts",
@@ -86,7 +89,7 @@ def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> State
         {
             "check_authorization": "check_authorization",
             "execute_actions": "execute_actions",
-            "log_actions": "log_actions"
+            "generate_response": "generate_response"
         }
     )
 
@@ -105,12 +108,15 @@ def create_voice_agent_graph(email_adapter=None, calendar_adapter=None) -> State
         authorization_result,
         {
             "execute_actions": "execute_actions",
-            "end_awaiting_auth": "log_actions"
+            "end_awaiting_auth": "generate_response"
         }
     )
 
-    # After execution, always log
-    workflow.add_edge("execute_actions", "log_actions")
+    # After execution, generate friendly response
+    workflow.add_edge("execute_actions", "generate_response")
+
+    # After response generation, log everything
+    workflow.add_edge("generate_response", "log_actions")
 
     # Log actions is the final step
     workflow.add_edge("log_actions", END)

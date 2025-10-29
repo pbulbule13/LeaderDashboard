@@ -20,6 +20,10 @@ class IntentClassification(BaseModel):
         "check_calendar",
         "follow_up",
         "summarize",
+        "manage_communications",
+        "send_email",
+        "archive_email",
+        "prioritize_inbox",
         "config",
         "unknown"
     ] = Field(description="The classified intent")
@@ -38,8 +42,8 @@ class IntentClassificationAgent:
         self.parser = PydanticOutputParser(pydantic_object=IntentClassification)
 
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are an intent classification system for an executive assistant AI.
-Your job is to determine what the user wants to do based on their query.
+            ("system", """You are an intent classification system for an executive assistant AI named Vinegar.
+Your job is to determine what the CEO wants to do based on their query.
 
 Available intents:
 - triage_inbox: User wants to know what's in their inbox, what needs attention
@@ -48,10 +52,14 @@ Available intents:
 - check_calendar: User wants to see their schedule or availability
 - follow_up: User wants to set up or check follow-up tasks
 - summarize: User wants a summary of emails, meetings, or activity
+- manage_communications: User wants to manage their Communications tab (view, organize, etc.)
+- send_email: User wants to send or compose a new email
+- archive_email: User wants to archive, delete, or organize emails
+- prioritize_inbox: User wants help prioritizing or organizing their inbox
 - config: User wants to change settings or configuration
 - unknown: Intent is unclear
 
-Classify the intent with high confidence. Be decisive.
+**Context:** You're helping a busy CEO manage their day. Be proactive and decisive in classification.
 
 {format_instructions}"""),
             ("human", "{query}")
