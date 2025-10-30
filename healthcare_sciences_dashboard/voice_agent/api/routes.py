@@ -15,6 +15,7 @@ except Exception:
 import json
 from ..utils.email_query import parse_email_nl_to_gmail_query
 import base64
+import base64
 
 # Initialize router
 router = APIRouter(prefix="/voice-agent", tags=["voice-agent"])
@@ -256,6 +257,45 @@ async def search_emails(nl: str, max_results: int = 25, unread_only: bool = Fals
             })
 
         return {"emails": emails, "count": len(emails), "query": gmail_query}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Voice Mode: Text-To-Speech (mock) ---
+class TTSRequest(BaseModel):
+    text: str
+    voice: str | None = None
+
+
+@router.post("/voice/tts")
+async def tts_synthesize(request: TTSRequest):
+    """Return base64-encoded audio for the given text using mock TTS adapter."""
+    try:
+        from voice_agent.adapters.voice.mock import MockTTS
+
+        tts = MockTTS()
+        audio_bytes, mime_type = await tts.synthesize(request.text, request.voice)
+        return {"audio_base64": base64.b64encode(audio_bytes).decode("utf-8"), "mime_type": mime_type}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Voice Mode: Speech-To-Text (mock) ---
+class STTRequest(BaseModel):
+    audio_base64: str
+    mime_type: str = "audio/wav"
+
+
+@router.post("/voice/stt")
+async def stt_transcribe(request: STTRequest):
+    """Transcribe base64-encoded audio using mock STT adapter."""
+    try:
+        from voice_agent.adapters.voice.mock import MockSTT
+
+        audio_bytes = base64.b64decode(request.audio_base64 or "")
+        stt = MockSTT()
+        text = await stt.transcribe(audio_bytes, request.mime_type)
+        return {"text": text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

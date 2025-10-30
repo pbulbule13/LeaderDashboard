@@ -28,6 +28,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ==================== VOICE MODE HELPERS ====================
+let fullVoiceMode = false;
+function toggleFullVoiceMode(on) {
+    fullVoiceMode = !!on;
+}
+
+function base64ToUint8Array(base64) {
+    const binary = atob(base64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+}
+
+async function ttsSpeak(text) {
+    try {
+        const res = await fetch(`${API_BASE}/voice-agent/voice/tts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        if (!data.audio_base64) return;
+        const bytes = base64ToUint8Array(data.audio_base64);
+        const blob = new Blob([bytes], { type: data.mime_type || 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+    } catch (e) {
+        console.warn('TTS error:', e);
+    }
+}
+
+let mediaRecorder = null;
+let recording = false;
+let recordChunks = [];
+
+async function toggleRecording() {
+    const btn = document.getElementById('recordBtn');
+    const status = document.getElementById('recordStatus');
+    if (!recording) {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            recordChunks = [];
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordChunks.push(e.data); };
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(recordChunks, { type: 'audio/webm' });
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const base64 = reader.result.split(',')[1] || '';
+                    try {
+                        const resp = await fetch(`${API_BASE}/voice-agent/voice/stt`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ audio_base64: base64, mime_type: 'audio/webm' })
+                        });
+                        const out = await resp.json();
+                        const text = out.text || '';
+                        const input = document.getElementById('reasoningInput');
+                        input.value = text;
+                        if (text) { askReasoning(); }
+                    } catch (err) { console.warn('STT error:', err); }
+                };
+                reader.readAsDataURL(blob);
+            };
+            mediaRecorder.start();
+            recording = true;
+            btn.textContent = 'Stop Recording';
+            status.textContent = 'Recording…';
+        } catch (err) {
+            console.warn('Mic permission error:', err);
+            status.textContent = 'Mic permission denied';
+        }
+    } else {
+        mediaRecorder?.stop();
+        recording = false;
+        btn.textContent = 'Start Recording';
+        status.textContent = 'Processing…';
+    }
+}
+
 // AI Panel Functions
 function toggleAIPanel() {
     const panel = document.getElementById('aiPanel');
@@ -2357,7 +2439,7 @@ async function askReasoning() {
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
             `;
-            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
         } else {
             const errorMsg = document.createElement('div');
             errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
@@ -2434,7 +2516,7 @@ async function askQuick(question) {
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
             `;
-            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
         } else {
             const errorMsg = document.createElement('div');
             errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
@@ -2458,5 +2540,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuickNotes();
     }, 1000);
 });
+
+
+
+
 
 
