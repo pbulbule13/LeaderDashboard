@@ -1,4 +1,4 @@
-// ==================== DASHBOARD CONFIGURATION ====================
+﻿// ==================== DASHBOARD CONFIGURATION ====================
 // This is the SINGLE SOURCE OF TRUTH for all dashboard settings
 // Modify this file to customize the entire dashboard
 
@@ -27,7 +27,7 @@ const DASHBOARD_CONFIG = {
     branding: {
         companyName: 'HealthCare Sciences',
         companyShortName: 'HCS',
-        dashboardTitle: 'Executive Command Center',
+        dashboardTitle: 'CEO Dashboard',
         logoColors: {
             from: '#3B82F6',  // blue-500
             to: '#2563EB'     // blue-600
@@ -36,19 +36,19 @@ const DASHBOARD_CONFIG = {
 
     // ==================== NAVIGATION TABS ====================
     tabs: [
-        { id: 'overview', label: 'Dashboard', icon: '📊', default: true },
-        { id: 'email', label: 'Email', icon: '📧' },
-        { id: 'calendar', label: 'Calendar', icon: '📅' },
-        { id: 'personal', label: 'Personal', icon: '💼' },
-        { id: 'orders', label: 'Orders', icon: '📈' },
-        { id: 'compliance', label: 'Compliance', icon: '✅' },
-        { id: 'reimbursement', label: 'Reimbursement', icon: '💵' },
-        { id: 'costs', label: 'Costs', icon: '💰' },
-        { id: 'lab', label: 'Lab', icon: '🔬' },
-        { id: 'regional', label: 'Regional', icon: '🗺️' },
-        { id: 'forecasting', label: 'Forecast', icon: '🔮' },
-        { id: 'market', label: 'Market', icon: '📰' },
-        { id: 'milestones', label: 'Projects', icon: '🎯' }
+        { id: 'overview', label: 'Dashboard', icon: '', default: true },
+        { id: 'email', label: 'Email', icon: '' },
+        { id: 'calendar', label: 'Calendar', icon: '' },
+        { id: 'personal', label: 'Personal', icon: '' },
+        { id: 'orders', label: 'Orders', icon: '' },
+        { id: 'compliance', label: 'Compliance', icon: '' },
+        { id: 'reimbursement', label: 'Reimbursement', icon: '' },
+        { id: 'costs', label: 'Costs', icon: '' },
+        { id: 'lab', label: 'Lab', icon: '' },
+        { id: 'regional', label: 'Regional', icon: '' },
+        { id: 'forecasting', label: 'Forecast', icon: '' },
+        { id: 'market', label: 'Market', icon: '' },
+        { id: 'milestones', label: 'Projects', icon: '' }
     ],
 
     // ==================== METRICS CONFIGURATION ====================
@@ -56,7 +56,7 @@ const DASHBOARD_CONFIG = {
         orders: {
             id: 'orders',
             label: 'Orders',
-            icon: '📈',
+            icon: '',
             color: '#3B82F6',          // blue-600
             bgColor: '#DBEAFE',        // blue-100
             textColor: '#2563EB',      // blue-600
@@ -75,7 +75,7 @@ const DASHBOARD_CONFIG = {
         reimbursement: {
             id: 'reimbursement',
             label: 'Reimbursement',
-            icon: '💵',
+            icon: '',
             color: '#A855F7',          // purple-500
             bgColor: '#F3E8FF',        // purple-100
             textColor: '#9333EA',      // purple-600
@@ -94,7 +94,7 @@ const DASHBOARD_CONFIG = {
         compliance: {
             id: 'compliance',
             label: 'Compliance',
-            icon: '✅',
+            icon: '',
             color: '#22C55E',          // green-500
             bgColor: '#DCFCE7',        // green-100
             textColor: '#16A34A',      // green-600
@@ -113,7 +113,7 @@ const DASHBOARD_CONFIG = {
         lab: {
             id: 'lab',
             label: 'Lab TAT',
-            icon: '🔬',
+            icon: '',
             color: '#F97316',          // orange-500
             bgColor: '#FFEDD5',        // orange-100
             textColor: '#EA580C',      // orange-600
@@ -132,7 +132,7 @@ const DASHBOARD_CONFIG = {
         costs: {
             id: 'costs',
             label: 'Operating Costs',
-            icon: '💰',
+            icon: '',
             color: '#EF4444',          // red-500
             bgColor: '#FEE2E2',        // red-100
             textColor: '#DC2626',      // red-600
@@ -151,7 +151,7 @@ const DASHBOARD_CONFIG = {
         forecast: {
             id: 'forecast',
             label: 'Forecast',
-            icon: '🔮',
+            icon: '',
             color: '#6366F1',          // indigo-500
             bgColor: '#E0E7FF',        // indigo-100
             textColor: '#4F46E5',      // indigo-600
@@ -204,18 +204,18 @@ const DASHBOARD_CONFIG = {
         widgets: {
             email: {
                 title: 'Inbox',
-                icon: '📧',
+                icon: '',
                 badgeCount: 24,
                 maxItems: 3
             },
             calendar: {
                 title: "Today's Schedule",
-                icon: '📅',
+                icon: '',
                 maxItems: 3
             },
             notes: {
                 title: 'Quick Notes',
-                icon: '📝',
+                icon: '',
                 maxNotes: 10,
                 displayNotes: 3
             }
@@ -226,24 +226,24 @@ const DASHBOARD_CONFIG = {
     ai: {
         assistant: {
             title: 'AI Executive Assistant',
-            icon: '🤖',
-            welcomeMessage: "👋 Hello! I'm your AI Executive Assistant.\nI can help you with emails, schedule, analytics, and strategic insights.",
+            icon: '',
+            welcomeMessage: "ðŸ‘‹ Hello! I'm your AI Executive Assistant.\nI can help you with emails, schedule, analytics, and strategic insights.",
             quickActions: [
-                { label: 'Emails', icon: '📧', query: 'Summarize my unread emails', color: 'blue' },
-                { label: 'Schedule', icon: '📅', query: 'What meetings do I have today?', color: 'green' },
-                { label: 'Priorities', icon: '🎯', query: 'Top priorities for today', color: 'purple' },
-                { label: 'Alerts', icon: '⚠️', query: 'What needs my attention?', color: 'red' }
+                { label: 'Emails', icon: '', query: 'Summarize my unread emails', color: 'blue' },
+                { label: 'Schedule', icon: '', query: 'What meetings do I have today?', color: 'green' },
+                { label: 'Priorities', icon: '', query: 'Top priorities for today', color: 'purple' },
+                { label: 'Alerts', icon: '', query: 'What needs my attention?', color: 'red' }
             ]
         },
         reasoning: {
             title: 'AI Analytics & Reasoning',
-            icon: '🧠',
+            icon: '',
             position: 'right-4 bottom-4',  // Tailwind positioning classes
             maxHeight: 'max-h-96',
             quickActions: [
-                { label: 'Analyze This Page', icon: '📊', action: 'analyzeCurrentPage', color: 'purple' },
-                { label: 'Compare Trends', icon: '📈', query: 'Compare trends across metrics', color: 'indigo' },
-                { label: 'Alerts', icon: '⚠️', query: 'What needs attention?', color: 'red' }
+                { label: 'Analyze This Page', icon: '', action: 'analyzeCurrentPage', color: 'purple' },
+                { label: 'Compare Trends', icon: '', query: 'Compare trends across metrics', color: 'indigo' },
+                { label: 'Alerts', icon: '', query: 'What needs attention?', color: 'red' }
             ]
         }
     },
@@ -254,8 +254,8 @@ const DASHBOARD_CONFIG = {
             { id: 'inbox', label: 'Inbox', badge: 24 },
             { id: 'sent', label: 'Sent' },
             { id: 'drafts', label: 'Drafts', badge: 3 },
-            { id: 'starred', label: '⭐ Starred' },
-            { id: 'archive', label: '📦 Archive' }
+            { id: 'starred', label: 'â­ Starred' },
+            { id: 'archive', label: 'ðŸ“¦ Archive' }
         ],
         sampleEmails: [
             {
@@ -301,25 +301,25 @@ const DASHBOARD_CONFIG = {
             {
                 time: '9:00 AM - 10:00 AM',
                 title: 'Executive Team Meeting',
-                location: '📍 Conference Room A',
+                location: 'ðŸ“ Conference Room A',
                 color: 'blue'
             },
             {
                 time: '11:30 AM - 12:30 PM',
                 title: 'Investor Call - Q3 Results',
-                location: '📞 Virtual',
+                location: 'ðŸ“ž Virtual',
                 color: 'green'
             },
             {
                 time: '2:00 PM - 3:00 PM',
                 title: 'Product Strategy Review',
-                location: '👥 With VP Product',
+                location: 'ðŸ‘¥ With VP Product',
                 color: 'purple'
             },
             {
                 time: '4:00 PM - 5:00 PM',
                 title: 'Board Prep Session',
-                location: '📍 Office',
+                location: 'ðŸ“ Office',
                 color: 'orange'
             }
         ]
@@ -344,10 +344,10 @@ const DASHBOARD_CONFIG = {
             trackingPeriod: 7  // days
         },
         quickActions: [
-            { label: 'Call Assistant', icon: '📞', color: 'blue' },
-            { label: 'Book Car', icon: '🚗', color: 'green' },
-            { label: 'Travel Plans', icon: '✈️', color: 'purple' },
-            { label: 'Reservations', icon: '🍽️', color: 'orange' }
+            { label: 'Call Assistant', icon: '', color: 'blue' },
+            { label: 'Book Car', icon: '', color: 'green' },
+            { label: 'Travel Plans', icon: '', color: 'purple' },
+            { label: 'Reservations', icon: '', color: 'orange' }
         ]
     },
 
@@ -651,3 +651,4 @@ Focus on high-impact, achievable actions.`
 
 // Make config globally available
 window.DASHBOARD_CONFIG = DASHBOARD_CONFIG;
+
