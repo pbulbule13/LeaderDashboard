@@ -67,7 +67,7 @@ async def synthesize_response_node(state: DashboardState) -> Dict[str, Any]:
     
     if state.get('products_data'):
         total_orders = state['products_data'].get('total_orders', 'N/A')
-        response += f"Products: {total_orders} total orders\n"
+        response += f"Portfolio: {total_orders} total orders\n"
     
     if state.get('revenue_data'):
         total_actual = state['revenue_data'].get('total_actual', 0)
