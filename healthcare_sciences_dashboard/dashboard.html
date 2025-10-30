@@ -1,1089 +1,1090 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="config.js"></script>
-    <style>
-        .tab-active { border-bottom: 3px solid #2563EB; color: #2563EB; font-weight: 600; background: #EFF6FF; }
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .tile { transition: all 0.3s ease; }
-        .tile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.2); }
-        .chart-container { position: relative; height: 300px; }
-        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
-        .email-item:hover { background: #F0F9FF; }
-        .calendar-event { border-left: 4px solid #2563EB; }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script src="config.js"></script>
+ <style>
+ .tab-active { border-bottom: 3px solid #2563EB; color: #2563EB; font-weight: 600; background: #EFF6FF; }
+ .fade-in { animation: fadeIn 0.3s ease-in; }
+ @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ .tile { transition: all 0.3s ease; }
+ .tile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.2); }
+ .chart-container { position: relative; height: 300px; }
+ .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+ @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
+ .email-item:hover { background: #F0F9FF; }
+ .calendar-event { border-left: 4px solid #2563EB; }
 
-        /* Left Sidebar for AI Analytics - 20% width */
-        .ai-sidebar {
-            position: fixed;
-            left: 0;
-            top: 145px;
-            width: 20%;
-            height: calc(100vh - 145px);
-            overflow-y: hidden; /* Only response section scrolls */
-            z-index: 30;
-        }
+ /* Left Sidebar for AI Analytics - 20% width */
+ .ai-sidebar {
+ position: fixed;
+ left: 0;
+ top: 145px;
+ width: 20%;
+ height: calc(100vh - 145px);
+ overflow-y: hidden; /* Only response section scrolls */
+ z-index: 30;
+ }
 
-        /* Main content adjusted for sidebar - 80% width */
-        .main-content-with-sidebar {
-            margin-left: 20%;
-            width: 80%;
-        }
+ /* Main content adjusted for sidebar - 80% width */
+ .main-content-with-sidebar {
+ margin-left: 20%;
+ width: 80%;
+ }
 
-        .ai-insight-card {
-            animation: slideIn 0.3s ease-out;
-        }
+ .ai-insight-card {
+ animation: slideIn 0.3s ease-out;
+ }
 
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+ @keyframes slideIn {
+ from { transform: translateX(-20px); opacity: 0; }
+ to { transform: translateX(0); opacity: 1; }
+ }
 
-        /* Circular Progress Charts */
-        .circular-chart {
-            display: block;
-            margin: 10px auto;
-            max-width: 100%;
-            max-height: 180px;
-        }
+ /* Circular Progress Charts */
+ .circular-chart {
+ display: block;
+ margin: 10px auto;
+ max-width: 100%;
+ max-height: 180px;
+ }
 
-        .circle-bg {
-            fill: none;
-            stroke: #eee;
-            stroke-width: 3.8;
-        }
+ .circle-bg {
+ fill: none;
+ stroke: #eee;
+ stroke-width: 3.8;
+ }
 
-        .circle {
-            fill: none;
-            stroke-width: 2.8;
-            stroke-linecap: round;
-            animation: progress 1.5s ease-out forwards;
-        }
+ .circle {
+ fill: none;
+ stroke-width: 2.8;
+ stroke-linecap: round;
+ animation: progress 1.5s ease-out forwards;
+ }
 
-        @keyframes progress {
-            0% { stroke-dasharray: 0 100; }
-        }
+ @keyframes progress {
+ 0% { stroke-dasharray: 0 100; }
+ }
 
-        .percentage {
-            fill: #666;
-            font-family: sans-serif;
-            font-size: 0.5em;
-            text-anchor: middle;
-        }
+ .percentage {
+ fill: #666;
+ font-family: sans-serif;
+ font-size: 0.5em;
+ text-anchor: middle;
+ }
 
-        .pulse-dot {
-            animation: pulse-grow 2s ease-in-out infinite;
-        }
+ .pulse-dot {
+ animation: pulse-grow 2s ease-in-out infinite;
+ }
 
-        @keyframes pulse-grow {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
+ @keyframes pulse-grow {
+ 0%, 100% { transform: scale(1); opacity: 1; }
+ 50% { transform: scale(1.1); opacity: 0.8; }
+ }
 
-        /* USA Heat Map */
-        .state {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+ /* USA Heat Map */
+ .state {
+ transition: all 0.3s ease;
+ cursor: pointer;
+ }
 
-        .state:hover {
-            stroke: #000;
-            stroke-width: 2;
-        }
-    </style>
+ .state:hover {
+ stroke: #000;
+ stroke-width: 2;
+ }
+ </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-    <!-- Header -->
-    <nav class="bg-white shadow-md border-b border-blue-200 sticky top-0 z-50">
-        <div class="max-w-full mx-auto px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow">
-                        <span class="text-white font-bold text-xl">HCS</span>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">CEO Dashboard</h1>
-                        <p class="text-xs text-gray-500">Developed by Prashil Bulbule • <span id="currentDate"></span></p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div id="stockPrice" class="text-right bg-blue-50 px-4 py-2 rounded-lg">
-                        <p class="text-xs text-gray-600">Loading...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex gap-1 mt-4 border-b overflow-x-auto">
-                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">ðŸ“Š Dashboard</button>
-                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“¬ Communications</button>
-                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’¼ Personal</button>
-                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“ˆ Orders</button>
-                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">âœ… Compliance</button>
-                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’µ Reimbursement</button>
-                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’° Costs</button>
-                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ”¬ Lab</button>
-                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ—ºï¸ Regional</button>
-                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ”® Forecast</button>
-                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“° Market</button>
-                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸŽ¯ Projects</button>
-            </div>
-        </div>
-    </nav>
+ <!-- Header -->
+ <nav class="bg-white shadow-md border-b border-blue-200 sticky top-0 z-50">
+ <div class="max-w-full mx-auto px-6 py-3">
+ <div class="flex items-center justify-between">
+ <div class="flex items-center gap-4">
+ <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow">
+ <span class="text-white font-bold text-xl">HCS</span>
+ </div>
+ <div>
+ <h1 class="text-2xl font-bold text-gray-800">CEO Dashboard</h1>
+ <p class="text-xs text-gray-500">Developed by Prashil Bulbule • <span id="currentDate"></span></p>
+ </div>
+ </div>
+ <div class="flex items-center gap-4">
+ <div id="stockPrice" class="text-right bg-blue-50 px-4 py-2 rounded-lg">
+ <p class="text-xs text-gray-600">Loading...</p>
+ </div>
+ </div>
+ </div>
+ <div class="flex gap-1 mt-4 border-b overflow-x-auto">
+ <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t"> Dashboard</button>
+ <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Communications</button>
+ <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Personal</button>
+ <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Orders</button>
+ <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">âœ… Compliance</button>
+ <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Reimbursement</button>
+ <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Costs</button>
+ <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Lab</button>
+ <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Regional</button>
+ <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Forecast</button>
+ <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Market</button>
+ <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t"> Projects</button>
+ </div>
+ </div>
+ </nav>
 
-    <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
-    <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
-        <div class="p-4">
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
-                <span class="text-lg">ðŸ‘” CEO Executive Assistant</span>
-                <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
-            </div>
-            <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“Š Analyze This Page</button>
-                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">âš ï¸ Key Risks</button>
-                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“‹ Day Summary</button>
-                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“ˆ Dept. Performance</button>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
-                <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
-                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-purple-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
-                <button onclick="askReasoning()" class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
-                    ðŸš€ Ask AI Assistant
-                </button>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-3 mb-4 border border-purple-200">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-semibold text-gray-700">Full Voice Mode</label>
-                    <input type="checkbox" id="voiceModeToggle" onchange="toggleFullVoiceMode(this.checked)">
-                </div>
-                <div class="mt-2 flex items-center gap-2">
-                    <button id="recordBtn" onclick="toggleRecording()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">Start Recording</button>
-                    <span id="recordStatus" class="text-xs text-gray-500">Idle</span>
-                </div>
-            </div>
-            <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-420px)] overflow-y-auto">
-                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
-                    <p class="text-xs text-purple-900 mb-2">
-                        <span class="font-bold">ðŸ‘” Executive Assistant:</span>
-                    </p>
-                    <p class="text-xs text-gray-700">
-                        I can help you with questions about Orders, Compliance, Lab Operations, Finance, Regional Performance, and more. Just ask!
-                    </p>
-                </div>
-                <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm ai-insight-card">
-                    <div class="flex items-start gap-2">
-                        <span class="text-sm">ðŸŽ¯</span>
-                        <div>
-                            <p class="font-semibold text-indigo-900 text-xs">Real-time Insight</p>
-                            <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="daySummarySection" class="mt-4 space-y-2">
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-blue-900 mb-2">ðŸ“Š Today's Executive Summary</h3>
-                    <div id="daySummaryContent" class="space-y-1 text-xs">
-                        <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">ðŸ“ˆ Orders:</span>
-                            <span class="font-semibold text-blue-900">24.5K (+15.2%)</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">âœ… Compliance:</span>
-                            <span class="font-semibold text-green-900">94.5% (+0.3%)</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">ðŸ’µ Reimbursement:</span>
-                            <span class="font-semibold text-purple-900">98.5% (â†‘)</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">ðŸ”¬ Lab TAT:</span>
-                            <span class="font-semibold text-orange-900">38.2hrs (target: 42hrs)</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">ðŸ’° Costs:</span>
-                            <span class="font-semibold text-red-900">$2.8M (-2.1%)</span>
-                        </div>
-                        <div class="flex justify-between py-1">
-                            <span class="text-gray-600">ðŸ”® Forecast:</span>
-                            <span class="font-semibold text-indigo-900">26.8K next month</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-green-900 mb-2">ðŸ’¡ Key Highlights</h3>
-                    <ul class="space-y-1 text-xs text-gray-700">
-                        <li>â€¢ Orders up 15.2% - Strong regional performance</li>
-                        <li>â€¢ Lab efficiency improved - TAT under target</li>
-                        <li>â€¢ Cost optimization working - $60K saved</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+ <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
+ <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
+ <div class="p-4">
+ <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
+ <span class="text-lg"> CEO Executive Assistant</span>
+ <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
+ </div>
+ <div class="space-y-2 mb-4">
+ <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition"> Analyze This Page</button>
+ <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">âš ï¸ Key Risks</button>
+ <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition"> Day Summary</button>
+ <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition"> Dept. Performance</button>
+ </div>
+ <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
+ <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
+ <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-purple-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
+ <button onclick="askReasoning()" class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+ Ask AI Assistant
+ </button>
+ </div>
+ <div class="bg-white rounded-lg shadow-sm p-3 mb-4 border border-purple-200">
+ <div class="flex items-center justify-between">
+ <label class="text-xs font-semibold text-gray-700">Full Voice Mode</label>
+ <input type="checkbox" id="voiceModeToggle" onchange="toggleFullVoiceMode(this.checked)">
+ </div>
+ <div class="mt-2 flex items-center gap-2">
+ <button id="recordBtn" onclick="toggleRecording()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">Start Recording</button>
+ <span id="recordStatus" class="text-xs text-gray-500">Idle</span>
+ </div>
+ </div>
+ <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-420px)] overflow-y-auto">
+ <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
+ <p class="text-xs text-purple-900 mb-2">
+ <span class="font-bold"> Executive Assistant:</span>
+ </p>
+ <p class="text-xs text-gray-700">
+ I can help you with questions about Orders, Compliance, Lab Operations, Finance, Regional Performance, and more. Just ask!
+ </p>
+ </div>
+ <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm ai-insight-card">
+ <div class="flex items-start gap-2">
+ <span class="text-sm"> </span>
+ <div>
+ <p class="font-semibold text-indigo-900 text-xs">Real-time Insight</p>
+ <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div id="daySummarySection" class="mt-4 space-y-2">
+ <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
+ <h3 class="font-bold text-sm text-blue-900 mb-2"> Today's Executive Summary</h3>
+ <div id="daySummaryContent" class="space-y-1 text-xs">
+ <div class="flex justify-between py-1 border-b border-blue-100">
+ <span class="text-gray-600"> Orders:</span>
+ <span class="font-semibold text-blue-900">24.5K (+15.2%)</span>
+ </div>
+ <div class="flex justify-between py-1 border-b border-blue-100">
+ <span class="text-gray-600">âœ… Compliance:</span>
+ <span class="font-semibold text-green-900">94.5% (+0.3%)</span>
+ </div>
+ <div class="flex justify-between py-1 border-b border-blue-100">
+ <span class="text-gray-600"> Reimbursement:</span>
+ <span class="font-semibold text-purple-900">98.5% (â†‘)</span>
+ </div>
+ <div class="flex justify-between py-1 border-b border-blue-100">
+ <span class="text-gray-600"> Lab TAT:</span>
+ <span class="font-semibold text-orange-900">38.2hrs (target: 42hrs)</span>
+ </div>
+ <div class="flex justify-between py-1 border-b border-blue-100">
+ <span class="text-gray-600"> Costs:</span>
+ <span class="font-semibold text-red-900">$2.8M (-2.1%)</span>
+ </div>
+ <div class="flex justify-between py-1">
+ <span class="text-gray-600"> Forecast:</span>
+ <span class="font-semibold text-indigo-900">26.8K next month</span>
+ </div>
+ </div>
+ </div>
+ <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
+ <h3 class="font-bold text-sm text-green-900 mb-2"> Key Highlights</h3>
+ <ul class="space-y-1 text-xs text-gray-700">
+ <li>â€¢ Orders up 15.2% - Strong regional performance</li>
+ <li>â€¢ Lab efficiency improved - TAT under target</li>
+ <li>â€¢ Cost optimization working - $60K saved</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <!-- Main Content Area (80% width, adjusted for left sidebar) -->
-    <div class="main-content-with-sidebar px-6 py-6 pb-32">
-        <!-- Dashboard Tab -->
-        <div id="content-overview" class="tab-content fade-in">
-            <!-- Interactive KPI Charts with Time Period Toggles -->
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <!-- Orders Chart -->
-                <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ“ˆ Orders</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartOrders"></canvas></div>
-                </div>
+ <!-- Main Content Area (80% width, adjusted for left sidebar) -->
+ <div class="main-content-with-sidebar px-6 py-6 pb-32">
+ <!-- Dashboard Tab -->
+ <div id="content-overview" class="tab-content fade-in">
+ <!-- Interactive KPI Charts with Time Period Toggles -->
+ <div class="grid grid-cols-3 gap-4 mb-4">
+ <!-- Orders Chart -->
+ <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Orders</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartOrders"></canvas></div>
+ </div>
 
-                <!-- Reimbursement Chart -->
-                <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ’µ Reimbursement</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
-                </div>
+ <!-- Reimbursement Chart -->
+ <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Reimbursement</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
+ </div>
 
-                <!-- Compliance Chart -->
-                <div class="bg-white border border-green-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">âœ… Compliance</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartCompliance"></canvas></div>
-                </div>
-            </div>
+ <!-- Compliance Chart -->
+ <div class="bg-white border border-green-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800">âœ… Compliance</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartCompliance"></canvas></div>
+ </div>
+ </div>
 
-            <div class="grid grid-cols-3 gap-4 mb-4">
-                <!-- Lab TAT Chart -->
-                <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ”¬ Lab TAT</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartLab"></canvas></div>
-                </div>
+ <div class="grid grid-cols-3 gap-4 mb-4">
+ <!-- Lab TAT Chart -->
+ <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Lab TAT</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartLab"></canvas></div>
+ </div>
 
-                <!-- Costs Chart -->
-                <div class="bg-white border border-red-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ’° Operating Costs</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartCosts"></canvas></div>
-                </div>
+ <!-- Costs Chart -->
+ <div class="bg-white border border-red-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Operating Costs</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartCosts"></canvas></div>
+ </div>
 
-                <!-- Forecast Chart -->
-                <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-4 tile">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ”® Forecast</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
-                        </div>
-                    </div>
-                    <div class="h-48"><canvas id="chartForecast"></canvas></div>
-                </div>
-            </div>
+ <!-- Forecast Chart -->
+ <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-4 tile">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Forecast</h3>
+ <div class="flex gap-1">
+ <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
+ <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
+ <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
+ <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
+ </div>
+ </div>
+ <div class="h-48"><canvas id="chartForecast"></canvas></div>
+ </div>
+ </div>
 
-            <!-- Quick Widgets Row - Email, Calendar, Notes -->
-            <div class="grid grid-cols-3 gap-4 mb-6">
-                <!-- Email Widget -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('email')">
-                    <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">ðŸ“§ Inbox</h3>
-                        <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
-                    </div>
-                    <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">JD</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Q4 Financial Review</p>
-                                <p class="text-gray-500 truncate">Meeting scheduled for tomorrow...</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-bold text-green-600">SK</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Board Presentation</p>
-                                <p class="text-gray-500 truncate">Slides attached for review...</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-bold text-purple-600">MJ</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Regulatory Update</p>
-                                <p class="text-gray-500 truncate">FDA submission timeline...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <!-- Quick Widgets Row - Email, Calendar, Notes -->
+ <div class="grid grid-cols-3 gap-4 mb-6">
+ <!-- Email Widget -->
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('email')">
+ <div class="flex justify-between items-center mb-3">
+ <h3 class="text-sm font-bold text-gray-800"> Inbox</h3>
+ <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
+ </div>
+ <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+ <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+ <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">JD</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Q4 Financial Review</p>
+ <p class="text-gray-500 truncate">Meeting scheduled for tomorrow...</p>
+ </div>
+ </div>
+ <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+ <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-bold text-green-600">SK</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Board Presentation</p>
+ <p class="text-gray-500 truncate">Slides attached for review...</p>
+ </div>
+ </div>
+ <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+ <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-bold text-purple-600">MJ</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Regulatory Update</p>
+ <p class="text-gray-500 truncate">FDA submission timeline...</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Calendar Widget -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('calendar')">
-                    <h3 class="text-sm font-bold text-gray-800 mb-3">ðŸ“… Today's Schedule</h3>
-                    <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
-                        <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-500">
-                            <div class="font-semibold text-gray-600 whitespace-nowrap">9:00 AM</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Executive Team Meeting</p>
-                                <p class="text-gray-500">Conference Room A</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 p-2 bg-green-50 rounded border-l-4 border-green-500">
-                            <div class="font-semibold text-gray-600 whitespace-nowrap">11:30 AM</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Investor Call</p>
-                                <p class="text-gray-500">Virtual</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 p-2 bg-purple-50 rounded border-l-4 border-purple-500">
-                            <div class="font-semibold text-gray-600 whitespace-nowrap">2:00 PM</div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">Strategy Review</p>
-                                <p class="text-gray-500">Office</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <!-- Calendar Widget -->
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('calendar')">
+ <h3 class="text-sm font-bold text-gray-800 mb-3"> Today's Schedule</h3>
+ <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
+ <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-500">
+ <div class="font-semibold text-gray-600 whitespace-nowrap">9:00 AM</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Executive Team Meeting</p>
+ <p class="text-gray-500">Conference Room A</p>
+ </div>
+ </div>
+ <div class="flex gap-2 p-2 bg-green-50 rounded border-l-4 border-green-500">
+ <div class="font-semibold text-gray-600 whitespace-nowrap">11:30 AM</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Investor Call</p>
+ <p class="text-gray-500">Virtual</p>
+ </div>
+ </div>
+ <div class="flex gap-2 p-2 bg-purple-50 rounded border-l-4 border-purple-500">
+ <div class="font-semibold text-gray-600 whitespace-nowrap">2:00 PM</div>
+ <div class="flex-1">
+ <p class="font-semibold text-gray-800">Strategy Review</p>
+ <p class="text-gray-500">Office</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Quick Notes Widget -->
-                <div class="bg-white border border-amber-300 rounded-xl shadow-sm p-4 tile">
-                    <h3 class="text-sm font-bold text-amber-900 mb-3">ðŸ“ Quick Notes</h3>
-                    <textarea id="quickNoteInput" placeholder="Type a quick note..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
-                    <button onclick="saveQuickNote()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-1 rounded text-xs font-semibold">Save Note</button>
-                    <div id="quickNotesDisplay" class="mt-3 space-y-1 max-h-16 overflow-y-auto text-xs"></div>
-                </div>
-            </div>
+ <!-- Quick Notes Widget -->
+ <div class="bg-white border border-amber-300 rounded-xl shadow-sm p-4 tile">
+ <h3 class="text-sm font-bold text-amber-900 mb-3"> Quick Notes</h3>
+ <textarea id="quickNoteInput" placeholder="Type a quick note..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
+ <button onclick="saveQuickNote()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-1 rounded text-xs font-semibold">Save Note</button>
+ <div id="quickNotesDisplay" class="mt-3 space-y-1 max-h-16 overflow-y-auto text-xs"></div>
+ </div>
+ </div>
 
-            <!-- Charts Row -->
-            <div class="grid grid-cols-3 gap-6 mb-6">
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Order Volume Trend</h3>
-                    <div class="chart-container">
-                        <canvas id="overviewOrdersChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’° Operating Costs</h3>
-                    <div class="chart-container">
-                        <canvas id="overviewFinancialsChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Stock Performance</h3>
-                    <div id="overview-stock-summary" class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-semibold text-gray-700">Current Price</span>
-                            <span class="text-lg font-bold text-green-600">$127.45</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Change</span>
-                            <span class="text-sm font-semibold text-green-600">+$3.21 (+2.58%)</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">52-Week High</span>
-                            <span class="text-sm text-gray-700">$142.18</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">52-Week Low</span>
-                            <span class="text-sm text-gray-700">$98.32</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-600">Market Cap</span>
-                            <span class="text-sm text-gray-700">$12.4B</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <!-- Charts Row -->
+ <div class="grid grid-cols-3 gap-6 mb-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Order Volume Trend</h3>
+ <div class="chart-container">
+ <canvas id="overviewOrdersChart"></canvas>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Operating Costs</h3>
+ <div class="chart-container">
+ <canvas id="overviewFinancialsChart"></canvas>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Stock Performance</h3>
+ <div id="overview-stock-summary" class="space-y-3">
+ <div class="flex justify-between items-center">
+ <span class="text-sm font-semibold text-gray-700">Current Price</span>
+ <span class="text-lg font-bold text-green-600">$127.45</span>
+ </div>
+ <div class="flex justify-between items-center">
+ <span class="text-sm text-gray-600">Change</span>
+ <span class="text-sm font-semibold text-green-600">+$3.21 (+2.58%)</span>
+ </div>
+ <div class="flex justify-between items-center">
+ <span class="text-sm text-gray-600">52-Week High</span>
+ <span class="text-sm text-gray-700">$142.18</span>
+ </div>
+ <div class="flex justify-between items-center">
+ <span class="text-sm text-gray-600">52-Week Low</span>
+ <span class="text-sm text-gray-700">$98.32</span>
+ </div>
+ <div class="flex justify-between items-center">
+ <span class="text-sm text-gray-600">Market Cap</span>
+ <span class="text-sm text-gray-700">$12.4B</span>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            <!-- Data Grid -->
-            <div class="grid grid-cols-4 gap-4 mb-6">
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ—ºï¸ USA Regional Performance</h3>
-                    <div id="overview-regional">
-                        <svg viewBox="0 0 960 600" class="w-full h-auto">
-                            <!-- Simplified USA Map with heat map coloring -->
-                            <g id="states">
-                                <!-- West Coast (High) -->
-                                <path d="M50,200 L80,180 L90,220 L85,280 L60,290 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="CA" data-revenue="38.7M">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                                <path d="M60,140 L90,130 L95,170 L85,180 L65,175 Z" class="state" fill="#34d399" stroke="#fff" stroke-width="1" data-state="WA">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
+ <!-- Data Grid -->
+ <div class="grid grid-cols-4 gap-4 mb-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> USA Regional Performance</h3>
+ <div id="overview-regional">
+ <svg viewBox="0 0 960 600" class="w-full h-auto">
+ <!-- Simplified USA Map with heat map coloring -->
+ <g id="states">
+ <!-- West Coast (High) -->
+ <path d="M50,200 L80,180 L90,220 L85,280 L60,290 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="CA" data-revenue="38.7M">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ <path d="M60,140 L90,130 L95,170 L85,180 L65,175 Z" class="state" fill="#34d399" stroke="#fff" stroke-width="1" data-state="WA">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
 
-                                <!-- Northeast (Highest) -->
-                                <path d="M800,120 L830,110 L850,130 L840,160 L810,155 Z" class="state" fill="#059669" stroke="#fff" stroke-width="1" data-state="NY">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                                <path d="M850,140 L870,135 L880,150 L865,165 L850,160 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="MA">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
+ <!-- Northeast (Highest) -->
+ <path d="M800,120 L830,110 L850,130 L840,160 L810,155 Z" class="state" fill="#059669" stroke="#fff" stroke-width="1" data-state="NY">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ <path d="M850,140 L870,135 L880,150 L865,165 L850,160 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="MA">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
 
-                                <!-- Southeast (Medium-High) -->
-                                <path d="M700,350 L750,340 L780,380 L760,420 L720,415 Z" class="state" fill="#22c55e" stroke="#fff" stroke-width="1" data-state="FL">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                                <path d="M650,280 L700,270 L720,310 L695,340 L665,330 Z" class="state" fill="#4ade80" stroke="#fff" stroke-width="1" data-state="GA">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
+ <!-- Southeast (Medium-High) -->
+ <path d="M700,350 L750,340 L780,380 L760,420 L720,415 Z" class="state" fill="#22c55e" stroke="#fff" stroke-width="1" data-state="FL">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ <path d="M650,280 L700,270 L720,310 L695,340 L665,330 Z" class="state" fill="#4ade80" stroke="#fff" stroke-width="1" data-state="GA">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
 
-                                <!-- Midwest (Medium) -->
-                                <path d="M450,180 L500,170 L520,210 L505,250 L465,245 Z" class="state" fill="#86efac" stroke="#fff" stroke-width="1" data-state="IL">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                                <path d="M400,150 L450,145 L465,180 L450,210 L410,205 Z" class="state" fill="#bbf7d0" stroke="#fff" stroke-width="1" data-state="MI">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
+ <!-- Midwest (Medium) -->
+ <path d="M450,180 L500,170 L520,210 L505,250 L465,245 Z" class="state" fill="#86efac" stroke="#fff" stroke-width="1" data-state="IL">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ <path d="M400,150 L450,145 L465,180 L450,210 L410,205 Z" class="state" fill="#bbf7d0" stroke="#fff" stroke-width="1" data-state="MI">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
 
-                                <!-- Texas (High) -->
-                                <path d="M350,350 L450,340 L480,400 L450,460 L370,450 L340,400 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="TX">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
+ <!-- Texas (High) -->
+ <path d="M350,350 L450,340 L480,400 L450,460 L370,450 L340,400 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="TX">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
 
-                                <!-- Other states (Lower performance) -->
-                                <path d="M200,250 L280,245 L300,290 L285,330 L220,325 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="CO">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                                <path d="M120,300 L180,290 L195,340 L175,380 L130,370 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="NV">
-                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
-                                </path>
-                            </g>
-                        </svg>
-                        <div class="mt-3 flex justify-between items-center text-xs">
-                            <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-green-900 rounded"></div>
-                                <span class="text-gray-600">High</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-green-400 rounded"></div>
-                                <span class="text-gray-600">Medium</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-green-100 rounded"></div>
-                                <span class="text-gray-600">Low</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-3 border-t border-gray-200">
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Top: NY</span>
-                                    <span class="font-semibold text-green-700">$42.3M</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">CA</span>
-                                    <span class="font-semibold text-green-600">$38.7M</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Projects Status</h3>
-                    <div id="overview-projects" class="space-y-2">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span class="text-sm text-gray-700">FDA Submission</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span class="text-sm text-gray-700">Lab Expansion</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                            <span class="text-sm text-gray-700">New Product Launch</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                            <span class="text-sm text-gray-700">AI Integration</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸš¨ Critical Alerts</h3>
-                    <div id="overview-alerts" class="space-y-2">
-                        <div class="bg-red-50 border-l-4 border-red-500 p-2 rounded">
-                            <p class="text-xs font-semibold text-red-900">Lab Equipment Alert</p>
-                            <p class="text-xs text-red-700">Maintenance needed</p>
-                        </div>
-                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-2 rounded">
-                            <p class="text-xs font-semibold text-yellow-900">Inventory Low</p>
-                            <p class="text-xs text-yellow-700">Reagents below threshold</p>
-                        </div>
-                        <div class="bg-orange-50 border-l-4 border-orange-500 p-2 rounded">
-                            <p class="text-xs font-semibold text-orange-900">Compliance Due</p>
-                            <p class="text-xs text-orange-700">Q4 audit in 2 weeks</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Operations</h3>
-                    <div id="overview-stats" class="space-y-3">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600">Lab Capacity</span>
-                                <span class="font-semibold text-green-600">87%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 87%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600">Order Processing</span>
-                                <span class="font-semibold text-blue-600">92%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: 92%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-gray-600">Staff Utilization</span>
-                                <span class="font-semibold text-purple-600">78%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-purple-500 h-2 rounded-full" style="width: 78%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+ <!-- Other states (Lower performance) -->
+ <path d="M200,250 L280,245 L300,290 L285,330 L220,325 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="CO">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ <path d="M120,300 L180,290 L195,340 L175,380 L130,370 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="NV">
+ <title>CEO Dashboard - Developed by Prashil Bulbule</title>
+ </path>
+ </g>
+ </svg>
+ <div class="mt-3 flex justify-between items-center text-xs">
+ <div class="flex items-center gap-2">
+ <div class="w-4 h-4 bg-green-900 rounded"></div>
+ <span class="text-gray-600">High</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <div class="w-4 h-4 bg-green-400 rounded"></div>
+ <span class="text-gray-600">Medium</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <div class="w-4 h-4 bg-green-100 rounded"></div>
+ <span class="text-gray-600">Low</span>
+ </div>
+ </div>
+ <div class="mt-3 pt-3 border-t border-gray-200">
+ <div class="grid grid-cols-2 gap-2 text-xs">
+ <div class="flex justify-between">
+ <span class="text-gray-600">Top: NY</span>
+ <span class="font-semibold text-green-700">$42.3M</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">CA</span>
+ <span class="font-semibold text-green-600">$38.7M</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Projects Status</h3>
+ <div id="overview-projects" class="space-y-2">
+ <div class="flex items-center gap-2">
+ <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+ <span class="text-sm text-gray-700">FDA Submission</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+ <span class="text-sm text-gray-700">Lab Expansion</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+ <span class="text-sm text-gray-700">New Product Launch</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+ <span class="text-sm text-gray-700">AI Integration</span>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Critical Alerts</h3>
+ <div id="overview-alerts" class="space-y-2">
+ <div class="bg-red-50 border-l-4 border-red-500 p-2 rounded">
+ <p class="text-xs font-semibold text-red-900">Lab Equipment Alert</p>
+ <p class="text-xs text-red-700">Maintenance needed</p>
+ </div>
+ <div class="bg-yellow-50 border-l-4 border-yellow-500 p-2 rounded">
+ <p class="text-xs font-semibold text-yellow-900">Inventory Low</p>
+ <p class="text-xs text-yellow-700">Reagents below threshold</p>
+ </div>
+ <div class="bg-orange-50 border-l-4 border-orange-500 p-2 rounded">
+ <p class="text-xs font-semibold text-orange-900">Compliance Due</p>
+ <p class="text-xs text-orange-700">Q4 audit in 2 weeks</p>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Operations</h3>
+ <div id="overview-stats" class="space-y-3">
+ <div>
+ <div class="flex justify-between text-sm mb-1">
+ <span class="text-gray-600">Lab Capacity</span>
+ <span class="font-semibold text-green-600">87%</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-green-500 h-2 rounded-full" style="width: 87%"></div>
+ </div>
+ </div>
+ <div>
+ <div class="flex justify-between text-sm mb-1">
+ <span class="text-gray-600">Order Processing</span>
+ <span class="font-semibold text-blue-600">92%</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-blue-500 h-2 rounded-full" style="width: 92%"></div>
+ </div>
+ </div>
+ <div>
+ <div class="flex justify-between text-sm mb-1">
+ <span class="text-gray-600">Staff Utilization</span>
+ <span class="font-semibold text-purple-600">78%</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-purple-500 h-2 rounded-full" style="width: 78%"></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-            <!-- Market Intelligence -->
-            <div class="grid grid-cols-2 gap-6">
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“° Market News</h3>
-                    <div id="overview-market" class="space-y-2 max-h-96 overflow-y-auto">
-                        <div class="border-b border-gray-200 pb-2">
-                            <p class="text-sm font-semibold text-gray-900">FDA Approves New Genetic Testing Protocol</p>
-                            <p class="text-xs text-gray-600 mt-1">Genomics News â€¢ 2 hours ago</p>
-                        </div>
-                        <div class="border-b border-gray-200 pb-2">
-                            <p class="text-sm font-semibold text-gray-900">Healthcare Spending Projected to Increase 15%</p>
-                            <p class="text-xs text-gray-600 mt-1">Healthcare Finance â€¢ 5 hours ago</p>
-                        </div>
-                        <div class="border-b border-gray-200 pb-2">
-                            <p class="text-sm font-semibold text-gray-900">AI in Diagnostics Market Reaches $2.1B</p>
-                            <p class="text-xs text-gray-600 mt-1">MedTech Daily â€¢ 1 day ago</p>
-                        </div>
-                        <div class="border-b border-gray-200 pb-2">
-                            <p class="text-sm font-semibold text-gray-900">Medicare Reimbursement Changes for 2026</p>
-                            <p class="text-xs text-gray-600 mt-1">CMS Updates â€¢ 2 days ago</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Competitor Activity</h3>
-                    <div id="overview-competitors" class="space-y-2 max-h-96 overflow-y-auto">
-                        <div class="border-l-4 border-red-500 pl-3 py-2">
-                            <p class="text-sm font-semibold text-gray-900">GenomaCorp</p>
-                            <p class="text-xs text-gray-600">Launched AI-powered test analysis platform</p>
-                        </div>
-                        <div class="border-l-4 border-orange-500 pl-3 py-2">
-                            <p class="text-sm font-semibold text-gray-900">BioTest Systems</p>
-                            <p class="text-xs text-gray-600">Acquired regional lab network for $450M</p>
-                        </div>
-                        <div class="border-l-4 border-yellow-500 pl-3 py-2">
-                            <p class="text-sm font-semibold text-gray-900">HealthDx Inc</p>
-                            <p class="text-xs text-gray-600">Expanded into European markets</p>
-                        </div>
-                        <div class="border-l-4 border-blue-500 pl-3 py-2">
-                            <p class="text-sm font-semibold text-gray-900">MediLabs Pro</p>
-                            <p class="text-xs text-gray-600">Announced partnership with major hospital chain</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+ <!-- Market Intelligence -->
+ <div class="grid grid-cols-2 gap-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Market News</h3>
+ <div id="overview-market" class="space-y-2 max-h-96 overflow-y-auto">
+ <div class="border-b border-gray-200 pb-2">
+ <p class="text-sm font-semibold text-gray-900">FDA Approves New Genetic Testing Protocol</p>
+ <p class="text-xs text-gray-600 mt-1">Genomics News â€¢ 2 hours ago</p>
+ </div>
+ <div class="border-b border-gray-200 pb-2">
+ <p class="text-sm font-semibold text-gray-900">Healthcare Spending Projected to Increase 15%</p>
+ <p class="text-xs text-gray-600 mt-1">Healthcare Finance â€¢ 5 hours ago</p>
+ </div>
+ <div class="border-b border-gray-200 pb-2">
+ <p class="text-sm font-semibold text-gray-900">AI in Diagnostics Market Reaches $2.1B</p>
+ <p class="text-xs text-gray-600 mt-1">MedTech Daily â€¢ 1 day ago</p>
+ </div>
+ <div class="border-b border-gray-200 pb-2">
+ <p class="text-sm font-semibold text-gray-900">Medicare Reimbursement Changes for 2026</p>
+ <p class="text-xs text-gray-600 mt-1">CMS Updates â€¢ 2 days ago</p>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Competitor Activity</h3>
+ <div id="overview-competitors" class="space-y-2 max-h-96 overflow-y-auto">
+ <div class="border-l-4 border-red-500 pl-3 py-2">
+ <p class="text-sm font-semibold text-gray-900">GenomaCorp</p>
+ <p class="text-xs text-gray-600">Launched AI-powered test analysis platform</p>
+ </div>
+ <div class="border-l-4 border-orange-500 pl-3 py-2">
+ <p class="text-sm font-semibold text-gray-900">BioTest Systems</p>
+ <p class="text-xs text-gray-600">Acquired regional lab network for $450M</p>
+ </div>
+ <div class="border-l-4 border-yellow-500 pl-3 py-2">
+ <p class="text-sm font-semibold text-gray-900">HealthDx Inc</p>
+ <p class="text-xs text-gray-600">Expanded into European markets</p>
+ </div>
+ <div class="border-l-4 border-blue-500 pl-3 py-2">
+ <p class="text-sm font-semibold text-gray-900">MediLabs Pro</p>
+ <p class="text-xs text-gray-600">Announced partnership with major hospital chain</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-        <!-- Communications Tab (Email, Calendar, Travel) -->
-        <div id="content-email" class="tab-content hidden fade-in">
-            <div class="grid grid-cols-12 gap-6">
-                <!-- Email Section -->
-                <div class="col-span-5">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-800">ðŸ“¨ Inbox <span id="email-count">(Loading...)</span></h3>
-                            <button onclick="refreshEmails()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">ðŸ”„ Refresh</button>
-                        </div>
-                        <div id="email-list-container" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
-                            <!-- Emails will be loaded dynamically from Gmail -->
-                            <div class="p-6 text-center">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                                <p class="text-sm text-gray-600">Loading your emails from Gmail...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <!-- Communications Tab (Email, Calendar, Travel) -->
+ <div id="content-email" class="tab-content hidden fade-in">
+ <div class="grid grid-cols-12 gap-6">
+ <!-- Email Section -->
+ <div class="col-span-5">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+ <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+ <h3 class="font-bold text-gray-800"> Inbox <span id="email-count">(Loading...)</span></h3>
+ <button onclick="refreshEmails()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold"> Refresh</button>
+ </div>
+ <div id="email-list-container" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+ <!-- Emails will be loaded dynamically from Gmail -->
+ <div class="p-6 text-center">
+ <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+ <p class="text-sm text-gray-600">Loading your emails from Gmail...</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Calendar & Schedule Section -->
-                <div class="col-span-4">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                        <h3 class="font-bold text-gray-800 mb-4">ðŸ“… This Week</h3>
-                        <div class="space-y-2 max-h-[600px] overflow-y-auto">
-                            <!-- Today -->
-                            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-                                <p class="text-xs font-semibold text-blue-900">TODAY - Monday, Oct 27</p>
-                                <div class="mt-2 space-y-2">
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-blue-700 w-16">9:00 AM</span>
-                                        <div>
-                                            <p class="text-xs font-semibold">Executive Team Sync</p>
-                                            <p class="text-xs text-gray-600">Conference Room A</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-blue-700 w-16">11:30 AM</span>
-                                        <div>
-                                            <p class="text-xs font-semibold">Investor Call - Q3</p>
-                                            <p class="text-xs text-gray-600">Virtual (Zoom)</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-blue-700 w-16">2:00 PM</span>
-                                        <div>
-                                            <p class="text-xs font-semibold">Product Strategy</p>
-                                            <p class="text-xs text-gray-600">Office - 1 hour</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- Calendar & Schedule Section -->
+ <div class="col-span-4">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+ <h3 class="font-bold text-gray-800 mb-4"> This Week</h3>
+ <div class="space-y-2 max-h-[600px] overflow-y-auto">
+ <!-- Today -->
+ <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+ <p class="text-xs font-semibold text-blue-900">TODAY - Monday, Oct 27</p>
+ <div class="mt-2 space-y-2">
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-blue-700 w-16">9:00 AM</span>
+ <div>
+ <p class="text-xs font-semibold">Executive Team Sync</p>
+ <p class="text-xs text-gray-600">Conference Room A</p>
+ </div>
+ </div>
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-blue-700 w-16">11:30 AM</span>
+ <div>
+ <p class="text-xs font-semibold">Investor Call - Q3</p>
+ <p class="text-xs text-gray-600">Virtual (Zoom)</p>
+ </div>
+ </div>
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-blue-700 w-16">2:00 PM</span>
+ <div>
+ <p class="text-xs font-semibold">Product Strategy</p>
+ <p class="text-xs text-gray-600">Office - 1 hour</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                            <!-- Tuesday -->
-                            <div class="border-l-4 border-green-500 p-3 rounded bg-green-50">
-                                <p class="text-xs font-semibold text-green-900">TUESDAY - Oct 28</p>
-                                <div class="mt-2 space-y-2">
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-green-700 w-16">10:00 AM</span>
-                                        <p class="text-xs font-semibold">Board Prep Session</p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-green-700 w-16">3:00 PM</span>
-                                        <p class="text-xs font-semibold">Lab Tour & Review</p>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- Tuesday -->
+ <div class="border-l-4 border-green-500 p-3 rounded bg-green-50">
+ <p class="text-xs font-semibold text-green-900">TUESDAY - Oct 28</p>
+ <div class="mt-2 space-y-2">
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-green-700 w-16">10:00 AM</span>
+ <p class="text-xs font-semibold">Board Prep Session</p>
+ </div>
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-green-700 w-16">3:00 PM</span>
+ <p class="text-xs font-semibold">Lab Tour & Review</p>
+ </div>
+ </div>
+ </div>
 
-                            <!-- Wednesday -->
-                            <div class="border-l-4 border-purple-500 p-3 rounded bg-purple-50">
-                                <p class="text-xs font-semibold text-purple-900">WEDNESDAY - Oct 29</p>
-                                <div class="mt-2">
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-purple-700 w-16">All Day</span>
-                                        <p class="text-xs font-semibold">Board Meeting</p>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- Wednesday -->
+ <div class="border-l-4 border-purple-500 p-3 rounded bg-purple-50">
+ <p class="text-xs font-semibold text-purple-900">WEDNESDAY - Oct 29</p>
+ <div class="mt-2">
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-purple-700 w-16">All Day</span>
+ <p class="text-xs font-semibold">Board Meeting</p>
+ </div>
+ </div>
+ </div>
 
-                            <!-- Thursday -->
-                            <div class="border-l-4 border-orange-500 p-3 rounded bg-orange-50">
-                                <p class="text-xs font-semibold text-orange-900">THURSDAY - Oct 30</p>
-                                <div class="mt-2 space-y-2">
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-orange-700 w-16">9:00 AM</span>
-                                        <p class="text-xs font-semibold">Compliance Review</p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-orange-700 w-16">1:00 PM</span>
-                                        <p class="text-xs font-semibold">Partner Negotiations</p>
-                                    </div>
-                                </div>
-                            </div>
+ <!-- Thursday -->
+ <div class="border-l-4 border-orange-500 p-3 rounded bg-orange-50">
+ <p class="text-xs font-semibold text-orange-900">THURSDAY - Oct 30</p>
+ <div class="mt-2 space-y-2">
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-orange-700 w-16">9:00 AM</span>
+ <p class="text-xs font-semibold">Compliance Review</p>
+ </div>
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-orange-700 w-16">1:00 PM</span>
+ <p class="text-xs font-semibold">Partner Negotiations</p>
+ </div>
+ </div>
+ </div>
 
-                            <!-- Friday -->
-                            <div class="border-l-4 border-indigo-500 p-3 rounded bg-indigo-50">
-                                <p class="text-xs font-semibold text-indigo-900">FRIDAY - Oct 31</p>
-                                <div class="mt-2">
-                                    <div class="flex gap-2">
-                                        <span class="text-xs font-semibold text-indigo-700 w-16">2:00 PM</span>
-                                        <p class="text-xs font-semibold">All Hands Meeting</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <!-- Friday -->
+ <div class="border-l-4 border-indigo-500 p-3 rounded bg-indigo-50">
+ <p class="text-xs font-semibold text-indigo-900">FRIDAY - Oct 31</p>
+ <div class="mt-2">
+ <div class="flex gap-2">
+ <span class="text-xs font-semibold text-indigo-700 w-16">2:00 PM</span>
+ <p class="text-xs font-semibold">All Hands Meeting</p>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Travel Plans Section -->
-                <div class="col-span-3">
-                    <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm p-4">
-                        <h3 class="font-bold text-amber-900 mb-4">âœˆï¸ Upcoming Travel</h3>
-                        <div class="space-y-3 max-h-[450px] overflow-y-auto">
-                            <div class="bg-white rounded-lg p-3 border border-amber-200">
-                                <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">ðŸ›«</span>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-sm text-gray-900">San Francisco, CA</p>
-                                        <p class="text-xs text-gray-600">Nov 5-7 â€¢ 3 days</p>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-700 mb-2">â€¢ Healthcare Innovation Conference</p>
-                                <p class="text-xs text-gray-700">â€¢ Investor Meetings</p>
-                                <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-gray-600">âœ“ Flight booked</p>
-                                    <p class="text-xs text-gray-600">âœ“ Hotel: Marriott Union Square</p>
-                                </div>
-                            </div>
+ <!-- Travel Plans Section -->
+ <div class="col-span-3">
+ <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm p-4">
+ <h3 class="font-bold text-amber-900 mb-4">âœˆï¸ Upcoming Travel</h3>
+ <div class="space-y-3 max-h-[450px] overflow-y-auto">
+ <div class="bg-white rounded-lg p-3 border border-amber-200">
+ <div class="flex items-start gap-2 mb-2">
+ <span class="text-lg"> </span>
+ <div class="flex-1">
+ <p class="font-semibold text-sm text-gray-900">San Francisco, CA</p>
+ <p class="text-xs text-gray-600">Nov 5-7 â€¢ 3 days</p>
+ </div>
+ </div>
+ <p class="text-xs text-gray-700 mb-2">â€¢ Healthcare Innovation Conference</p>
+ <p class="text-xs text-gray-700">â€¢ Investor Meetings</p>
+ <div class="mt-2 pt-2 border-t border-amber-100">
+ <p class="text-xs text-gray-600">âœ“ Flight booked</p>
+ <p class="text-xs text-gray-600">âœ“ Hotel: Marriott Union Square</p>
+ </div>
+ </div>
 
-                            <div class="bg-white rounded-lg p-3 border border-amber-200">
-                                <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">ðŸ›¬</span>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-sm text-gray-900">Boston, MA</p>
-                                        <p class="text-xs text-gray-600">Nov 12-14 â€¢ 3 days</p>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-700 mb-2">â€¢ FDA Meeting</p>
-                                <p class="text-xs text-gray-700">â€¢ Lab Partner Visit</p>
-                                <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-gray-600">â³ Flight pending</p>
-                                    <p class="text-xs text-gray-600">âœ“ Hotel: Hyatt Regency</p>
-                                </div>
-                            </div>
+ <div class="bg-white rounded-lg p-3 border border-amber-200">
+ <div class="flex items-start gap-2 mb-2">
+ <span class="text-lg"> </span>
+ <div class="flex-1">
+ <p class="font-semibold text-sm text-gray-900">Boston, MA</p>
+ <p class="text-xs text-gray-600">Nov 12-14 â€¢ 3 days</p>
+ </div>
+ </div>
+ <p class="text-xs text-gray-700 mb-2">â€¢ FDA Meeting</p>
+ <p class="text-xs text-gray-700">â€¢ Lab Partner Visit</p>
+ <div class="mt-2 pt-2 border-t border-amber-100">
+ <p class="text-xs text-gray-600">â³ Flight pending</p>
+ <p class="text-xs text-gray-600">âœ“ Hotel: Hyatt Regency</p>
+ </div>
+ </div>
 
-                            <div class="bg-white rounded-lg p-3 border border-amber-200">
-                                <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">ðŸŒŽ</span>
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-sm text-gray-900">London, UK</p>
-                                        <p class="text-xs text-gray-600">Nov 20-24 â€¢ 5 days</p>
-                                    </div>
-                                </div>
-                                <p class="text-xs text-gray-700 mb-2">â€¢ Global Summit</p>
-                                <p class="text-xs text-gray-700">â€¢ European Partners</p>
-                                <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-amber-700">âš ï¸ Needs booking</p>
-                                </div>
-                            </div>
-                        </div>
+ <div class="bg-white rounded-lg p-3 border border-amber-200">
+ <div class="flex items-start gap-2 mb-2">
+ <span class="text-lg"> </span>
+ <div class="flex-1">
+ <p class="font-semibold text-sm text-gray-900">London, UK</p>
+ <p class="text-xs text-gray-600">Nov 20-24 â€¢ 5 days</p>
+ </div>
+ </div>
+ <p class="text-xs text-gray-700 mb-2">â€¢ Global Summit</p>
+ <p class="text-xs text-gray-700">â€¢ European Partners</p>
+ <div class="mt-2 pt-2 border-t border-amber-100">
+ <p class="text-xs text-amber-700">âš ï¸ Needs booking</p>
+ </div>
+ </div>
+ </div>
 
-                        <button class="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-xs font-semibold">
-                            + Add Travel Plan
-                        </button>
-                    </div>
+ <button class="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-xs font-semibold">
+ + Add Travel Plan
+ </button>
+ </div>
 
-                    <!-- Quick Stats -->
-                    <div class="mt-4 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">ðŸ“Š This Month</h4>
-                        <div class="space-y-2 text-xs">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Total Meetings:</span>
-                                <span class="font-semibold">32</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Travel Days:</span>
-                                <span class="font-semibold text-amber-600">11</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Emails Processed:</span>
-                                <span class="font-semibold text-green-600">248</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+ <!-- Quick Stats -->
+ <div class="mt-4 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+ <h4 class="font-semibold text-gray-800 mb-3 text-sm"> This Month</h4>
+ <div class="space-y-2 text-xs">
+ <div class="flex justify-between">
+ <span class="text-gray-600">Total Meetings:</span>
+ <span class="font-semibold">32</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Travel Days:</span>
+ <span class="font-semibold text-amber-600">11</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Emails Processed:</span>
+ <span class="font-semibold text-green-600">248</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
 
-        <!-- Personal Assistant Tab -->
-        <div id="content-personal" class="tab-content hidden fade-in">
-            <div class="grid grid-cols-3 gap-6">
-                <!-- Health & Wellness -->
-                <div class="space-y-6">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’ª Health & Fitness</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <div class="flex justify-between text-sm mb-2">
-                                    <span class="text-gray-600">Steps Today</span>
-                                    <span class="font-bold text-blue-600">8,432 / 10,000</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 84%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm mb-2">
-                                    <span class="text-gray-600">Exercise This Week</span>
-                                    <span class="font-bold text-green-600">4 / 5 days</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm mb-2">
-                                    <span class="text-gray-600">Water Intake</span>
-                                    <span class="font-bold text-cyan-600">6 / 8 glasses</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-cyan-500 h-2 rounded-full" style="width: 75%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-semibold">
-                            Log Exercise
-                        </button>
-                    </div>
+ <!-- Personal Assistant Tab -->
+ <div id="content-personal" class="tab-content hidden fade-in">
+ <div class="grid grid-cols-3 gap-6">
+ <!-- Health & Wellness -->
+ <div class="space-y-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Health & Fitness</h3>
+ <div class="space-y-4">
+ <div>
+ <div class="flex justify-between text-sm mb-2">
+ <span class="text-gray-600">Steps Today</span>
+ <span class="font-bold text-blue-600">8,432 / 10,000</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-blue-500 h-2 rounded-full" style="width: 84%"></div>
+ </div>
+ </div>
+ <div>
+ <div class="flex justify-between text-sm mb-2">
+ <span class="text-gray-600">Exercise This Week</span>
+ <span class="font-bold text-green-600">4 / 5 days</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
+ </div>
+ </div>
+ <div>
+ <div class="flex justify-between text-sm mb-2">
+ <span class="text-gray-600">Water Intake</span>
+ <span class="font-bold text-cyan-600">6 / 8 glasses</span>
+ </div>
+ <div class="w-full bg-gray-200 rounded-full h-2">
+ <div class="bg-cyan-500 h-2 rounded-full" style="width: 75%"></div>
+ </div>
+ </div>
+ </div>
+ <button class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-semibold">
+ Log Exercise
+ </button>
+ </div>
 
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-800 mb-3">ðŸƒ Today's Exercise</h4>
-                        <div class="space-y-2">
-                            <div class="bg-white rounded-lg p-3">
-                                <p class="text-sm font-semibold text-gray-800">Morning Run</p>
-                                <p class="text-xs text-gray-600">6:30 AM - 30 minutes</p>
-                            </div>
-                            <div class="bg-white rounded-lg p-3">
-                                <p class="text-sm font-semibold text-gray-800">Lunch Yoga</p>
-                                <p class="text-xs text-gray-600">12:30 PM - 20 minutes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+ <h4 class="font-semibold text-gray-800 mb-3"> Today's Exercise</h4>
+ <div class="space-y-2">
+ <div class="bg-white rounded-lg p-3">
+ <p class="text-sm font-semibold text-gray-800">Morning Run</p>
+ <p class="text-xs text-gray-600">6:30 AM - 30 minutes</p>
+ </div>
+ <div class="bg-white rounded-lg p-3">
+ <p class="text-sm font-semibold text-gray-800">Lunch Yoga</p>
+ <p class="text-xs text-gray-600">12:30 PM - 20 minutes</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Personal Tasks & Goals -->
-                <div class="space-y-6">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">âœ… Personal Tasks</h3>
-                        <div class="space-y-2 mb-4">
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
-                                <input type="checkbox" checked class="w-4 h-4 text-blue-600">
-                                <span class="text-sm text-gray-400 line-through">Review quarterly goals</span>
-                            </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600">
-                                <span class="text-sm text-gray-800">Schedule annual physical</span>
-                            </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600">
-                                <span class="text-sm text-gray-800">Plan family vacation</span>
-                            </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
-                                <input type="checkbox" class="w-4 h-4 text-blue-600">
-                                <span class="text-sm text-gray-800">Update will and estate plan</span>
-                            </div>
-                        </div>
-                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold">
-                            + Add Task
-                        </button>
-                    </div>
+ <!-- Personal Tasks & Goals -->
+ <div class="space-y-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4">âœ… Personal Tasks</h3>
+ <div class="space-y-2 mb-4">
+ <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+ <input type="checkbox" checked class="w-4 h-4 text-blue-600">
+ <span class="text-sm text-gray-400 line-through">Review quarterly goals</span>
+ </div>
+ <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+ <input type="checkbox" class="w-4 h-4 text-blue-600">
+ <span class="text-sm text-gray-800">Schedule annual physical</span>
+ </div>
+ <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+ <input type="checkbox" class="w-4 h-4 text-blue-600">
+ <span class="text-sm text-gray-800">Plan family vacation</span>
+ </div>
+ <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+ <input type="checkbox" class="w-4 h-4 text-blue-600">
+ <span class="text-sm text-gray-800">Update will and estate plan</span>
+ </div>
+ </div>
+ <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold">
+ + Add Task
+ </button>
+ </div>
 
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Goals & Habits</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm font-semibold text-gray-700 mb-1">Read 30 min/day</p>
-                                <div class="flex gap-1">
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">5 day streak</p>
-                            </div>
-                            <div>
-                                <p class="text-sm font-semibold text-gray-700 mb-1">Meditate daily</p>
-                                <div class="flex gap-1">
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-green-500 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                    <div class="w-6 h-6 bg-gray-200 rounded"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">3 day streak</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Goals & Habits</h3>
+ <div class="space-y-3">
+ <div>
+ <p class="text-sm font-semibold text-gray-700 mb-1">Read 30 min/day</p>
+ <div class="flex gap-1">
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ </div>
+ <p class="text-xs text-gray-500 mt-1">5 day streak</p>
+ </div>
+ <div>
+ <p class="text-sm font-semibold text-gray-700 mb-1">Meditate daily</p>
+ <div class="flex gap-1">
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-green-500 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ <div class="w-6 h-6 bg-gray-200 rounded"></div>
+ </div>
+ <p class="text-xs text-gray-500 mt-1">3 day streak</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-                <!-- Quick Actions & Reminders -->
-                <div class="space-y-6">
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Quick Actions</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-semibold border border-blue-200">
-                                ðŸ“ž Call Assistant
-                            </button>
-                            <button class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm font-semibold border border-green-200">
-                                ðŸš— Book Car
-                            </button>
-                            <button class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-semibold border border-purple-200">
-                                âœˆï¸ Travel Plans
-                            </button>
-                            <button class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm font-semibold border border-orange-200">
-                                ðŸ½ï¸ Reservations
-                            </button>
-                        </div>
-                    </div>
+ <!-- Quick Actions & Reminders -->
+ <div class="space-y-6">
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Quick Actions</h3>
+ <div class="grid grid-cols-2 gap-3">
+ <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-semibold border border-blue-200">
+ Call Assistant
+ </button>
+ <button class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm font-semibold border border-green-200">
+ Book Car
+ </button>
+ <button class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-semibold border border-purple-200">
+ âœˆï¸ Travel Plans
+ </button>
+ <button class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm font-semibold border border-orange-200">
+ Reservations
+ </button>
+ </div>
+ </div>
 
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ”” Reminders</h3>
-                        <div class="space-y-3">
-                            <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
-                                <p class="text-sm font-semibold text-red-900">Annual physical exam</p>
-                                <p class="text-xs text-red-700">Tomorrow, 2:00 PM</p>
-                            </div>
-                            <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-                                <p class="text-sm font-semibold text-blue-900">Submit expense reports</p>
-                                <p class="text-xs text-blue-700">Due Friday</p>
-                            </div>
-                            <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded">
-                                <p class="text-sm font-semibold text-green-900">Family dinner reservation</p>
-                                <p class="text-xs text-green-700">Saturday, 7:00 PM</p>
-                            </div>
-                        </div>
-                    </div>
+ <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+ <h3 class="text-lg font-bold text-gray-800 mb-4"> Reminders</h3>
+ <div class="space-y-3">
+ <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+ <p class="text-sm font-semibold text-red-900">Annual physical exam</p>
+ <p class="text-xs text-red-700">Tomorrow, 2:00 PM</p>
+ </div>
+ <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+ <p class="text-sm font-semibold text-blue-900">Submit expense reports</p>
+ <p class="text-xs text-blue-700">Due Friday</p>
+ </div>
+ <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded">
+ <p class="text-sm font-semibold text-green-900">Family dinner reservation</p>
+ <p class="text-xs text-green-700">Saturday, 7:00 PM</p>
+ </div>
+ </div>
+ </div>
 
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">ðŸ“Š Life Balance</h4>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Work:</span>
-                                <span class="font-semibold">60%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Family:</span>
-                                <span class="font-semibold">25%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Personal:</span>
-                                <span class="font-semibold">15%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+ <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
+ <h4 class="font-semibold text-gray-800 mb-2"> Life Balance</h4>
+ <div class="space-y-2 text-sm">
+ <div class="flex justify-between">
+ <span class="text-gray-600">Work:</span>
+ <span class="font-semibold">60%</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Family:</span>
+ <span class="font-semibold">25%</span>
+ </div>
+ <div class="flex justify-between">
+ <span class="text-gray-600">Personal:</span>
+ <span class="font-semibold">15%</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
 
-        <!-- Other Business Tabs (Orders, Compliance, etc.) -->
-        <div id="content-orders" class="tab-content hidden fade-in">
-            <div id="orders-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading order volume data...</p>
-                </div>
-            </div>
-        </div>
+ <!-- Other Business Tabs (Orders, Compliance, etc.) -->
+ <div id="content-orders" class="tab-content hidden fade-in">
+ <div id="orders-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading order volume data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-compliance" class="tab-content hidden fade-in">
-            <div id="compliance-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading compliance data...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-compliance" class="tab-content hidden fade-in">
+ <div id="compliance-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading compliance data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-reimbursement" class="tab-content hidden fade-in">
-            <div id="reimbursement-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading reimbursement data...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-reimbursement" class="tab-content hidden fade-in">
+ <div id="reimbursement-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading reimbursement data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-costs" class="tab-content hidden fade-in">
-            <div id="costs-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading costs data...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-costs" class="tab-content hidden fade-in">
+ <div id="costs-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading costs data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-lab" class="tab-content hidden fade-in">
-            <div id="lab-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading lab metrics...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-lab" class="tab-content hidden fade-in">
+ <div id="lab-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading lab metrics...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-regional" class="tab-content hidden fade-in">
-            <div id="regional-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading regional data...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-regional" class="tab-content hidden fade-in">
+ <div id="regional-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading regional data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-forecasting" class="tab-content hidden fade-in">
-            <div id="forecasting-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading forecast data...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-forecasting" class="tab-content hidden fade-in">
+ <div id="forecasting-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading forecast data...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-market" class="tab-content hidden fade-in">
-            <div id="market-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading market intelligence...</p>
-                </div>
-            </div>
-        </div>
+ <div id="content-market" class="tab-content hidden fade-in">
+ <div id="market-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading market intelligence...</p>
+ </div>
+ </div>
+ </div>
 
-        <div id="content-milestones" class="tab-content hidden fade-in">
-            <div id="milestones-content">
-                <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-gray-600">Loading project milestones...</p>
-                </div>
-            </div>
-        </div>
-    </div>
+ <div id="content-milestones" class="tab-content hidden fade-in">
+ <div id="milestones-content">
+ <div class="text-center py-12">
+ <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+ <p class="text-gray-600">Loading project milestones...</p>
+ </div>
+ </div>
+ </div>
+ </div>
 
-    <script src="test_data.js"></script>
-    <script src="dashboard.js"></script>
-    <script src="voice_agent_integration.js"></script>
-    <script src="communications_enhanced.js"></script>
+ <script src="test_data.js"></script>
+ <script src="dashboard.js"></script>
+ <script src="voice_agent_integration.js"></script>
+ <script src="communications_enhanced.js"></script>
 </body>
 </html>
+
 
 
 
