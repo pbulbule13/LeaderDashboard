@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthCare Sciences - Executive Command Center</title>
+    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="config.js"></script>
@@ -108,8 +108,8 @@
                         <span class="text-white font-bold text-xl">HCS</span>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Executive Command Center</h1>
-                        <p class="text-xs text-gray-500">HealthCare Sciences | <span id="currentDate"></span></p>
+                        <h1 class="text-2xl font-bold text-gray-800">CEO Dashboard</h1>
+                        <p class="text-xs text-gray-500">Developed by Prashil Bulbule • <span id="currentDate"></span></p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -119,18 +119,18 @@
                 </div>
             </div>
             <div class="flex gap-1 mt-4 border-b overflow-x-auto">
-                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">📊 Dashboard</button>
-                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📬 Communications</button>
-                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💼 Personal</button>
-                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📈 Orders</button>
-                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">✅ Compliance</button>
-                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💵 Reimbursement</button>
-                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💰 Costs</button>
-                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔬 Lab</button>
-                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🗺️ Regional</button>
-                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔮 Forecast</button>
-                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📰 Market</button>
-                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🎯 Projects</button>
+                <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">ðŸ“Š Dashboard</button>
+                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“¬ Communications</button>
+                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’¼ Personal</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“ˆ Orders</button>
+                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">âœ… Compliance</button>
+                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’µ Reimbursement</button>
+                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ’° Costs</button>
+                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ”¬ Lab</button>
+                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ—ºï¸ Regional</button>
+                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ”® Forecast</button>
+                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸ“° Market</button>
+                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">ðŸŽ¯ Projects</button>
             </div>
         </div>
     </nav>
@@ -139,20 +139,20 @@
     <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
         <div class="p-4">
             <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
-                <span class="text-lg">👔 CEO Executive Assistant</span>
+                <span class="text-lg">ðŸ‘” CEO Executive Assistant</span>
                 <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
             </div>
             <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
-                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
-                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
-                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
+                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“Š Analyze This Page</button>
+                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">âš ï¸ Key Risks</button>
+                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“‹ Day Summary</button>
+                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">ðŸ“ˆ Dept. Performance</button>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
                 <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
                 <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-purple-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
                 <button onclick="askReasoning()" class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
-                    🚀 Ask AI Assistant
+                    ðŸš€ Ask AI Assistant
                 </button>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-3 mb-4 border border-purple-200">
@@ -168,7 +168,7 @@
             <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-420px)] overflow-y-auto">
                 <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
                     <p class="text-xs text-purple-900 mb-2">
-                        <span class="font-bold">👔 Executive Assistant:</span>
+                        <span class="font-bold">ðŸ‘” Executive Assistant:</span>
                     </p>
                     <p class="text-xs text-gray-700">
                         I can help you with questions about Orders, Compliance, Lab Operations, Finance, Regional Performance, and more. Just ask!
@@ -176,7 +176,7 @@
                 </div>
                 <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm ai-insight-card">
                     <div class="flex items-start gap-2">
-                        <span class="text-sm">🎯</span>
+                        <span class="text-sm">ðŸŽ¯</span>
                         <div>
                             <p class="font-semibold text-indigo-900 text-xs">Real-time Insight</p>
                             <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
@@ -186,40 +186,40 @@
             </div>
             <div id="daySummarySection" class="mt-4 space-y-2">
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-blue-900 mb-2">📊 Today's Executive Summary</h3>
+                    <h3 class="font-bold text-sm text-blue-900 mb-2">ðŸ“Š Today's Executive Summary</h3>
                     <div id="daySummaryContent" class="space-y-1 text-xs">
                         <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">📈 Orders:</span>
+                            <span class="text-gray-600">ðŸ“ˆ Orders:</span>
                             <span class="font-semibold text-blue-900">24.5K (+15.2%)</span>
                         </div>
                         <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">✅ Compliance:</span>
+                            <span class="text-gray-600">âœ… Compliance:</span>
                             <span class="font-semibold text-green-900">94.5% (+0.3%)</span>
                         </div>
                         <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">💵 Reimbursement:</span>
-                            <span class="font-semibold text-purple-900">98.5% (↑)</span>
+                            <span class="text-gray-600">ðŸ’µ Reimbursement:</span>
+                            <span class="font-semibold text-purple-900">98.5% (â†‘)</span>
                         </div>
                         <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">🔬 Lab TAT:</span>
+                            <span class="text-gray-600">ðŸ”¬ Lab TAT:</span>
                             <span class="font-semibold text-orange-900">38.2hrs (target: 42hrs)</span>
                         </div>
                         <div class="flex justify-between py-1 border-b border-blue-100">
-                            <span class="text-gray-600">💰 Costs:</span>
+                            <span class="text-gray-600">ðŸ’° Costs:</span>
                             <span class="font-semibold text-red-900">$2.8M (-2.1%)</span>
                         </div>
                         <div class="flex justify-between py-1">
-                            <span class="text-gray-600">🔮 Forecast:</span>
+                            <span class="text-gray-600">ðŸ”® Forecast:</span>
                             <span class="font-semibold text-indigo-900">26.8K next month</span>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-green-900 mb-2">💡 Key Highlights</h3>
+                    <h3 class="font-bold text-sm text-green-900 mb-2">ðŸ’¡ Key Highlights</h3>
                     <ul class="space-y-1 text-xs text-gray-700">
-                        <li>• Orders up 15.2% - Strong regional performance</li>
-                        <li>• Lab efficiency improved - TAT under target</li>
-                        <li>• Cost optimization working - $60K saved</li>
+                        <li>â€¢ Orders up 15.2% - Strong regional performance</li>
+                        <li>â€¢ Lab efficiency improved - TAT under target</li>
+                        <li>â€¢ Cost optimization working - $60K saved</li>
                     </ul>
                 </div>
             </div>
@@ -235,7 +235,7 @@
                 <!-- Orders Chart -->
                 <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">📈 Orders</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ“ˆ Orders</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
@@ -249,7 +249,7 @@
                 <!-- Reimbursement Chart -->
                 <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">💵 Reimbursement</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ’µ Reimbursement</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
@@ -263,7 +263,7 @@
                 <!-- Compliance Chart -->
                 <div class="bg-white border border-green-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">✅ Compliance</h3>
+                        <h3 class="text-sm font-bold text-gray-800">âœ… Compliance</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
@@ -279,7 +279,7 @@
                 <!-- Lab TAT Chart -->
                 <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">🔬 Lab TAT</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ”¬ Lab TAT</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
@@ -293,7 +293,7 @@
                 <!-- Costs Chart -->
                 <div class="bg-white border border-red-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">💰 Operating Costs</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ’° Operating Costs</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
@@ -307,7 +307,7 @@
                 <!-- Forecast Chart -->
                 <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">🔮 Forecast</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ”® Forecast</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
@@ -324,7 +324,7 @@
                 <!-- Email Widget -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('email')">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-gray-800">📧 Inbox</h3>
+                        <h3 class="text-sm font-bold text-gray-800">ðŸ“§ Inbox</h3>
                         <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
                     </div>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
@@ -354,7 +354,7 @@
 
                 <!-- Calendar Widget -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('calendar')">
-                    <h3 class="text-sm font-bold text-gray-800 mb-3">📅 Today's Schedule</h3>
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">ðŸ“… Today's Schedule</h3>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
                         <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-500">
                             <div class="font-semibold text-gray-600 whitespace-nowrap">9:00 AM</div>
@@ -382,7 +382,7 @@
 
                 <!-- Quick Notes Widget -->
                 <div class="bg-white border border-amber-300 rounded-xl shadow-sm p-4 tile">
-                    <h3 class="text-sm font-bold text-amber-900 mb-3">📝 Quick Notes</h3>
+                    <h3 class="text-sm font-bold text-amber-900 mb-3">ðŸ“ Quick Notes</h3>
                     <textarea id="quickNoteInput" placeholder="Type a quick note..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
                     <button onclick="saveQuickNote()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-1 rounded text-xs font-semibold">Save Note</button>
                     <div id="quickNotesDisplay" class="mt-3 space-y-1 max-h-16 overflow-y-auto text-xs"></div>
@@ -392,19 +392,19 @@
             <!-- Charts Row -->
             <div class="grid grid-cols-3 gap-6 mb-6">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Order Volume Trend</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Order Volume Trend</h3>
                     <div class="chart-container">
                         <canvas id="overviewOrdersChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Operating Costs</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’° Operating Costs</h3>
                     <div class="chart-container">
                         <canvas id="overviewFinancialsChart"></canvas>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Stock Performance</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Stock Performance</h3>
                     <div id="overview-stock-summary" class="space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-semibold text-gray-700">Current Price</span>
@@ -433,54 +433,54 @@
             <!-- Data Grid -->
             <div class="grid grid-cols-4 gap-4 mb-6">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ USA Regional Performance</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ—ºï¸ USA Regional Performance</h3>
                     <div id="overview-regional">
                         <svg viewBox="0 0 960 600" class="w-full h-auto">
                             <!-- Simplified USA Map with heat map coloring -->
                             <g id="states">
                                 <!-- West Coast (High) -->
                                 <path d="M50,200 L80,180 L90,220 L85,280 L60,290 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="CA" data-revenue="38.7M">
-                                    <title>California: $38.7M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                                 <path d="M60,140 L90,130 L95,170 L85,180 L65,175 Z" class="state" fill="#34d399" stroke="#fff" stroke-width="1" data-state="WA">
-                                    <title>Washington: $15.2M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
 
                                 <!-- Northeast (Highest) -->
                                 <path d="M800,120 L830,110 L850,130 L840,160 L810,155 Z" class="state" fill="#059669" stroke="#fff" stroke-width="1" data-state="NY">
-                                    <title>New York: $42.3M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                                 <path d="M850,140 L870,135 L880,150 L865,165 L850,160 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="MA">
-                                    <title>Massachusetts: $18.5M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
 
                                 <!-- Southeast (Medium-High) -->
                                 <path d="M700,350 L750,340 L780,380 L760,420 L720,415 Z" class="state" fill="#22c55e" stroke="#fff" stroke-width="1" data-state="FL">
-                                    <title>Florida: $35.2M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                                 <path d="M650,280 L700,270 L720,310 L695,340 L665,330 Z" class="state" fill="#4ade80" stroke="#fff" stroke-width="1" data-state="GA">
-                                    <title>Georgia: $22.1M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
 
                                 <!-- Midwest (Medium) -->
                                 <path d="M450,180 L500,170 L520,210 L505,250 L465,245 Z" class="state" fill="#86efac" stroke="#fff" stroke-width="1" data-state="IL">
-                                    <title>Illinois: $31.8M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                                 <path d="M400,150 L450,145 L465,180 L450,210 L410,205 Z" class="state" fill="#bbf7d0" stroke="#fff" stroke-width="1" data-state="MI">
-                                    <title>Michigan: $19.3M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
 
                                 <!-- Texas (High) -->
                                 <path d="M350,350 L450,340 L480,400 L450,460 L370,450 L340,400 Z" class="state" fill="#10b981" stroke="#fff" stroke-width="1" data-state="TX">
-                                    <title>Texas: $38.1M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
 
                                 <!-- Other states (Lower performance) -->
                                 <path d="M200,250 L280,245 L300,290 L285,330 L220,325 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="CO">
-                                    <title>Colorado: $12.4M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                                 <path d="M120,300 L180,290 L195,340 L175,380 L130,370 Z" class="state" fill="#d1fae5" stroke="#fff" stroke-width="1" data-state="NV">
-                                    <title>Nevada: $10.2M</title>
+                                    <title>CEO Dashboard - Developed by Prashil Bulbule</title>
                                 </path>
                             </g>
                         </svg>
@@ -513,7 +513,7 @@
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Projects Status</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Projects Status</h3>
                     <div id="overview-projects" class="space-y-2">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -534,7 +534,7 @@
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🚨 Critical Alerts</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸš¨ Critical Alerts</h3>
                     <div id="overview-alerts" class="space-y-2">
                         <div class="bg-red-50 border-l-4 border-red-500 p-2 rounded">
                             <p class="text-xs font-semibold text-red-900">Lab Equipment Alert</p>
@@ -551,7 +551,7 @@
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Operations</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Operations</h3>
                     <div id="overview-stats" class="space-y-3">
                         <div>
                             <div class="flex justify-between text-sm mb-1">
@@ -587,28 +587,28 @@
             <!-- Market Intelligence -->
             <div class="grid grid-cols-2 gap-6">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📰 Market News</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“° Market News</h3>
                     <div id="overview-market" class="space-y-2 max-h-96 overflow-y-auto">
                         <div class="border-b border-gray-200 pb-2">
                             <p class="text-sm font-semibold text-gray-900">FDA Approves New Genetic Testing Protocol</p>
-                            <p class="text-xs text-gray-600 mt-1">Genomics News • 2 hours ago</p>
+                            <p class="text-xs text-gray-600 mt-1">Genomics News â€¢ 2 hours ago</p>
                         </div>
                         <div class="border-b border-gray-200 pb-2">
                             <p class="text-sm font-semibold text-gray-900">Healthcare Spending Projected to Increase 15%</p>
-                            <p class="text-xs text-gray-600 mt-1">Healthcare Finance • 5 hours ago</p>
+                            <p class="text-xs text-gray-600 mt-1">Healthcare Finance â€¢ 5 hours ago</p>
                         </div>
                         <div class="border-b border-gray-200 pb-2">
                             <p class="text-sm font-semibold text-gray-900">AI in Diagnostics Market Reaches $2.1B</p>
-                            <p class="text-xs text-gray-600 mt-1">MedTech Daily • 1 day ago</p>
+                            <p class="text-xs text-gray-600 mt-1">MedTech Daily â€¢ 1 day ago</p>
                         </div>
                         <div class="border-b border-gray-200 pb-2">
                             <p class="text-sm font-semibold text-gray-900">Medicare Reimbursement Changes for 2026</p>
-                            <p class="text-xs text-gray-600 mt-1">CMS Updates • 2 days ago</p>
+                            <p class="text-xs text-gray-600 mt-1">CMS Updates â€¢ 2 days ago</p>
                         </div>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Competitor Activity</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Competitor Activity</h3>
                     <div id="overview-competitors" class="space-y-2 max-h-96 overflow-y-auto">
                         <div class="border-l-4 border-red-500 pl-3 py-2">
                             <p class="text-sm font-semibold text-gray-900">GenomaCorp</p>
@@ -638,8 +638,8 @@
                 <div class="col-span-5">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
                         <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-800">📨 Inbox <span id="email-count">(Loading...)</span></h3>
-                            <button onclick="refreshEmails()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">🔄 Refresh</button>
+                            <h3 class="font-bold text-gray-800">ðŸ“¨ Inbox <span id="email-count">(Loading...)</span></h3>
+                            <button onclick="refreshEmails()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">ðŸ”„ Refresh</button>
                         </div>
                         <div id="email-list-container" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
                             <!-- Emails will be loaded dynamically from Gmail -->
@@ -654,7 +654,7 @@
                 <!-- Calendar & Schedule Section -->
                 <div class="col-span-4">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                        <h3 class="font-bold text-gray-800 mb-4">📅 This Week</h3>
+                        <h3 class="font-bold text-gray-800 mb-4">ðŸ“… This Week</h3>
                         <div class="space-y-2 max-h-[600px] overflow-y-auto">
                             <!-- Today -->
                             <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
@@ -742,52 +742,52 @@
                 <!-- Travel Plans Section -->
                 <div class="col-span-3">
                     <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm p-4">
-                        <h3 class="font-bold text-amber-900 mb-4">✈️ Upcoming Travel</h3>
+                        <h3 class="font-bold text-amber-900 mb-4">âœˆï¸ Upcoming Travel</h3>
                         <div class="space-y-3 max-h-[450px] overflow-y-auto">
                             <div class="bg-white rounded-lg p-3 border border-amber-200">
                                 <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">🛫</span>
+                                    <span class="text-lg">ðŸ›«</span>
                                     <div class="flex-1">
                                         <p class="font-semibold text-sm text-gray-900">San Francisco, CA</p>
-                                        <p class="text-xs text-gray-600">Nov 5-7 • 3 days</p>
+                                        <p class="text-xs text-gray-600">Nov 5-7 â€¢ 3 days</p>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-700 mb-2">• Healthcare Innovation Conference</p>
-                                <p class="text-xs text-gray-700">• Investor Meetings</p>
+                                <p class="text-xs text-gray-700 mb-2">â€¢ Healthcare Innovation Conference</p>
+                                <p class="text-xs text-gray-700">â€¢ Investor Meetings</p>
                                 <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-gray-600">✓ Flight booked</p>
-                                    <p class="text-xs text-gray-600">✓ Hotel: Marriott Union Square</p>
+                                    <p class="text-xs text-gray-600">âœ“ Flight booked</p>
+                                    <p class="text-xs text-gray-600">âœ“ Hotel: Marriott Union Square</p>
                                 </div>
                             </div>
 
                             <div class="bg-white rounded-lg p-3 border border-amber-200">
                                 <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">🛬</span>
+                                    <span class="text-lg">ðŸ›¬</span>
                                     <div class="flex-1">
                                         <p class="font-semibold text-sm text-gray-900">Boston, MA</p>
-                                        <p class="text-xs text-gray-600">Nov 12-14 • 3 days</p>
+                                        <p class="text-xs text-gray-600">Nov 12-14 â€¢ 3 days</p>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-700 mb-2">• FDA Meeting</p>
-                                <p class="text-xs text-gray-700">• Lab Partner Visit</p>
+                                <p class="text-xs text-gray-700 mb-2">â€¢ FDA Meeting</p>
+                                <p class="text-xs text-gray-700">â€¢ Lab Partner Visit</p>
                                 <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-gray-600">⏳ Flight pending</p>
-                                    <p class="text-xs text-gray-600">✓ Hotel: Hyatt Regency</p>
+                                    <p class="text-xs text-gray-600">â³ Flight pending</p>
+                                    <p class="text-xs text-gray-600">âœ“ Hotel: Hyatt Regency</p>
                                 </div>
                             </div>
 
                             <div class="bg-white rounded-lg p-3 border border-amber-200">
                                 <div class="flex items-start gap-2 mb-2">
-                                    <span class="text-lg">🌎</span>
+                                    <span class="text-lg">ðŸŒŽ</span>
                                     <div class="flex-1">
                                         <p class="font-semibold text-sm text-gray-900">London, UK</p>
-                                        <p class="text-xs text-gray-600">Nov 20-24 • 5 days</p>
+                                        <p class="text-xs text-gray-600">Nov 20-24 â€¢ 5 days</p>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-700 mb-2">• Global Summit</p>
-                                <p class="text-xs text-gray-700">• European Partners</p>
+                                <p class="text-xs text-gray-700 mb-2">â€¢ Global Summit</p>
+                                <p class="text-xs text-gray-700">â€¢ European Partners</p>
                                 <div class="mt-2 pt-2 border-t border-amber-100">
-                                    <p class="text-xs text-amber-700">⚠️ Needs booking</p>
+                                    <p class="text-xs text-amber-700">âš ï¸ Needs booking</p>
                                 </div>
                             </div>
                         </div>
@@ -799,7 +799,7 @@
 
                     <!-- Quick Stats -->
                     <div class="mt-4 bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">📊 This Month</h4>
+                        <h4 class="font-semibold text-gray-800 mb-3 text-sm">ðŸ“Š This Month</h4>
                         <div class="space-y-2 text-xs">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Total Meetings:</span>
@@ -826,7 +826,7 @@
                 <!-- Health & Wellness -->
                 <div class="space-y-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">💪 Health & Fitness</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’ª Health & Fitness</h3>
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-sm mb-2">
@@ -862,7 +862,7 @@
                     </div>
 
                     <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-800 mb-3">🏃 Today's Exercise</h4>
+                        <h4 class="font-semibold text-gray-800 mb-3">ðŸƒ Today's Exercise</h4>
                         <div class="space-y-2">
                             <div class="bg-white rounded-lg p-3">
                                 <p class="text-sm font-semibold text-gray-800">Morning Run</p>
@@ -879,7 +879,7 @@
                 <!-- Personal Tasks & Goals -->
                 <div class="space-y-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">✅ Personal Tasks</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">âœ… Personal Tasks</h3>
                         <div class="space-y-2 mb-4">
                             <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
                                 <input type="checkbox" checked class="w-4 h-4 text-blue-600">
@@ -904,7 +904,7 @@
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Goals & Habits</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Goals & Habits</h3>
                         <div class="space-y-3">
                             <div>
                                 <p class="text-sm font-semibold text-gray-700 mb-1">Read 30 min/day</p>
@@ -939,25 +939,25 @@
                 <!-- Quick Actions & Reminders -->
                 <div class="space-y-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Quick Actions</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">âš¡ Quick Actions</h3>
                         <div class="grid grid-cols-2 gap-3">
                             <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-semibold border border-blue-200">
-                                📞 Call Assistant
+                                ðŸ“ž Call Assistant
                             </button>
                             <button class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm font-semibold border border-green-200">
-                                🚗 Book Car
+                                ðŸš— Book Car
                             </button>
                             <button class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-semibold border border-purple-200">
-                                ✈️ Travel Plans
+                                âœˆï¸ Travel Plans
                             </button>
                             <button class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm font-semibold border border-orange-200">
-                                🍽️ Reservations
+                                ðŸ½ï¸ Reservations
                             </button>
                         </div>
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔔 Reminders</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ”” Reminders</h3>
                         <div class="space-y-3">
                             <div class="bg-red-50 border-l-4 border-red-500 p-3 rounded">
                                 <p class="text-sm font-semibold text-red-900">Annual physical exam</p>
@@ -975,7 +975,7 @@
                     </div>
 
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">📊 Life Balance</h4>
+                        <h4 class="font-semibold text-gray-800 mb-2">ðŸ“Š Life Balance</h4>
                         <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Work:</span>
@@ -1084,3 +1084,4 @@
     <script src="communications_enhanced.js"></script>
 </body>
 </html>
+
