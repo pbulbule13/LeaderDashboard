@@ -26,8 +26,23 @@ class BaseAgent:
                     return _Resp()
             return _MockLLM()
 
+        model_name = config.MODEL_NAME
+        model_lower = (model_name or "").lower()
+
+        # Support DeepSeek via OpenAI-compatible API
+        if "deepseek" in model_lower:
+            api_key = os.getenv("DEEPSEEK_API_KEY", os.getenv("OPENAI_API_KEY"))
+            api_base = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+            return ChatOpenAI(
+                model=model_name,
+                temperature=0.1,
+                openai_api_base=api_base,
+                openai_api_key=api_key
+            )
+
+        # Default OpenAI
         return ChatOpenAI(
-            model=config.MODEL_NAME,
+            model=model_name,
             temperature=0.1,
             api_key=config.OPENAI_API_KEY
         )
