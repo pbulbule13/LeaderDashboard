@@ -5,7 +5,9 @@
 const DASHBOARD_CONFIG = {
     // ==================== API SETTINGS ====================
     api: {
-        baseUrl: 'http://localhost:8000',
+        // Use the current origin if running behind a tunnel (ngrok/cloudflared),
+        // fallback to localhost for local development.
+        baseUrl: (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8000'),
         endpoints: {
             overview: '/api/dashboard/overview',
             stock: '/api/dashboard/tiles/stock',

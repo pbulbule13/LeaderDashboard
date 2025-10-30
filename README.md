@@ -16,6 +16,17 @@
 
 ---
 
+Live URL
+- Current public (ngrok) URL: https://civilized-undaring-anneliese.ngrok-free.dev
+- API health: https://civilized-undaring-anneliese.ngrok-free.dev/health
+- Full dashboard: https://civilized-undaring-anneliese.ngrok-free.dev/dash/dashboard.html
+
+Ngrok Deployment (Local → Public)
+- From project root, run: `./setup_and_expose.ps1 -NgrokAuthToken '<YOUR_AUTHTOKEN>' -Port 8000`
+- The script starts the FastAPI server and an ngrok tunnel and prints a public URL.
+- The dashboard uses `window.location.origin`, so API calls route to your ngrok host automatically.
+- Note: ngrok URLs are ephemeral; they change on each run unless you reserve a domain.
+
 ## 🎯 Overview
 
 LeaderDashboard is an intelligent executive command center for **HealthCare Sciences**, providing real-time analytics and AI-powered insights across 15+ critical business metrics.

@@ -1,13 +1,20 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import sys
 from pathlib import Path
 
 # Ensure parent directory is in path
-root_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(root_dir))
+root_dir = Path(__file__).resolve().parent.parent
+# Ensure both possible roots are on sys.path so that 'data.*' and other
+# absolute imports work whether the app is copied to /app or /app/healthcare_sciences_dashboard
+alt_root = root_dir / "healthcare_sciences_dashboard"
+for p in [root_dir, alt_root]:
+    p_str = str(p)
+    if p_str not in sys.path:
+        sys.path.insert(0, p_str)
 
 from app_config import config
 
@@ -24,6 +31,14 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+# Serve static dashboard files under /dash (e.g., /dash/dashboard.html, /dash/config.js)
+try:
+    static_dir = root_dir  # healthcare_sciences_dashboard directory
+    app.mount("/dash", StaticFiles(directory=str(static_dir)), name="dash")
+    print(f"[OK] Static files mounted at /dash -> {static_dir}")
+except Exception as e:
+    print(f"[WARNING] Could not mount static files: {e}")
 
 @app.get('/')
 async def root():
