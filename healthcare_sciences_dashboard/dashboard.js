@@ -1,4 +1,4 @@
-// Load configuration from config.js
+﻿// Load configuration from config.js
 const CONFIG = window.DASHBOARD_CONFIG;
 const API_BASE = CONFIG.api.baseUrl;
 let overviewChartsCreated = false;
@@ -90,13 +90,14 @@ async function askAI() {
             const answer = result.answer || result.text || 'No response received';
 
             // Escape HTML to prevent XSS and formatting issues
-            const escapedAnswer = answer
+            let escapedAnswer = answer
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;')
-                .replace(/\n/g, '<br>'); // Convert newlines to <br>
+                .replace(/\\n/g, '<br>');
+                        escapedAnswer = escapedAnswer.replace(/(\\$[0-9,\\.]+|\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?%?\\b)/g, '<strong></strong>'); // Convert newlines to <br>
 
             console.log('Displaying answer, length:', answer.length);
 
@@ -107,7 +108,7 @@ async function askAI() {
                             <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
                                 ${result.tab_name || currentTab.toUpperCase()}
                             </span>
-                            ${result.has_reasoning ? '<span class="text-xs text-gray-500">• With Reasoning</span>' : ''}
+                            ${result.has_reasoning ? '<span class="text-xs text-gray-500">â€¢ With Reasoning</span>' : ''}
                         </div>
                         <div class="text-sm text-gray-700">${escapedAnswer}</div>
                     </div>
@@ -226,18 +227,18 @@ function updateAIPanelContext(tabName) {
     const aiTitle = document.querySelector('#aiPanel h2');
     if (aiTitle) {
         const tabNames = {
-            'overview': '📊 Dashboard',
-            'email': '📬 Communications',
-            'personal': '💼 Personal',
-            'orders': '📈 Orders',
-            'compliance': '✅ Compliance',
-            'reimbursement': '💵 Reimbursement',
-            'costs': '💰 Costs',
-            'lab': '🔬 Lab',
-            'regional': '🗺️ Regional',
-            'forecasting': '🔮 Forecast',
-            'market': '📰 Market',
-            'milestones': '🎯 Projects'
+            'overview': 'ðŸ“Š Dashboard',
+            'email': 'ðŸ“¬ Communications',
+            'personal': 'ðŸ’¼ Personal',
+            'orders': 'ðŸ“ˆ Orders',
+            'compliance': 'âœ… Compliance',
+            'reimbursement': 'ðŸ’µ Reimbursement',
+            'costs': 'ðŸ’° Costs',
+            'lab': 'ðŸ”¬ Lab',
+            'regional': 'ðŸ—ºï¸ Regional',
+            'forecasting': 'ðŸ”® Forecast',
+            'market': 'ðŸ“° Market',
+            'milestones': 'ðŸŽ¯ Projects'
         };
         const displayName = tabNames[tabName] || tabName;
         aiTitle.innerHTML = `Ask Me Anything <span class="text-xs font-normal text-blue-600 ml-2">(${displayName})</span>`;
@@ -405,7 +406,7 @@ async function loadOverviewData() {
 
         // Update KPI cards
         document.getElementById('overview-orders').textContent = data.order_volume.monthly_orders.toLocaleString();
-        document.getElementById('overview-orders-growth').textContent = `↑ ${data.order_volume.growth_metrics.mom}% MoM`;
+        document.getElementById('overview-orders-growth').textContent = `â†‘ ${data.order_volume.growth_metrics.mom}% MoM`;
 
         document.getElementById('overview-compliance').textContent = `${(100 - data.compliance.overall_return_rate).toFixed(1)}%`;
         document.getElementById('overview-compliance-returns').textContent = `${data.compliance.total_returns} returns`;
@@ -430,7 +431,7 @@ async function loadOverviewData() {
             <div class="text-center mb-4">
                 <p class="text-sm text-gray-600">HCS Stock Price</p>
                 <p class="text-4xl font-bold ${data.stock.current_price.change >= 0 ? 'text-green-600' : 'text-red-600'}">$${data.stock.current_price.price}</p>
-                <p class="text-sm ${data.stock.current_price.change >= 0 ? 'text-green-600' : 'text-red-600'} mt-2">${data.stock.current_price.change >= 0 ? '↑' : '↓'} $${Math.abs(data.stock.current_price.change).toFixed(2)} (${data.stock.current_price.change_percentage}%)</p>
+                <p class="text-sm ${data.stock.current_price.change >= 0 ? 'text-green-600' : 'text-red-600'} mt-2">${data.stock.current_price.change >= 0 ? 'â†‘' : 'â†“'} $${Math.abs(data.stock.current_price.change).toFixed(2)} (${data.stock.current_price.change_percentage}%)</p>
             </div>
             <div class="space-y-2 text-sm border-t pt-4">
                 <div class="flex justify-between">
@@ -578,7 +579,7 @@ async function loadStockData() {
         document.getElementById('stockPrice').innerHTML = `
             <p class="text-xs text-gray-600">HCS Stock</p>
             <p class="text-xl font-bold ${data.change >= 0 ? 'text-green-600' : 'text-red-600'}">$${data.price}</p>
-            <p class="text-xs ${data.change >= 0 ? 'text-green-600' : 'text-red-600'}">${data.change >= 0 ? '↑' : '↓'} ${data.change_percentage}%</p>
+            <p class="text-xs ${data.change >= 0 ? 'text-green-600' : 'text-red-600'}">${data.change >= 0 ? 'â†‘' : 'â†“'} ${data.change_percentage}%</p>
         `;
     } catch (error) {
         console.error('Error rendering stock data:', error);
@@ -686,7 +687,7 @@ async function loadOrdersData() {
                     <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Monthly Orders</h3>
                         <p class="text-3xl font-bold text-blue-600">${data.monthly_orders.toLocaleString()}</p>
-                        <p class="text-xs text-green-600 mt-2">↑ ${data.growth_metrics.mom}% MoM</p>
+                        <p class="text-xs text-green-600 mt-2">â†‘ ${data.growth_metrics.mom}% MoM</p>
                     </div>
                     <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">YoY Growth</h3>
@@ -708,18 +709,18 @@ async function loadOrdersData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Order Volume Trend</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Order Volume Trend</h3>
                         <div class="h-80"><canvas id="ordersDetailChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Orders by Category</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Orders by Category</h3>
                         <div class="h-80"><canvas id="ordersCategoryChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Detailed Stats -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📋 Monthly Breakdown</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“‹ Monthly Breakdown</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50">
@@ -734,7 +735,7 @@ async function loadOrdersData() {
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-4 py-2">${t.period}</td>
                                         <td class="px-4 py-2 text-right font-semibold">${t.count.toLocaleString()}</td>
-                                        <td class="px-4 py-2 text-right ${t.growth >= 0 ? 'text-green-600' : 'text-red-600'}">${t.growth >= 0 ? '↑' : '↓'} ${Math.abs(t.growth)}%</td>
+                                        <td class="px-4 py-2 text-right ${t.growth >= 0 ? 'text-green-600' : 'text-red-600'}">${t.growth >= 0 ? 'â†‘' : 'â†“'} ${Math.abs(t.growth)}%</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -845,18 +846,18 @@ async function loadComplianceData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">✅ Compliance Trend</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">âœ… Compliance Trend</h3>
                         <div class="h-80"><canvas id="complianceTrendChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Return Reasons</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Return Reasons</h3>
                         <div class="h-80"><canvas id="complianceReasonsChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Top Issues -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚠️ Top Compliance Issues</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">âš ï¸ Top Compliance Issues</h3>
                     <div class="space-y-3">
                         ${data.top_return_reasons.map(reason => `
                             <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
@@ -974,7 +975,7 @@ async function loadReimbursementData() {
                     <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Reimbursement Rate</h3>
                         <p class="text-3xl font-bold text-purple-600">${data.reimbursement_percentage.toFixed(1)}%</p>
-                        <p class="text-xs text-green-600 mt-2">↑ ${data.growth_rate}% vs last month</p>
+                        <p class="text-xs text-green-600 mt-2">â†‘ ${data.growth_rate}% vs last month</p>
                     </div>
                     <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Claims Reimbursed</h3>
@@ -996,18 +997,18 @@ async function loadReimbursementData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">💵 Reimbursement Trend</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’µ Reimbursement Trend</h3>
                         <div class="h-80"><canvas id="reimbursementTrendChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 By Payer Type</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š By Payer Type</h3>
                         <div class="h-80"><canvas id="reimbursementPayerChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Payer Breakdown -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏥 Payer Performance</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ¥ Payer Performance</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50">
@@ -1150,18 +1151,18 @@ async function loadCostsData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Cost Trend</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’° Cost Trend</h3>
                         <div class="h-80"><canvas id="costsTrendChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Cost Breakdown</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Cost Breakdown</h3>
                         <div class="h-80"><canvas id="costsBreakdownChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Monthly Breakdown -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📅 Monthly Cost Analysis</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“… Monthly Cost Analysis</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50">
@@ -1311,11 +1312,11 @@ async function loadLabData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔬 TAT Trend</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ”¬ TAT Trend</h3>
                         <div class="h-80"><canvas id="labTatChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Tests by Type</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Tests by Type</h3>
                         <div class="h-80"><canvas id="labTestsChart"></canvas></div>
                     </div>
                 </div>
@@ -1323,7 +1324,7 @@ async function loadLabData() {
                 <!-- Capacity Metrics -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ Lab Capacity Utilization</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">âš™ï¸ Lab Capacity Utilization</h3>
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-sm mb-2">
@@ -1348,7 +1349,7 @@ async function loadLabData() {
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Performance Metrics</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Performance Metrics</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                                 <span class="text-sm text-gray-700">Efficiency Score</span>
@@ -1452,13 +1453,13 @@ async function loadRegionalData() {
             <div class="space-y-6">
                 <!-- Top Territories -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏆 Top Performing Territories</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ† Top Performing Territories</h3>
                     <div class="grid grid-cols-4 gap-4">
                         ${data.territories.slice(0, 4).map((territory, index) => `
                             <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-2xl font-bold text-blue-600">#${index + 1}</span>
-                                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">↑ ${territory.growth_percentage}%</span>
+                                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">â†‘ ${territory.growth_percentage}%</span>
                                 </div>
                                 <h4 class="font-bold text-gray-800 mb-1">${territory.territory_name}</h4>
                                 <p class="text-2xl font-bold text-blue-600">${territory.orders.toLocaleString()}</p>
@@ -1471,18 +1472,18 @@ async function loadRegionalData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🗺️ Orders by Territory</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ—ºï¸ Orders by Territory</h3>
                         <div class="h-80"><canvas id="regionalOrdersChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Growth Comparison</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Growth Comparison</h3>
                         <div class="h-80"><canvas id="regionalGrowthChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Detailed Territory Table -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 All Territories Performance</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š All Territories Performance</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50">
@@ -1504,7 +1505,7 @@ async function loadRegionalData() {
                                         <td class="px-4 py-2 text-right">$${(territory.revenue / 1000000).toFixed(1)}M</td>
                                         <td class="px-4 py-2 text-right">
                                             <span class="px-2 py-1 rounded-full text-xs font-semibold ${territory.growth_percentage >= 10 ? 'bg-green-100 text-green-700' : territory.growth_percentage >= 0 ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}">
-                                                ${territory.growth_percentage >= 0 ? '↑' : '↓'} ${Math.abs(territory.growth_percentage)}%
+                                                ${territory.growth_percentage >= 0 ? 'â†‘' : 'â†“'} ${Math.abs(territory.growth_percentage)}%
                                             </span>
                                         </td>
                                         <td class="px-4 py-2 text-center">
@@ -1610,7 +1611,7 @@ async function loadForecastingData() {
                     <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Next Quarter Forecast</h3>
                         <p class="text-3xl font-bold text-indigo-600">${(data.next_quarter_orders / 1000).toFixed(0)}K</p>
-                        <p class="text-xs text-green-600 mt-2">↑ ${data.forecast_growth}% projected</p>
+                        <p class="text-xs text-green-600 mt-2">â†‘ ${data.forecast_growth}% projected</p>
                     </div>
                     <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Revenue Forecast</h3>
@@ -1632,18 +1633,18 @@ async function loadForecastingData() {
                 <!-- Charts -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🔮 Order Forecast</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ”® Order Forecast</h3>
                         <div class="h-80"><canvas id="forecastOrdersChart"></canvas></div>
                     </div>
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Revenue Forecast</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ’° Revenue Forecast</h3>
                         <div class="h-80"><canvas id="forecastRevenueChart"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Forecast Details -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Quarterly Forecast Breakdown</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“Š Quarterly Forecast Breakdown</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead class="bg-gray-50">
@@ -1663,7 +1664,7 @@ async function loadForecastingData() {
                                         <td class="px-4 py-2 text-right">$${(quarter.revenue / 1000000).toFixed(2)}M</td>
                                         <td class="px-4 py-2 text-right">
                                             <span class="px-2 py-1 rounded-full text-xs font-semibold ${quarter.growth >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-                                                ${quarter.growth >= 0 ? '↑' : '↓'} ${Math.abs(quarter.growth)}%
+                                                ${quarter.growth >= 0 ? 'â†‘' : 'â†“'} ${Math.abs(quarter.growth)}%
                                             </span>
                                         </td>
                                         <td class="px-4 py-2 text-center">
@@ -1680,7 +1681,7 @@ async function loadForecastingData() {
 
                 <!-- Key Assumptions -->
                 <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📝 Key Assumptions</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ Key Assumptions</h3>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-white rounded-lg p-4">
                             <p class="text-sm text-gray-600 mb-2">Market Growth Rate</p>
@@ -1791,7 +1792,7 @@ async function loadMarketData() {
                 ${data.critical_alerts.length > 0 ? `
                     <div class="bg-red-50 border-2 border-red-500 rounded-xl p-6">
                         <h3 class="text-lg font-bold text-red-900 mb-4 flex items-center gap-2">
-                            <span class="text-2xl">🚨</span> Critical Market Alerts
+                            <span class="text-2xl">ðŸš¨</span> Critical Market Alerts
                         </h3>
                         <div class="space-y-3">
                             ${data.critical_alerts.map(alert => `
@@ -1805,7 +1806,7 @@ async function loadMarketData() {
 
                 <!-- Latest News -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">📰 Latest Market News</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“° Latest Market News</h3>
                     <div class="space-y-4">
                         ${data.latest_news.map(news => `
                             <div class="border-l-4 ${news.importance === 'high' ? 'border-red-500 bg-red-50' : 'border-blue-500 bg-blue-50'} p-4 rounded">
@@ -1827,7 +1828,7 @@ async function loadMarketData() {
 
                 <!-- Competitor Updates -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🏢 Competitor Activity</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ¢ Competitor Activity</h3>
                     <div class="space-y-4">
                         ${data.competitor_updates.map(update => `
                             <div class="border-l-4 ${update.impact_level === 'high' ? 'border-red-500 bg-red-50' : 'border-orange-500 bg-orange-50'} p-4 rounded">
@@ -1846,7 +1847,7 @@ async function loadMarketData() {
                 <!-- Market Trends -->
                 <div class="grid grid-cols-2 gap-6">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">📈 Market Share Trends</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸ“ˆ Market Share Trends</h3>
                         <div class="space-y-3">
                             ${data.market_trends.market_share.map(share => `
                                 <div>
@@ -1863,7 +1864,7 @@ async function loadMarketData() {
                     </div>
 
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Industry Insights</h3>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Industry Insights</h3>
                         <div class="space-y-3">
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                                 <p class="text-sm text-gray-700"><strong>Market Size:</strong> $${data.market_trends.market_size_billions}B</p>
@@ -1947,7 +1948,7 @@ async function loadMilestonesData() {
                 ${data.critical_items.length > 0 ? `
                     <div class="bg-orange-50 border-2 border-orange-500 rounded-xl p-6">
                         <h3 class="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
-                            <span class="text-2xl">⚠️</span> Critical Items Requiring Attention
+                            <span class="text-2xl">âš ï¸</span> Critical Items Requiring Attention
                         </h3>
                         <div class="space-y-2">
                             ${data.critical_items.map(item => `
@@ -1961,7 +1962,7 @@ async function loadMilestonesData() {
 
                 <!-- Active Projects -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Active Projects</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">ðŸŽ¯ Active Projects</h3>
                     <div class="space-y-4">
                         ${data.active_projects.map(project => `
                             <div class="border rounded-lg p-4 ${
@@ -2018,7 +2019,7 @@ async function loadMilestonesData() {
                                         ${project.key_milestones.map(milestone => `
                                             <div class="flex items-center gap-2 text-sm">
                                                 <span class="${milestone.status === 'completed' ? 'text-green-600' : milestone.status === 'in_progress' ? 'text-blue-600' : 'text-gray-400'}">
-                                                    ${milestone.status === 'completed' ? '✓' : milestone.status === 'in_progress' ? '◐' : '○'}
+                                                    ${milestone.status === 'completed' ? 'âœ“' : milestone.status === 'in_progress' ? 'â—' : 'â—‹'}
                                                 </span>
                                                 <span class="flex-1">${milestone.milestone_name}</span>
                                                 <span class="text-xs text-gray-500">${milestone.target_date}</span>
@@ -2064,7 +2065,7 @@ function generateMetricData(metric, period) {
     const labels = CONFIG.charts.doughnutLabels;
     const data = metricConfig.periods.map(p => {
         const baseValue = metricConfig.baseValues[p];
-        const variance = (Math.random() - 0.5) * 0.1; // ±5% variance
+        const variance = (Math.random() - 0.5) * 0.1; // Â±5% variance
         return baseValue * (1 + variance);
     });
 
@@ -2204,7 +2205,7 @@ function createMetricCharts() {
                 if (chart && chart.data.datasets[0]) {
                     // Slightly vary the data to simulate real-time updates
                     chart.data.datasets[0].data = chart.data.datasets[0].data.map(val => {
-                        const variance = (Math.random() - 0.5) * 0.02; // ±1% variance
+                        const variance = (Math.random() - 0.5) * 0.02; // Â±1% variance
                         return val * (1 + variance);
                     });
                     chart.update('none'); // Update without animation for smooth effect
@@ -2225,7 +2226,7 @@ function toggleReasoningWidget() {
 
     if (reasoningWidgetCollapsed) {
         content.classList.remove('hidden');
-        btn.textContent = '−';
+        btn.textContent = 'âˆ’';
         reasoningWidgetCollapsed = false;
     } else {
         content.classList.add('hidden');
@@ -2339,17 +2340,18 @@ async function askReasoning() {
             const answer = result.answer || result.text || 'No response received';
 
             // Escape HTML and convert newlines
-            const escapedAnswer = answer
+            let escapedAnswer = answer
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;')
-                .replace(/\n/g, '<br>');
+                .replace(/\\n/g, '<br>');
+                        escapedAnswer = escapedAnswer.replace(/(\\$[0-9,\\.]+|\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?%?\\b)/g, '<strong></strong>');
 
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
-                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs font-semibold text-purple-800">ðŸ¤– AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
@@ -2421,11 +2423,12 @@ async function askQuick(question) {
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;')
-                .replace(/\n/g, '<br>');
+                .replace(/\\n/g, '<br>');
+                        escapedAnswer = escapedAnswer.replace(/(\\$[0-9,\\.]+|\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?%?\\b)/g, '<strong></strong>');
 
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
-                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs font-semibold text-purple-800">ðŸ¤– AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
@@ -2455,3 +2458,5 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuickNotes();
     }, 1000);
 });
+
+

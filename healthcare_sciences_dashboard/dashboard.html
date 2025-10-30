@@ -26,7 +26,7 @@
             top: 145px;
             width: 20%;
             height: calc(100vh - 145px);
-            overflow-y: auto;
+            overflow-y: hidden; /* Only response section scrolls */
             z-index: 30;
         }
 
@@ -155,7 +155,7 @@
                     🚀 Ask AI Assistant
                 </button>
             </div>
-            <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
+            <div id="reasoningMessages" class="space-y-3 max-h-[calc(100vh-420px)] overflow-y-auto">
                 <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
                     <p class="text-xs text-purple-900 mb-2">
                         <span class="font-bold">👔 Executive Assistant:</span>
@@ -174,7 +174,7 @@
                     </div>
                 </div>
             </div>
-            <div id="daySummarySection" class="mt-4 space-y-2 max-h-[calc(100vh-650px)] overflow-y-auto">
+            <div id="daySummarySection" class="mt-4 space-y-2">
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
                     <h3 class="font-bold text-sm text-blue-900 mb-2">📊 Today's Executive Summary</h3>
                     <div id="daySummaryContent" class="space-y-1 text-xs">

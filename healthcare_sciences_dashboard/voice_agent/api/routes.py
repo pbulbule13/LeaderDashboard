@@ -14,6 +14,7 @@ except Exception:
     SystemSettings = None  # type: ignore
 import json
 from ..utils.email_query import parse_email_nl_to_gmail_query
+import base64
 
 # Initialize router
 router = APIRouter(prefix="/voice-agent", tags=["voice-agent"])
@@ -201,6 +202,25 @@ async def get_calendar_events(timeframe: str = "week"):
 
         events = await adapter.get_events(start_time=start, end_time=end)
         return {"events": events}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Voice Mode: Text-To-Speech (mock) ---
+class TTSRequest(BaseModel):
+    text: str
+    voice: str | None = None
+
+
+@router.post("/voice/tts")
+async def tts_synthesize(request: TTSRequest):
+    """Return base64-encoded audio for the given text using mock TTS adapter."""
+    try:
+        from voice_agent.adapters.voice.mock import MockTTS
+
+        tts = MockTTS()
+        audio_bytes, mime_type = await tts.synthesize(request.text, request.voice)
+        return {"audio_base64": base64.b64encode(audio_bytes).decode("utf-8"), "mime_type": mime_type}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
