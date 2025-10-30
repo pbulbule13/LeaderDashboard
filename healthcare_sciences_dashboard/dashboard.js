@@ -2439,7 +2439,7 @@ async function askReasoning() {
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
             `;
-            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
         } else {
             const errorMsg = document.createElement('div');
             errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
@@ -2516,7 +2516,7 @@ async function askQuick(question) {
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
             `;
-            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
+            messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}\n            try { if (fullVoiceMode) { ttsSpeak(answer); } } catch(e) {}
         } else {
             const errorMsg = document.createElement('div');
             errorMsg.className = 'bg-red-50 border border-red-200 rounded-lg p-3 mb-2';
@@ -2548,4 +2548,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function showToast(msg){const t=document.createElement('div');t.className='fixed bottom-4 right-4 bg-black text-white text-xs px-3 py-2 rounded shadow z-50 opacity-90';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.remove()},2500);}
+
+
 
