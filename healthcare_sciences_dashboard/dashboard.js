@@ -670,7 +670,7 @@ async function loadStockData() {
 
 // Email Functions
 function composeEmail() {
-    alert('Opening email composer...');
+    showToast('Opening email composer…');
 }
 
 function loadEmails(folder) {
@@ -678,20 +678,20 @@ function loadEmails(folder) {
 }
 
 function refreshEmails() {
-    alert('Refreshing emails...');
+    showToast('Refreshing emails…');
 }
 
 function aiSummarizeEmails() {
-    alert('AI is summarizing your inbox...');
+    showToast('Summarizing inbox…');
 }
 
 function aiPriorityEmails() {
-    alert('AI is finding priority emails...');
+    showToast('Finding priority emails…');
 }
 
 // Calendar Functions
 function scheduleNewMeeting() {
-    alert('Opening meeting scheduler...');
+    showToast('Opening meeting scheduler…');
 }
 
 function generateCalendar() {
@@ -2545,4 +2545,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
+
+function showToast(msg){const t=document.createElement('div');t.className='fixed bottom-4 right-4 bg-black text-white text-xs px-3 py-2 rounded shadow z-50 opacity-90';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.remove()},2500);}
 
