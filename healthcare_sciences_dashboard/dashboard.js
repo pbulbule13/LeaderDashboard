@@ -85,7 +85,64 @@ function speakText(text) {
     utterance.volume = 1.0;
     utterance.lang = 'en-US';
 
+    // Load and apply saved voice preference
+    const savedVoiceName = localStorage.getItem('preferredVoiceName');
+    if (savedVoiceName) {
+        const voices = synthesis.getVoices();
+        const preferredVoice = voices.find(voice => voice.name === savedVoiceName);
+        if (preferredVoice) {
+            utterance.voice = preferredVoice;
+            console.log('Using saved voice:', preferredVoice.name);
+        }
+    }
+
     synthesis.speak(utterance);
+}
+
+// Function to save voice preference
+function saveVoicePreference(voiceName) {
+    localStorage.setItem('preferredVoiceName', voiceName);
+    console.log('Voice preference saved:', voiceName);
+}
+
+// Function to handle voice change
+function handleVoiceChange(voiceName) {
+    if (voiceName) {
+        saveVoicePreference(voiceName);
+        // Test the voice
+        speakText('Voice changed successfully. This is how I will sound.');
+    }
+}
+
+// Function to populate voice selector
+function populateVoiceSelector() {
+    const voiceSelector = document.getElementById('voiceSelector');
+    if (!voiceSelector) return;
+
+    const voices = synthesis.getVoices();
+    const savedVoiceName = localStorage.getItem('preferredVoiceName');
+
+    // Clear existing options
+    voiceSelector.innerHTML = '';
+
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Default Voice';
+    voiceSelector.appendChild(defaultOption);
+
+    // Add all available voices
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        if (voice.name === savedVoiceName) {
+            option.selected = true;
+        }
+        voiceSelector.appendChild(option);
+    });
+
+    console.log(`Loaded ${voices.length} voices`);
 }
 
 // Set current date
@@ -100,6 +157,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadStockData();
     renderNotes();
     generateCalendar();
+
+    // Load voices when available
+    if (synthesis) {
+        // Chrome/Edge load voices asynchronously
+        if (synthesis.getVoices().length > 0) {
+            populateVoiceSelector();
+        }
+        synthesis.onvoiceschanged = () => {
+            populateVoiceSelector();
+        };
+    }
 
     // Auto-refresh based on config
     if (CONFIG.features.autoRefresh) {
@@ -2061,6 +2129,18 @@ async function loadMilestonesData() {
         if (!data.active_projects) {
             data.active_projects = [];
         }
+        if (!data.total_projects && data.active_projects) {
+            data.total_projects = data.active_projects.length;
+        }
+        if (!data.projects_on_track && data.active_projects) {
+            data.projects_on_track = data.active_projects.filter(p => p.overall_status === 'on_track').length;
+        }
+        if (!data.projects_at_risk && data.active_projects) {
+            data.projects_at_risk = data.active_projects.filter(p => p.overall_status === 'at_risk').length;
+        }
+        if (!data.projects_delayed && data.active_projects) {
+            data.projects_delayed = data.active_projects.filter(p => p.overall_status === 'delayed').length;
+        }
 
         container.innerHTML = `
             <div class="space-y-6">
@@ -2068,28 +2148,28 @@ async function loadMilestonesData() {
                 <div class="grid grid-cols-4 gap-6">
                     <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Total Projects</h3>
-                        <p class="text-3xl font-bold text-blue-600">${data.total_projects}</p>
+                        <p class="text-3xl font-bold text-blue-600">${data.total_projects || 0}</p>
                         <p class="text-xs text-gray-500 mt-2">Active projects</p>
                     </div>
                     <div class="bg-white border border-green-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">On Track</h3>
-                        <p class="text-3xl font-bold text-green-600">${data.projects_on_track}</p>
-                        <p class="text-xs text-gray-500 mt-2">${((data.projects_on_track / data.total_projects) * 100).toFixed(0)}% of total</p>
+                        <p class="text-3xl font-bold text-green-600">${data.projects_on_track || 0}</p>
+                        <p class="text-xs text-gray-500 mt-2">${data.total_projects > 0 ? Math.round((data.projects_on_track / data.total_projects) * 100) : 0}% of total</p>
                     </div>
                     <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">At Risk</h3>
-                        <p class="text-3xl font-bold text-orange-600">${data.projects_at_risk}</p>
+                        <p class="text-3xl font-bold text-orange-600">${data.projects_at_risk || 0}</p>
                         <p class="text-xs text-gray-500 mt-2">Need attention</p>
                     </div>
                     <div class="bg-white border border-red-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-sm text-gray-600 mb-2">Delayed</h3>
-                        <p class="text-3xl font-bold text-red-600">${data.projects_delayed}</p>
+                        <p class="text-3xl font-bold text-red-600">${data.projects_delayed || 0}</p>
                         <p class="text-xs text-gray-500 mt-2">Behind schedule</p>
                     </div>
                 </div>
 
                 <!-- Critical Items -->
-                ${data.critical_items.length > 0 ? `
+                ${data.critical_items && data.critical_items.length > 0 ? `
                     <div class="bg-orange-50 border-2 border-orange-500 rounded-xl p-6">
                         <h3 class="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
                             <span class="text-2xl">⚠️</span> Critical Items Requiring Attention
@@ -2107,73 +2187,87 @@ async function loadMilestonesData() {
                 <!-- Active Projects -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Active Projects</h3>
-                    <div class="space-y-4">
-                        ${data.active_projects.map(project => `
-                            <div class="border rounded-lg p-4 ${
-                                project.overall_status === 'on_track' ? 'border-green-200 bg-green-50' :
-                                project.overall_status === 'at_risk' ? 'border-orange-200 bg-orange-50' :
-                                'border-red-200 bg-red-50'
-                            }">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="flex-1">
-                                        <h4 class="font-bold text-gray-900">${project.project_name}</h4>
-                                        <p class="text-sm text-gray-600 mt-1">${project.description}</p>
+                    ${data.active_projects && data.active_projects.length > 0 ? `
+                        <div class="space-y-4">
+                            ${data.active_projects.map(project => `
+                                <div class="border rounded-lg p-4 ${
+                                    project.overall_status === 'on_track' ? 'border-green-200 bg-green-50' :
+                                    project.overall_status === 'at_risk' ? 'border-orange-200 bg-orange-50' :
+                                    'border-red-200 bg-red-50'
+                                }">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="flex-1">
+                                            <h4 class="font-bold text-gray-900">${project.project_name}</h4>
+                                            ${project.description ? `<p class="text-sm text-gray-600 mt-1">${project.description}</p>` : ''}
+                                        </div>
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                                            project.overall_status === 'on_track' ? 'bg-green-100 text-green-700' :
+                                            project.overall_status === 'at_risk' ? 'bg-orange-100 text-orange-700' :
+                                            'bg-red-100 text-red-700'
+                                        }">
+                                            ${project.overall_status.replace('_', ' ').toUpperCase()}
+                                        </span>
                                     </div>
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${
-                                        project.overall_status === 'on_track' ? 'bg-green-100 text-green-700' :
-                                        project.overall_status === 'at_risk' ? 'bg-orange-100 text-orange-700' :
-                                        'bg-red-100 text-red-700'
-                                    }">
-                                        ${project.overall_status.replace('_', ' ').toUpperCase()}
-                                    </span>
-                                </div>
 
-                                <div class="mb-3">
-                                    <div class="flex justify-between text-sm mb-1">
-                                        <span class="text-gray-600">Progress</span>
-                                        <span class="font-bold">${project.completion_percentage}%</span>
+                                    <div class="mb-3">
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span class="text-gray-600">Progress</span>
+                                            <span class="font-bold">${project.completion_percentage}%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="${
+                                                project.overall_status === 'on_track' ? 'bg-green-500' :
+                                                project.overall_status === 'at_risk' ? 'bg-orange-500' :
+                                                'bg-red-500'
+                                            } h-2 rounded-full" style="width: ${project.completion_percentage}%"></div>
+                                        </div>
                                     </div>
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="${
-                                            project.overall_status === 'on_track' ? 'bg-green-500' :
-                                            project.overall_status === 'at_risk' ? 'bg-orange-500' :
-                                            'bg-red-500'
-                                        } h-2 rounded-full" style="width: ${project.completion_percentage}%"></div>
-                                    </div>
-                                </div>
 
-                                <div class="grid grid-cols-3 gap-3 mb-3">
-                                    <div class="text-sm">
-                                        <p class="text-gray-600">Start Date</p>
-                                        <p class="font-semibold">${project.start_date}</p>
-                                    </div>
-                                    <div class="text-sm">
-                                        <p class="text-gray-600">Target End</p>
-                                        <p class="font-semibold">${project.target_end_date}</p>
-                                    </div>
-                                    <div class="text-sm">
-                                        <p class="text-gray-600">Owner</p>
-                                        <p class="font-semibold">${project.project_owner}</p>
-                                    </div>
-                                </div>
+                                    ${project.start_date || project.target_end_date || project.project_owner ? `
+                                        <div class="grid grid-cols-3 gap-3 mb-3">
+                                            ${project.start_date ? `
+                                                <div class="text-sm">
+                                                    <p class="text-gray-600">Start Date</p>
+                                                    <p class="font-semibold">${project.start_date}</p>
+                                                </div>
+                                            ` : ''}
+                                            ${project.target_end_date ? `
+                                                <div class="text-sm">
+                                                    <p class="text-gray-600">Target End</p>
+                                                    <p class="font-semibold">${project.target_end_date}</p>
+                                                </div>
+                                            ` : ''}
+                                            ${project.project_owner ? `
+                                                <div class="text-sm">
+                                                    <p class="text-gray-600">Owner</p>
+                                                    <p class="font-semibold">${project.project_owner}</p>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    ` : ''}
 
-                                <div class="border-t pt-3">
-                                    <p class="text-sm font-semibold text-gray-700 mb-2">Key Milestones:</p>
-                                    <div class="space-y-2">
-                                        ${project.key_milestones.map(milestone => `
-                                            <div class="flex items-center gap-2 text-sm">
-                                                <span class="${milestone.status === 'completed' ? 'text-green-600' : milestone.status === 'in_progress' ? 'text-blue-600' : 'text-gray-400'}">
-                                                    ${milestone.status === 'completed' ? '✓' : milestone.status === 'in_progress' ? '◐' : '○'}
-                                                </span>
-                                                <span class="flex-1">${milestone.milestone_name}</span>
-                                                <span class="text-xs text-gray-500">${milestone.target_date}</span>
+                                    ${project.key_milestones && project.key_milestones.length > 0 ? `
+                                        <div class="border-t pt-3">
+                                            <p class="text-sm font-semibold text-gray-700 mb-2">Key Milestones:</p>
+                                            <div class="space-y-2">
+                                                ${project.key_milestones.map(milestone => `
+                                                    <div class="flex items-center gap-2 text-sm">
+                                                        <span class="${milestone.status === 'completed' ? 'text-green-600' : milestone.status === 'in_progress' ? 'text-blue-600' : 'text-gray-400'}">
+                                                            ${milestone.status === 'completed' ? '✓' : milestone.status === 'in_progress' ? '◐' : '○'}
+                                                        </span>
+                                                        <span class="flex-1">${milestone.milestone_name}</span>
+                                                        <span class="text-xs text-gray-500">${milestone.target_date}</span>
+                                                    </div>
+                                                `).join('')}
                                             </div>
-                                        `).join('')}
-                                    </div>
+                                        </div>
+                                    ` : ''}
                                 </div>
-                            </div>
-                        `).join('')}
-                    </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <p class="text-gray-500 text-center py-8">No active projects at this time</p>
+                    `}
                 </div>
             </div>
         `;
@@ -2444,45 +2538,77 @@ async function askReasoning() {
 
     // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-gray-100 border border-gray-300 rounded-lg p-3 mb-2';
+    userMsg.className = 'bg-blue-50 border border-blue-100 rounded-lg p-3 mb-2';
     userMsg.innerHTML = `<p class="text-xs font-semibold text-gray-700">You:</p><p class="text-xs text-gray-800">${question}</p>`;
     messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
     // Add loading at the TOP
     const loadingMsg = document.createElement('div');
-    loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
+    loadingMsg.className = 'bg-blue-50 rounded-lg p-3 mb-2';
     loadingMsg.id = 'loading-reasoning';
-    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
     messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
 
     input.value = '';
 
     try {
-        // Use tab-specific Q&A endpoint with context
-        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                question: question,
-                tab: currentTab,
-                tab_data: currentTabData
-            })
-        });
+        let result;
+        try {
+            // Use tab-specific Q&A endpoint with context
+            const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: question,
+                    tab: currentTab,
+                    tab_data: currentTabData
+                })
+            });
 
-        // Check if response is JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Server returned non-JSON response. The API endpoint may be unavailable.');
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('API unavailable');
+            }
+
+            result = await response.json();
+        } catch (apiError) {
+            // Fallback to smart mock response when API is unavailable
+            console.log('API unavailable, using smart mock response:', apiError);
+
+            // Use generateAIResponse if available, otherwise use simple fallback
+            let mockResponse;
+            try {
+                if (typeof generateAIResponse === 'function') {
+                    mockResponse = generateAIResponse(question);
+                } else {
+                    mockResponse = {
+                        response: `I understand you're asking about "${question}". The AI backend is currently offline. Please start the backend server with 'python run_app.py' to get intelligent AI-powered responses. In the meantime, you can view the dashboard data and test metrics.`,
+                        agent_used: 'Offline Mode'
+                    };
+                }
+            } catch (genError) {
+                console.error('Error generating mock response:', genError);
+                mockResponse = {
+                    response: `The AI backend is currently offline. Please start the backend server with 'python run_app.py' to get AI-powered responses.`,
+                    agent_used: 'Offline Mode'
+                };
+            }
+
+            result = {
+                success: true,
+                answer: mockResponse.response + '\n\n💡 Note: This is a test response. For full AI analysis, start the backend with: python run_app.py',
+                tab_name: currentTab,
+                model: 'Test Mode (' + mockResponse.agent_used + ')'
+            };
         }
-
-        const result = await response.json();
 
         console.log('Ask Reasoning Response:', result);
 
         // Remove loading
         document.getElementById('loading-reasoning')?.remove();
 
-        if (result.success) {
+        if (result.success || result.answer) {
             // Add AI response at the TOP
             const aiMsg = document.createElement('div');
             aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
@@ -2535,37 +2661,75 @@ async function askQuick(question) {
 
     // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-gray-100 border border-gray-300 rounded-lg p-3 mb-2';
+    userMsg.className = 'bg-blue-50 border border-blue-100 rounded-lg p-3 mb-2';
     userMsg.innerHTML = `<p class="text-xs font-semibold text-gray-700">You:</p><p class="text-xs text-gray-800">${question}</p>`;
     messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
     // Add loading at the TOP
     const loadingMsg = document.createElement('div');
-    loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
+    loadingMsg.className = 'bg-blue-50 rounded-lg p-3 mb-2';
     loadingMsg.id = 'loading-quick';
-    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
     messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
 
     try {
-        // Use tab-specific Q&A endpoint with context
-        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                question: question,
-                tab: currentTab,
-                tab_data: currentTabData
-            })
-        });
+        let result;
+        try {
+            // Use tab-specific Q&A endpoint with context
+            const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: question,
+                    tab: currentTab,
+                    tab_data: currentTabData
+                })
+            });
 
-        const result = await response.json();
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('API unavailable');
+            }
+
+            result = await response.json();
+        } catch (apiError) {
+            // Fallback to smart mock response when API is unavailable
+            console.log('API unavailable for quick question, using smart mock response:', apiError);
+
+            // Use generateAIResponse if available, otherwise use simple fallback
+            let mockResponse;
+            try {
+                if (typeof generateAIResponse === 'function') {
+                    mockResponse = generateAIResponse(question);
+                } else {
+                    mockResponse = {
+                        response: `I understand you're asking about "${question}". The AI backend is currently offline. Please start the backend server with 'python run_app.py' to get intelligent AI-powered responses.`,
+                        agent_used: 'Offline Mode'
+                    };
+                }
+            } catch (genError) {
+                console.error('Error generating mock response:', genError);
+                mockResponse = {
+                    response: `The AI backend is currently offline. Please start the backend server with 'python run_app.py' to get AI-powered responses.`,
+                    agent_used: 'Offline Mode'
+                };
+            }
+
+            result = {
+                success: true,
+                answer: mockResponse.response + '\n\n💡 Note: This is a test response. For full AI analysis, start the backend with: python run_app.py',
+                tab_name: currentTab,
+                model: 'Test Mode (' + mockResponse.agent_used + ')'
+            };
+        }
 
         console.log('Ask Quick Response:', result);
 
         // Remove loading
         document.getElementById('loading-quick')?.remove();
 
-        if (result.success) {
+        if (result.success || result.answer) {
             // Add AI response at the TOP
             const aiMsg = document.createElement('div');
             aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';

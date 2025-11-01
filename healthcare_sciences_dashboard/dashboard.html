@@ -98,7 +98,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-blue-50">
     <!-- Header -->
     <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-full mx-auto px-6 py-3">
@@ -124,17 +124,17 @@
             </div>
             <div class="flex gap-1 mt-4 border-b overflow-x-auto">
                 <button onclick="switchTab('overview')" id="tab-overview" class="px-4 py-2 text-sm tab-active whitespace-nowrap rounded-t">📊 Dashboard</button>
-                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📬 Communications</button>
-                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💼 Personal</button>
-                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📈 Orders</button>
-                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">✅ Compliance</button>
-                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💵 Reimbursement</button>
-                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">💰 Costs</button>
-                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔬 Lab</button>
-                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🗺️ Regional</button>
-                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🔮 Forecast</button>
-                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">📰 Market</button>
-                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-gray-50 whitespace-nowrap rounded-t">🎯 Projects</button>
+                <button onclick="switchTab('email')" id="tab-email" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">📬 Communications</button>
+                <button onclick="switchTab('personal')" id="tab-personal" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">💼 Personal</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">📈 Orders</button>
+                <button onclick="switchTab('compliance')" id="tab-compliance" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">✅ Compliance</button>
+                <button onclick="switchTab('reimbursement')" id="tab-reimbursement" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">💵 Reimbursement</button>
+                <button onclick="switchTab('costs')" id="tab-costs" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">💰 Costs</button>
+                <button onclick="switchTab('lab')" id="tab-lab" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">🔬 Lab</button>
+                <button onclick="switchTab('regional')" id="tab-regional" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">🗺️ Regional</button>
+                <button onclick="switchTab('forecasting')" id="tab-forecasting" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">🔮 Forecast</button>
+                <button onclick="switchTab('market')" id="tab-market" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">📰 Market</button>
+                <button onclick="switchTab('milestones')" id="tab-milestones" class="px-4 py-2 text-sm hover:bg-blue-50 whitespace-nowrap rounded-t">🎯 Projects</button>
             </div>
         </div>
     </nav>
@@ -142,24 +142,24 @@
     <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
     <div class="ai-sidebar bg-white border-r-2 border-gray-200 shadow-lg">
         <div class="p-4">
-            <div class="bg-gray-100 border border-gray-300 px-4 py-3 rounded-lg font-bold mb-4 shadow-sm">
+            <div class="bg-blue-50 border border-blue-100 px-4 py-3 rounded-lg font-bold mb-4 shadow-sm">
                 <span class="text-lg text-gray-800">👔 CEO Executive Assistant</span>
                 <p class="text-xs mt-1 text-gray-600">AI-powered insights across all departments</p>
             </div>
             <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
+                <button onclick="analyzeCurrentPage()" class="w-full bg-blue-100 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
                 <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
                 <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
-                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
+                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-blue-100 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
             </div>
-            <div class="bg-gray-50 rounded-lg shadow-sm p-3 mb-4 border border-gray-200">
+            <div class="bg-blue-50 rounded-lg shadow-sm p-3 mb-4 border border-blue-100">
                 <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
-                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-gray-400" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
+                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-blue-100 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-blue-200" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
                 <div class="flex gap-2 mt-2">
-                    <button onclick="startVoiceInput()" id="voiceBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1">
+                    <button onclick="startVoiceInput()" id="voiceBtn" class="bg-blue-100 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1">
                         🎤 Voice
                     </button>
-                    <button onclick="askReasoning()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+                    <button onclick="askReasoning()" class="flex-1 bg-blue-100 hover:bg-blue-100 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
                         🚀 Ask AI
                     </button>
                 </div>
@@ -167,9 +167,15 @@
                     <input type="checkbox" id="voiceResponseEnabled" class="rounded">
                     <label for="voiceResponseEnabled" class="text-xs text-gray-600">Enable voice response</label>
                 </div>
+                <div class="mt-2">
+                    <label for="voiceSelector" class="text-xs text-gray-600 block mb-1">Select Voice:</label>
+                    <select id="voiceSelector" class="w-full px-2 py-1 border border-blue-100 rounded text-xs" onchange="handleVoiceChange(this.value)">
+                        <option value="">Loading voices...</option>
+                    </select>
+                </div>
             </div>
             <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 shadow-sm">
                     <p class="text-xs text-gray-700 mb-2">
                         <span class="font-bold">👔 Executive Assistant:</span>
                     </p>
@@ -217,7 +223,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
+                <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 shadow-sm">
                     <h3 class="font-bold text-sm text-gray-700 mb-2">💡 Key Highlights</h3>
                     <ul class="space-y-1 text-xs text-gray-700">
                         <li>• Orders up 15.2% - Strong regional performance</li>
@@ -241,9 +247,9 @@
                         <h3 class="text-sm font-bold text-gray-800">📈 Orders</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="orders" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="orders" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="orders" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartOrders"></canvas></div>
@@ -255,9 +261,9 @@
                         <h3 class="text-sm font-bold text-gray-800">💵 Reimbursement</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="reimbursement" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
@@ -269,9 +275,9 @@
                         <h3 class="text-sm font-bold text-gray-800">✅ Compliance</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="compliance" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="compliance" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="compliance" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartCompliance"></canvas></div>
@@ -285,9 +291,9 @@
                         <h3 class="text-sm font-bold text-gray-800">🔬 Lab TAT</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="lab" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="lab" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="lab" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartLab"></canvas></div>
@@ -299,9 +305,9 @@
                         <h3 class="text-sm font-bold text-gray-800">💰 Operating Costs</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="costs" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="costs" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="costs" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartCosts"></canvas></div>
@@ -313,9 +319,9 @@
                         <h3 class="text-sm font-bold text-gray-800">🔮 Forecast</h3>
                         <div class="flex gap-1">
                             <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="forecast" data-period="day">D</button>
-                            <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
-                            <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
-                            <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
+                            <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="forecast" data-period="week">W</button>
+                            <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="forecast" data-period="month">M</button>
+                            <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
                         </div>
                     </div>
                     <div class="h-48"><canvas id="chartForecast"></canvas></div>
@@ -331,22 +337,22 @@
                         <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
                     </div>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
-                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
-                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">JD</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">JD</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Q4 Financial Review</p>
                                 <p class="text-gray-500 truncate">Meeting scheduled for tomorrow...</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
-                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">SK</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">SK</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Board Presentation</p>
                                 <p class="text-gray-500 truncate">Slides attached for review...</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
-                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">MJ</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
+                            <div class="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">MJ</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Regulatory Update</p>
                                 <p class="text-gray-500 truncate">FDA submission timeline...</p>
@@ -359,21 +365,21 @@
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('calendar')">
                     <h3 class="text-sm font-bold text-gray-800 mb-3">📅 Today's Schedule</h3>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
-                        <div class="flex gap-2 p-2 bg-gray-50 rounded border-l-4 border-gray-400">
+                        <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-200">
                             <div class="font-semibold text-gray-600 whitespace-nowrap">9:00 AM</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Executive Team Meeting</p>
                                 <p class="text-gray-500">Conference Room A</p>
                             </div>
                         </div>
-                        <div class="flex gap-2 p-2 bg-gray-50 rounded border-l-4 border-gray-400">
+                        <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-200">
                             <div class="font-semibold text-gray-600 whitespace-nowrap">11:30 AM</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Investor Call</p>
                                 <p class="text-gray-500">Virtual</p>
                             </div>
                         </div>
-                        <div class="flex gap-2 p-2 bg-gray-50 rounded border-l-4 border-gray-400">
+                        <div class="flex gap-2 p-2 bg-blue-50 rounded border-l-4 border-blue-200">
                             <div class="font-semibold text-gray-600 whitespace-nowrap">2:00 PM</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Strategy Review</p>
@@ -729,7 +735,7 @@
                             </div>
 
                             <!-- Tuesday -->
-                            <div class="border-l-4 border-gray-400 p-3 rounded bg-gray-50">
+                            <div class="border-l-4 border-blue-200 p-3 rounded bg-blue-50">
                                 <p class="text-xs font-semibold text-gray-800">TUESDAY - Oct 28</p>
                                 <div class="mt-2 space-y-2">
                                     <div class="flex gap-2">
@@ -744,7 +750,7 @@
                             </div>
 
                             <!-- Wednesday -->
-                            <div class="border-l-4 border-gray-400 p-3 rounded bg-gray-50">
+                            <div class="border-l-4 border-blue-200 p-3 rounded bg-blue-50">
                                 <p class="text-xs font-semibold text-gray-800">WEDNESDAY - Oct 29</p>
                                 <div class="mt-2">
                                     <div class="flex gap-2">
@@ -905,7 +911,7 @@
                         </button>
                     </div>
 
-                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
                         <h4 class="font-semibold text-gray-800 mb-3">🏃 Today's Exercise</h4>
                         <div class="space-y-2">
                             <div class="bg-white rounded-lg p-3">
@@ -925,19 +931,19 @@
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">✅ Personal Tasks</h3>
                         <div class="space-y-2 mb-4">
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                            <div class="flex items-center gap-3 p-2 hover:bg-blue-50 rounded">
                                 <input type="checkbox" checked class="w-4 h-4 text-blue-600">
                                 <span class="text-sm text-gray-400 line-through">Review quarterly goals</span>
                             </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                            <div class="flex items-center gap-3 p-2 hover:bg-blue-50 rounded">
                                 <input type="checkbox" class="w-4 h-4 text-blue-600">
                                 <span class="text-sm text-gray-800">Schedule annual physical</span>
                             </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                            <div class="flex items-center gap-3 p-2 hover:bg-blue-50 rounded">
                                 <input type="checkbox" class="w-4 h-4 text-blue-600">
                                 <span class="text-sm text-gray-800">Plan family vacation</span>
                             </div>
-                            <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                            <div class="flex items-center gap-3 p-2 hover:bg-blue-50 rounded">
                                 <input type="checkbox" class="w-4 h-4 text-blue-600">
                                 <span class="text-sm text-gray-800">Update will and estate plan</span>
                             </div>
@@ -985,16 +991,16 @@
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Quick Actions</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
+                            <button class="bg-gray-50 hover:bg-blue-50 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 📞 Call Assistant
                             </button>
-                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
+                            <button class="bg-gray-50 hover:bg-blue-50 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 🚗 Book Car
                             </button>
-                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
+                            <button class="bg-gray-50 hover:bg-blue-50 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 ✈️ Travel Plans
                             </button>
-                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
+                            <button class="bg-gray-50 hover:bg-blue-50 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 🍽️ Reservations
                             </button>
                         </div>
