@@ -251,16 +251,15 @@ function createOverviewCharts(data) {
     // Orders Trend Chart
     const ordersCtx = document.getElementById('overviewOrdersChart').getContext('2d');
     charts.overviewOrders = new Chart(ordersCtx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: data.order_volume.trend_data.map(t => t.period),
             datasets: [{
                 label: 'Orders',
                 data: data.order_volume.trend_data.map(t => t.count),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4,
-                fill: true
+                backgroundColor: 'rgba(156, 163, 175, 0.7)',
+                borderColor: 'rgb(107, 114, 128)',
+                borderWidth: 1
             }]
         },
         options: {
@@ -687,7 +686,7 @@ function generateCalendar() {
     for (let day = 1; day <= daysInMonth; day++) {
         const isToday = day === today.getDate();
         html += `
-            <div class="p-2 text-center hover:bg-blue-50 rounded cursor-pointer ${isToday ? 'bg-blue-600 text-white font-bold' : 'text-gray-700'}">
+            <div class="p-2 text-center hover:bg-gray-100 rounded cursor-pointer ${isToday ? 'bg-gray-700 text-white font-bold' : 'text-gray-700'}">
                 ${day}
             </div>
         `;
@@ -932,29 +931,34 @@ async function loadComplianceData() {
         // Create charts
         const trendCtx = document.getElementById('complianceTrendChart').getContext('2d');
         new Chart(trendCtx, {
-            type: 'line',
+            type: 'doughnut',
             data: {
                 labels: data.monthly_trend.map(t => t.month),
                 datasets: [{
                     label: 'Compliance Rate',
                     data: data.monthly_trend.map(t => 100 - t.return_rate),
-                    borderColor: '#22C55E',
-                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    tension: 0.4,
-                    fill: true
+                    backgroundColor: [
+                        'rgba(156, 163, 175, 0.9)',
+                        'rgba(156, 163, 175, 0.75)',
+                        'rgba(156, 163, 175, 0.6)',
+                        'rgba(156, 163, 175, 0.45)',
+                        'rgba(156, 163, 175, 0.3)',
+                        'rgba(156, 163, 175, 0.15)'
+                    ],
+                    borderColor: 'rgb(107, 114, 128)',
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 95,
-                        max: 100,
-                        ticks: {
-                            callback: (value) => value + '%'
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 10 },
+                            padding: 10
                         }
                     }
                 }
@@ -1102,8 +1106,8 @@ async function loadReimbursementData() {
                 datasets: [{
                     label: 'Reimbursement Rate',
                     data: data.monthly_trend.map(t => t.reimbursement_percentage),
-                    borderColor: '#A855F7',
-                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    borderColor: 'rgb(107, 114, 128)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.3)',
                     tension: 0.4,
                     fill: true
                 }]
@@ -1432,14 +1436,14 @@ async function loadLabData() {
                 datasets: [{
                     label: 'Average TAT (hours)',
                     data: data.turnaround_trend.map(t => t.avg_hours),
-                    borderColor: '#F97316',
-                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    borderColor: 'rgb(107, 114, 128)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.3)',
                     tension: 0.4,
                     fill: true
                 }, {
                     label: 'Target',
                     data: data.turnaround_trend.map(() => data.target_turnaround_hours),
-                    borderColor: '#22C55E',
+                    borderColor: 'rgb(156, 163, 175)',
                     borderDash: [5, 5],
                     borderWidth: 2,
                     pointRadius: 0
@@ -1447,7 +1451,8 @@ async function loadLabData() {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true, position: 'bottom' } }
             }
         });
 
@@ -1753,34 +1758,37 @@ async function loadForecastingData() {
         // Create charts
         const ordersCtx = document.getElementById('forecastOrdersChart').getContext('2d');
         new Chart(ordersCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.quarterly_forecast.map(q => q.quarter),
                 datasets: [{
                     label: 'Forecast',
                     data: data.quarterly_forecast.map(q => q.orders),
-                    borderColor: '#6366F1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    tension: 0.4,
-                    fill: true
+                    backgroundColor: 'rgba(156, 163, 175, 0.7)',
+                    borderColor: 'rgb(107, 114, 128)',
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                indexAxis: 'y',
                 plugins: { legend: { display: false } }
             }
         });
 
         const revenueCtx = document.getElementById('forecastRevenueChart').getContext('2d');
         new Chart(revenueCtx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: data.quarterly_forecast.map(q => q.quarter),
                 datasets: [{
                     label: 'Revenue Forecast',
                     data: data.quarterly_forecast.map(q => q.revenue / 1000000),
-                    backgroundColor: '#A855F7'
+                    borderColor: 'rgb(107, 114, 128)',
+                    backgroundColor: 'rgba(156, 163, 175, 0.3)',
+                    tension: 0.4,
+                    fill: true
                 }]
             },
             options: {
@@ -1920,7 +1928,7 @@ async function loadMarketData() {
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">🎯 Industry Insights</h3>
                         <div class="space-y-3">
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div class="bg-gray-100 border border-gray-300 rounded-lg p-3">
                                 <p class="text-sm text-gray-700"><strong>Market Size:</strong> $${data.market_trends.market_size_billions}B</p>
                             </div>
                             <div class="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -2354,15 +2362,15 @@ async function askReasoning() {
 
     // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2';
-    userMsg.innerHTML = `<p class="text-xs font-semibold text-blue-800">You:</p><p class="text-xs text-gray-800">${question}</p>`;
+    userMsg.className = 'bg-gray-100 border border-gray-300 rounded-lg p-3 mb-2';
+    userMsg.innerHTML = `<p class="text-xs font-semibold text-gray-700">You:</p><p class="text-xs text-gray-800">${question}</p>`;
     messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
     // Add loading at the TOP
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
     loadingMsg.id = 'loading-reasoning';
-    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
     messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
 
     input.value = '';
@@ -2389,7 +2397,7 @@ async function askReasoning() {
         if (result.success) {
             // Add AI response at the TOP
             const aiMsg = document.createElement('div');
-            aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 mb-2';
+            aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
 
             const answer = result.answer || result.text || 'No response received';
 
@@ -2404,7 +2412,7 @@ async function askReasoning() {
 
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
-                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs font-semibold text-gray-700">🤖 AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
@@ -2432,15 +2440,15 @@ async function askQuick(question) {
 
     // Add user question at the TOP (insert before first child)
     const userMsg = document.createElement('div');
-    userMsg.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2';
-    userMsg.innerHTML = `<p class="text-xs font-semibold text-blue-800">You:</p><p class="text-xs text-gray-800">${question}</p>`;
+    userMsg.className = 'bg-gray-100 border border-gray-300 rounded-lg p-3 mb-2';
+    userMsg.innerHTML = `<p class="text-xs font-semibold text-gray-700">You:</p><p class="text-xs text-gray-800">${question}</p>`;
     messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
 
     // Add loading at the TOP
     const loadingMsg = document.createElement('div');
     loadingMsg.className = 'bg-gray-50 rounded-lg p-3 mb-2';
     loadingMsg.id = 'loading-quick';
-    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
+    loadingMsg.innerHTML = '<div class="flex items-center gap-2"><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style="animation-delay: 0.2s"></div><span class="text-xs text-gray-600 ml-2">Analyzing...</span></div>';
     messagesDiv.insertBefore(loadingMsg, messagesDiv.firstChild);
 
     try {
@@ -2465,7 +2473,7 @@ async function askQuick(question) {
         if (result.success) {
             // Add AI response at the TOP
             const aiMsg = document.createElement('div');
-            aiMsg.className = 'bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 mb-2';
+            aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
 
             const answer = result.answer || result.text || 'No response received';
 
@@ -2480,7 +2488,7 @@ async function askQuick(question) {
 
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
-                    <span class="text-xs font-semibold text-purple-800">🤖 AI:</span>
+                    <span class="text-xs font-semibold text-gray-700">🤖 AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>

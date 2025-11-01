@@ -28,6 +28,7 @@ const TEST_DATA = {
         },
         compliance: {
             overall_return_rate: 1.5,
+            rejection_rate: 0.9,
             total_returns: 3685,
             total_claims: 245680,
             monthly_trend: [
@@ -47,8 +48,14 @@ const TEST_DATA = {
         },
         reimbursement: {
             total_reimbursed: 45250000,
+            total_reimbursed_amount: 45250000,
             pending_amount: 3800000,
             average_processing_days: 18.5,
+            average_turnaround_days: 18.5,
+            total_claims: 245680,
+            claims_reimbursed: 240120,
+            reimbursement_percentage: 97.7,
+            growth_rate: 2.6,
             monthly_trend: [
                 { month: 'Jan', amount: 38500000 },
                 { month: 'Feb', amount: 39800000 },
@@ -58,28 +65,38 @@ const TEST_DATA = {
                 { month: 'Jun', amount: 45250000 }
             ],
             by_payer: [
-                { payer_name: 'Medicare', amount: 18100000, percentage: 40.0 },
-                { payer_name: 'Private Insurance', amount: 15838000, percentage: 35.0 },
-                { payer_name: 'Medicaid', amount: 9050000, percentage: 20.0 },
-                { payer_name: 'Self-Pay', amount: 2262000, percentage: 5.0 }
+                { payer_name: 'Medicare', amount: 18100000, percentage: 40.0, claims: 98272, reimbursed_claims: 97890, reimbursement_rate: 99.6, avg_turnaround_days: 16 },
+                { payer_name: 'Private Insurance', amount: 15838000, percentage: 35.0, claims: 85988, reimbursed_claims: 84273, reimbursement_rate: 98.0, avg_turnaround_days: 19 },
+                { payer_name: 'Medicaid', amount: 9050000, percentage: 20.0, claims: 49136, reimbursed_claims: 47792, reimbursement_rate: 97.3, avg_turnaround_days: 22 },
+                { payer_name: 'Self-Pay', amount: 2262000, percentage: 5.0, claims: 12284, reimbursed_claims: 10165, reimbursement_rate: 82.8, avg_turnaround_days: 14 }
             ]
         },
         operating_costs: {
             total_monthly_costs: 32450000,
+            total_operating_costs: 32450000,
             cost_per_test: 132,
             monthly_trend: [
-                { month: 'Jan', cost: 28500000 },
-                { month: 'Feb', cost: 29200000 },
-                { month: 'Mar', cost: 30100000 },
-                { month: 'Apr', cost: 31200000 },
-                { month: 'May', cost: 31800000 },
-                { month: 'Jun', cost: 32450000 }
+                { month: 'Jan', cost: 28500000, total_cost: 28500000 },
+                { month: 'Feb', cost: 29200000, total_cost: 29200000 },
+                { month: 'Mar', cost: 30100000, total_cost: 30100000 },
+                { month: 'Apr', cost: 31200000, total_cost: 31200000 },
+                { month: 'May', cost: 31800000, total_cost: 31800000 },
+                { month: 'Jun', cost: 32450000, total_cost: 32450000 }
             ]
         },
         lab_metrics: {
             average_tat_hours: 38.5,
+            average_turnaround_hours: 38.5,
+            target_turnaround_hours: 42,
             tests_processed: 245680,
             capacity_utilization: 87.3,
+            lab_capacity: {
+                utilization_percentage: 87.3,
+                current_load: 214469,
+                max_capacity: 245680
+            },
+            efficiency_score: 94.5,
+            error_rate: 0.8,
             turnaround_trend: [
                 { period: 'Week 1', hours: 40.2 },
                 { period: 'Week 2', hours: 39.8 },
@@ -103,11 +120,20 @@ const TEST_DATA = {
             ]
         },
         forecasting: {
+            next_quarter_orders: 720000,
+            forecast_growth: 14.2,
+            revenue_forecast: 132480000,
+            confidence_level: 92,
+            year_end_projection: 3150000,
+            assumptions: {
+                market_growth_rate: 12.5,
+                seasonality_factor: 'Q4 holiday impact'
+            },
             quarterly_forecast: [
-                { quarter: 'Q2 2025', predicted_orders: 720000, confidence: 0.92 },
-                { quarter: 'Q3 2025', predicted_orders: 785000, confidence: 0.87 },
-                { quarter: 'Q4 2025', predicted_orders: 850000, confidence: 0.81 },
-                { quarter: 'Q1 2026', predicted_orders: 920000, confidence: 0.75 }
+                { quarter: 'Q2 2025', predicted_orders: 720000, orders: 720000, confidence: 92, revenue: 132480000, growth: 14.2 },
+                { quarter: 'Q3 2025', predicted_orders: 785000, orders: 785000, confidence: 87, revenue: 144440000, growth: 9.0 },
+                { quarter: 'Q4 2025', predicted_orders: 850000, orders: 850000, confidence: 81, revenue: 156400000, growth: 8.3 },
+                { quarter: 'Q1 2026', predicted_orders: 920000, orders: 920000, confidence: 75, revenue: 169280000, growth: 8.2 }
             ]
         },
         market_intelligence: {
@@ -145,6 +171,31 @@ const TEST_DATA = {
             ]
         },
         milestones: {
+            total_projects: 3,
+            projects_on_track: 2,
+            projects_at_risk: 0,
+            projects_delayed: 0,
+            active_projects: [
+                {
+                    project_name: 'FDA Submission - New Test Panel',
+                    overall_status: 'on_track',
+                    completion_percentage: 85
+                },
+                {
+                    project_name: 'Lab Expansion - West Coast',
+                    overall_status: 'on_track',
+                    completion_percentage: 92
+                },
+                {
+                    project_name: 'AI Integration - Results Analysis',
+                    overall_status: 'at_risk',
+                    completion_percentage: 45
+                }
+            ],
+            critical_items: [
+                'DiagnosticTest A 2.0 FDA submission on target for Q4 2025',
+                'Lab equipment maintenance required by end of month'
+            ],
             projects: [
                 {
                     name: 'FDA Submission - New Test Panel',
@@ -162,13 +213,99 @@ const TEST_DATA = {
                 },
                 {
                     name: 'AI Integration - Results Analysis',
-                    status: 'in_progress',
+                    status: 'at_risk',
                     completion: 45,
                     due_date: '2025-12-31',
                     owner: 'IT Department'
                 }
             ]
+        },
+        market_intelligence: {
+            latest_news: [
+                {
+                    title: 'FDA Approves New Genetic Testing Protocol',
+                    summary: 'FDA approval expands market opportunities for genetic testing',
+                    source: 'Genomics News',
+                    date: '2 hours ago',
+                    importance: 'high'
+                },
+                {
+                    title: 'Healthcare Spending Projected to Increase 15%',
+                    summary: 'Healthcare expenditure growth favorable for diagnostic services',
+                    source: 'Healthcare Finance',
+                    date: '5 hours ago',
+                    importance: 'medium'
+                },
+                {
+                    title: 'AI in Diagnostics Market Reaches $2.1B',
+                    summary: 'AI diagnostic tools market experiencing rapid growth',
+                    source: 'MedTech Daily',
+                    date: '1 day ago',
+                    importance: 'high'
+                }
+            ],
+            competitor_updates: [
+                {
+                    competitor_name: 'GenomaCorp',
+                    description: 'Launched AI-powered test analysis platform',
+                    impact_level: 'high'
+                },
+                {
+                    competitor_name: 'BioTest Systems',
+                    description: 'Acquired regional lab network for $450M',
+                    impact_level: 'medium'
+                }
+            ],
+            critical_alerts: [],
+            news: [
+                {
+                    title: 'FDA Approves New Genetic Testing Protocol',
+                    source: 'Genomics News',
+                    timestamp: '2 hours ago',
+                    relevance: 'high'
+                },
+                {
+                    title: 'Healthcare Spending Projected to Increase 15%',
+                    source: 'Healthcare Finance',
+                    timestamp: '5 hours ago',
+                    relevance: 'medium'
+                },
+                {
+                    title: 'AI in Diagnostics Market Reaches $2.1B',
+                    source: 'MedTech Daily',
+                    timestamp: '1 day ago',
+                    relevance: 'high'
+                }
+            ],
+            competitors: [
+                {
+                    name: 'GenomaCorp',
+                    activity: 'Launched AI-powered test analysis platform',
+                    impact: 'high'
+                },
+                {
+                    name: 'BioTest Systems',
+                    activity: 'Acquired regional lab network for $450M',
+                    impact: 'medium'
+                }
+            ]
+        },
+        stock: {
+            current_price: { price: 127.45, change: 2.35, change_percentage: '+1.88' },
+            day_high: 128.90,
+            day_low: 125.20,
+            volume: 2450000,
+            pe_ratio: 24.5,
+            market_cap: '$3.2B'
         }
+    },
+    stock: {
+        current_price: { price: 127.45, change: 2.35, change_percentage: '+1.88' },
+        day_high: 128.90,
+        day_low: 125.20,
+        volume: 2450000,
+        pe_ratio: 24.5,
+        market_cap: '$3.2B'
     }
 };
 
