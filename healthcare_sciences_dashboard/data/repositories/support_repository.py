@@ -1,5 +1,5 @@
 from typing import List
-from data.models.ticket import TicketMetrics, SupportMetrics
+from ..models.ticket import TicketMetrics, SupportMetrics
 
 class SupportRepository:
     '''Repository for support ticket data'''

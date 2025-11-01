@@ -15,7 +15,7 @@ class BaseAgent:
     def _initialize_llm(self):
         """Initialize the LLM based on configuration"""
         # Enable lightweight mock for tests/offline environments
-        if os.getenv("TEST_MODE") == "1" or os.getenv("MOCK_LLM") == "1":
+        if os.getenv("TEST_MODE") in ("1", "true", "True") or os.getenv("MOCK_LLM") in ("1", "true", "True"):
             class _MockLLM:
                 async def ainvoke(self, messages):
                     class _Resp:

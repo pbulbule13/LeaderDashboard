@@ -1,4 +1,4 @@
-from data.models.forecasting import Forecast, ForecastPeriod, ProductForecast, HistoricalTrend
+from ..models.forecasting import Forecast, ForecastPeriod, ProductForecast, HistoricalTrend
 
 class ForecastingRepository:
     """Repository for forecasting data"""

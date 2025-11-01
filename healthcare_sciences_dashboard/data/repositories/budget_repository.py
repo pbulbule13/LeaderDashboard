@@ -1,5 +1,5 @@
 from typing import List
-from data.models.budget import BudgetItem, QuarterBudget
+from ..models.budget import BudgetItem, QuarterBudget
 
 class BudgetRepository:
     '''Repository for budget data'''

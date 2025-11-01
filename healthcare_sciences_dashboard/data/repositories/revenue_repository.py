@@ -1,5 +1,5 @@
 ﻿from typing import List
-from data.models.revenue import RevenueRecord, RevenueMetrics
+from ..models.revenue import RevenueRecord, RevenueMetrics
 
 class RevenueRepository:
     '''Repository for revenue data'''

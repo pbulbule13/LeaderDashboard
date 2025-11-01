@@ -1,4 +1,4 @@
-from data.models.employee import WorkforceMetrics, Vacancy
+from ..models.employee import WorkforceMetrics, Vacancy
 
 class WorkforceRepository:
     '''Repository for workforce data'''

@@ -1,4 +1,4 @@
-from data.models.reimbursement import ReimbursementMetrics, RejectionReason, ReimbursementByProduct
+from ..models.reimbursement import ReimbursementMetrics, RejectionReason, ReimbursementByProduct
 
 class ReimbursementRepository:
     """Repository for reimbursement data"""

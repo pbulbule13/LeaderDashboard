@@ -1,4 +1,4 @@
-from data.models.market_intelligence import MarketIntelligence, NewsItem, CompetitorUpdate, RegulatoryChange, IndustryTrend
+from ..models.market_intelligence import MarketIntelligence, NewsItem, CompetitorUpdate, RegulatoryChange, IndustryTrend
 from datetime import datetime, timedelta
 
 class MarketIntelligenceRepository:

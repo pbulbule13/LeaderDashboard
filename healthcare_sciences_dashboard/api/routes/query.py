@@ -1,23 +1,46 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
+import os
 from dashboard_orchestrator import DashboardOrchestrator
+
+# Robust TabQAAgent setup: fall back to a lightweight mock in TEST/MOCK mode
+# or if the real agent cannot be created (e.g., missing API keys in Cloud Run).
 try:
-    from agents.tab_qa_agent import TabQAAgent  # real agent
+    from agents.tab_qa_agent import TabQAAgent  # real agent class
+
+    def _create_tab_agent():
+        if os.getenv("TEST_MODE") in ("1", "true", "True") or os.getenv("MOCK_LLM") in ("1", "true", "True"):
+            raise RuntimeError("TEST_MODE enabled; using mock TabQAAgent")
+        return TabQAAgent()
 except Exception:
-    class TabQAAgent:  # type: ignore
+    # Import failed (package missing). Force mock below.
+    def _create_tab_agent():
+        raise RuntimeError("TabQAAgent import unavailable; using mock")
+
+router = APIRouter()
+orchestrator = DashboardOrchestrator()
+
+# Safe instantiation that never fails at import time
+try:
+    tab_qa_agent = _create_tab_agent()
+except Exception:
+    class _MockTabQA:
         def __init__(self, *args, **kwargs):
             pass
         async def ask(self, question: str, tab: str, tab_data=None):
-            return {"success": True, "answer": f"[mock] {tab}: {question}", "tab": tab, "tab_name": tab}
+            return {
+                "success": True,
+                "answer": f"[mock] {tab}: {question}",
+                "tab": tab,
+                "tab_name": tab,
+                "model": "mock"
+            }
         def list_tabs(self):
             return {"overview": {"name": "Overview"}}
         def get_tab_info(self, tab: str):
             return {"name": tab}
-
-router = APIRouter()
-orchestrator = DashboardOrchestrator()
-tab_qa_agent = TabQAAgent()
+    tab_qa_agent = _MockTabQA()
 
 class QueryRequest(BaseModel):
     query: str

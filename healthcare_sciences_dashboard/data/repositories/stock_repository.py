@@ -1,4 +1,4 @@
-from data.models.stock import StockMetrics
+from ..models.stock import StockMetrics
 
 class StockRepository:
     '''Repository for stock data'''

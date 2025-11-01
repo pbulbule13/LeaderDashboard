@@ -1,4 +1,4 @@
-from data.models.lab_metrics import LabMetrics, TurnaroundTime, LabCapacity, QualityMetric
+from ..models.lab_metrics import LabMetrics, TurnaroundTime, LabCapacity, QualityMetric
 
 class LabMetricsRepository:
     """Repository for lab metrics data"""

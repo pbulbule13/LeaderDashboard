@@ -1,4 +1,4 @@
-from data.models.milestones import ProjectMilestones, ProjectStatus, Milestone, TimelineEvent
+from ..models.milestones import ProjectMilestones, ProjectStatus, Milestone, TimelineEvent
 from datetime import datetime, timedelta
 
 class MilestonesRepository:

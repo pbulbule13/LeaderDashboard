@@ -1,5 +1,5 @@
 from typing import List
-from data.models.product import Product, ProductMetrics
+from ..models.product import Product, ProductMetrics
 
 class ProductsRepository:
     """Repository for products data"""

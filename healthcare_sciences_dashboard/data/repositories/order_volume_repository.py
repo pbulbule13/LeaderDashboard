@@ -1,4 +1,4 @@
-from data.models.order_volume import OrderVolume, GrowthMetrics, ProductLineOrders, OrderVolumePeriod
+from ..models.order_volume import OrderVolume, GrowthMetrics, ProductLineOrders, OrderVolumePeriod
 
 class OrderVolumeRepository:
     """Repository for order volume data"""

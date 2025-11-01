@@ -1,4 +1,4 @@
-from data.models.regional import RegionalPerformance, TerritoryPerformance, RegionalComparison, TerritoryMapData, GeoCoordinate
+from ..models.regional import RegionalPerformance, TerritoryPerformance, RegionalComparison, TerritoryMapData, GeoCoordinate
 
 class RegionalRepository:
     """Repository for regional performance data"""

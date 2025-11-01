@@ -1,4 +1,4 @@
-from data.models.operating_costs import OperatingCosts, CostCategory, MonthlyCost
+from ..models.operating_costs import OperatingCosts, CostCategory, MonthlyCost
 
 class OperatingCostsRepository:
     """Repository for operating costs data"""

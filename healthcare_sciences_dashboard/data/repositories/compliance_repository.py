@@ -1,4 +1,4 @@
-from data.models.compliance import ComplianceMetrics, ProductReturns, ReturnReason
+from ..models.compliance import ComplianceMetrics, ProductReturns, ReturnReason
 
 class ComplianceRepository:
     """Repository for compliance and returns data"""
