@@ -15,14 +15,14 @@ class ReimbursementRepository:
 
         by_product = [
             ReimbursementByProduct(
-                product_name="Cologuard",
+                product_name="DiagnosticTest A",
                 total_claims=456789,
                 reimbursed=453249,
                 rejected=3540,
                 reimbursement_rate=99.2
             ),
             ReimbursementByProduct(
-                product_name="Oncotype DX",
+                product_name="DiagnosticTest B",
                 total_claims=234567,
                 reimbursed=232147,
                 rejected=2420,

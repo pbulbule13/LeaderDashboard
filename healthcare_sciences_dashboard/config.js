@@ -216,7 +216,7 @@ const DASHBOARD_CONFIG = {
                 maxItems: 3
             },
             notes: {
-                title: 'Quick Notes',
+                title: 'Quick Reminders',
                 icon: '📝',
                 maxNotes: 10,
                 displayNotes: 3

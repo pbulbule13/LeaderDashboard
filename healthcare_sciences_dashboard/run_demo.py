@@ -16,7 +16,7 @@ async def main():
     orchestrator = DashboardOrchestrator()
     
     queries = [
-        'How is Cologuard performing?',
+        'How is DiagnosticTest A performing?',
         'What is our revenue vs target this quarter?',
         'Show me product revenue breakdown',
         'Are we hitting our Q4 revenue goals?',

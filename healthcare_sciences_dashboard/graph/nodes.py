@@ -18,7 +18,7 @@ async def route_query_node(state: DashboardState) -> Dict[str, Any]:
     '''Determine which agent should handle the query'''
     query = state['user_query'].lower()
     
-    if any(word in query for word in ['product', 'order', 'cologuard', 'oncotype']):
+    if any(word in query for word in ['product', 'order', 'diagnostictest', 'test']):
         target = 'products'
     elif any(word in query for word in ['revenue', 'sales', 'income', 'target', 'earnings']):
         target = 'revenue'

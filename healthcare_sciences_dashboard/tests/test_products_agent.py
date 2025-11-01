@@ -18,7 +18,7 @@ async def test_products_agent_process_query():
     '''Test products agent can process queries'''
     agent = ProductsAgent()
     result = await agent.process_query(
-        'How is Cologuard performing?',
+        'How is DiagnosticTest A performing?',
         {}
     )
     

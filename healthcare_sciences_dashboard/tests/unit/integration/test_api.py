@@ -25,7 +25,7 @@ async def test_process_query():
     """Test query processing"""
     response = client.post(
         "/api/query/ask",
-        json={"query": "How is Cologuard performing?"}
+        json={"query": "How is DiagnosticTest A performing?"}
     )
     
     # Add debugging output

@@ -6,9 +6,9 @@ class LabMetricsRepository:
     async def get_lab_metrics_data(self) -> LabMetrics:
         """Get lab performance metrics"""
         turnaround_by_product = [
-            TurnaroundTime(product="Cologuard", average_hours=36.5, target_hours=48.0, performance="ahead"),
-            TurnaroundTime(product="Oncotype DX", average_hours=42.3, target_hours=48.0, performance="on_target"),
-            TurnaroundTime(product="PreventionGenetics", average_hours=38.7, target_hours=48.0, performance="ahead"),
+            TurnaroundTime(product="DiagnosticTest A", average_hours=36.5, target_hours=48.0, performance="ahead"),
+            TurnaroundTime(product="DiagnosticTest B", average_hours=42.3, target_hours=48.0, performance="on_target"),
+            TurnaroundTime(product="DiagnosticTest C", average_hours=38.7, target_hours=48.0, performance="ahead"),
         ]
 
         lab_capacity = LabCapacity(

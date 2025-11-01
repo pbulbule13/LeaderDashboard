@@ -7,10 +7,10 @@ class ComplianceRepository:
         """Get compliance and returns metrics"""
         # Mock data
         product_returns = [
-            ProductReturns(product_name="Cologuard", kits_returned=234, total_orders=456789),
-            ProductReturns(product_name="Oncotype DX", kits_returned=145, total_orders=234567),
-            ProductReturns(product_name="PreventionGenetics", kits_returned=89, total_orders=123456),
-            ProductReturns(product_name="Cologuard Plus", kits_returned=67, total_orders=89012),
+            ProductReturns(product_name="DiagnosticTest A", kits_returned=234, total_orders=456789),
+            ProductReturns(product_name="DiagnosticTest B", kits_returned=145, total_orders=234567),
+            ProductReturns(product_name="DiagnosticTest C", kits_returned=89, total_orders=123456),
+            ProductReturns(product_name="DiagnosticTest A Plus", kits_returned=67, total_orders=89012),
         ]
 
         for pr in product_returns:

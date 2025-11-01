@@ -7,7 +7,7 @@ async def main():
     
     # Test queries
     queries = [
-        "How is Cologuard performing?",
+        "How is DiagnosticTest A performing?",
         "What's our revenue status?",
         "Show me budget for Q4",
         "Any critical support tickets?",

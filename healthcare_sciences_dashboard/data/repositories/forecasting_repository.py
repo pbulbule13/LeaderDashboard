@@ -12,9 +12,9 @@ class ForecastingRepository:
         ]
 
         product_forecasts = [
-            ProductForecast(product_name="Cologuard", projected_orders=1650000, projected_revenue=152000000, growth_projection=12.5),
-            ProductForecast(product_name="Oncotype DX", projected_orders=850000, projected_revenue=78000000, growth_projection=8.3),
-            ProductForecast(product_name="PreventionGenetics", projected_orders=450000, projected_revenue=41000000, growth_projection=15.7),
+            ProductForecast(product_name="DiagnosticTest A", projected_orders=1650000, projected_revenue=152000000, growth_projection=12.5),
+            ProductForecast(product_name="DiagnosticTest B", projected_orders=850000, projected_revenue=78000000, growth_projection=8.3),
+            ProductForecast(product_name="DiagnosticTest C", projected_orders=450000, projected_revenue=41000000, growth_projection=15.7),
         ]
 
         historical_data = [
