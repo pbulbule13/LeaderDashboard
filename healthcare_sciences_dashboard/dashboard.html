@@ -142,22 +142,31 @@
     <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
     <div class="ai-sidebar bg-white border-r-2 border-gray-200 shadow-lg">
         <div class="p-4">
-            <div class="bg-gray-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
-                <span class="text-lg">👔 CEO Executive Assistant</span>
-                <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
+            <div class="bg-gray-100 border border-gray-300 px-4 py-3 rounded-lg font-bold mb-4 shadow-sm">
+                <span class="text-lg text-gray-800">👔 CEO Executive Assistant</span>
+                <p class="text-xs mt-1 text-gray-600">AI-powered insights across all departments</p>
             </div>
             <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
-                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
-                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
-                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
+                <button onclick="analyzeCurrentPage()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
+                <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-100 hover:bg-red-200 text-red-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
+                <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-100 hover:bg-green-200 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
+                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
             </div>
-            <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
+            <div class="bg-gray-50 rounded-lg shadow-sm p-3 mb-4 border border-gray-200">
                 <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
-                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-gray-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
-                <button onclick="askReasoning()" class="mt-2 w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
-                    🚀 Ask AI Assistant
-                </button>
+                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-gray-400" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="startVoiceInput()" id="voiceBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1">
+                        🎤 Voice
+                    </button>
+                    <button onclick="askReasoning()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+                        🚀 Ask AI
+                    </button>
+                </div>
+                <div class="mt-2 flex items-center gap-2">
+                    <input type="checkbox" id="voiceResponseEnabled" class="rounded">
+                    <label for="voiceResponseEnabled" class="text-xs text-gray-600">Enable voice response</label>
+                </div>
             </div>
             <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
@@ -224,69 +233,6 @@
     <div class="main-content-with-sidebar px-6 py-6 pb-32">
         <!-- Dashboard Tab -->
         <div id="content-overview" class="tab-content fade-in">
-            <!-- CEO Priority Attention Section -->
-            <div class="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-400 rounded-xl shadow-lg p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-bold text-red-900 flex items-center">
-                        <span class="text-3xl mr-3">⚠️</span>
-                        <span>Critical Items - Immediate Attention Required</span>
-                    </h2>
-                    <span class="bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold pulse">
-                        <span id="priority-count">3</span> URGENT
-                    </span>
-                </div>
-                <div id="ceo-priority-items" class="space-y-3">
-                    <div class="bg-white border-l-4 border-red-600 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-red-900 mb-1">🚨 Lab Equipment Maintenance Required</h3>
-                                <p class="text-sm text-gray-700 mb-2">Critical equipment showing performance degradation. Immediate maintenance needed to avoid service disruption.</p>
-                                <div class="flex items-center space-x-4 text-xs text-gray-600">
-                                    <span>📅 Due: Today</span>
-                                    <span>👤 Owner: Operations</span>
-                                    <span class="text-red-600 font-semibold">Impact: HIGH</span>
-                                </div>
-                            </div>
-                            <button class="ml-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                                Take Action
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-white border-l-4 border-orange-500 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-orange-900 mb-1">📋 Q4 FDA Audit in 2 Weeks</h3>
-                                <p class="text-sm text-gray-700 mb-2">Compliance review and documentation audit scheduled. Final preparations must be completed by next Friday.</p>
-                                <div class="flex items-center space-x-4 text-xs text-gray-600">
-                                    <span>📅 Due: Nov 14, 2025</span>
-                                    <span>👤 Owner: Compliance</span>
-                                    <span class="text-orange-600 font-semibold">Impact: CRITICAL</span>
-                                </div>
-                            </div>
-                            <button class="ml-4 bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                                Review
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-white border-l-4 border-yellow-500 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-yellow-900 mb-1">💰 Reimbursement Claims Backlog Increasing</h3>
-                                <p class="text-sm text-gray-700 mb-2">Pending claims increased 8% this week. Review process needed to prevent cash flow impact.</p>
-                                <div class="flex items-center space-x-4 text-xs text-gray-600">
-                                    <span>📅 Due: This Week</span>
-                                    <span>👤 Owner: Finance</span>
-                                    <span class="text-yellow-600 font-semibold">Impact: MEDIUM</span>
-                                </div>
-                            </div>
-                            <button class="ml-4 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                                Investigate
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Interactive KPI Charts with Time Period Toggles -->
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <!-- Orders Chart -->
@@ -437,16 +383,16 @@
                     </div>
                 </div>
 
-                <!-- Critical Item - Today's Priority -->
+                <!-- Critical Items & Alerts - Merged -->
                 <div class="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-400 rounded-xl shadow-lg p-4 tile">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-sm font-bold text-red-900 flex items-center gap-2">
                             <span class="text-xl">⚠️</span>
-                            <span>Critical Today</span>
+                            <span>Critical Items & Alerts</span>
                         </h3>
-                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">URGENT</span>
+                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">3 URGENT</span>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
                         <div class="bg-white border-l-4 border-red-600 rounded p-3">
                             <h4 class="font-bold text-red-900 text-xs mb-1">🚨 Lab Equipment Maintenance</h4>
                             <p class="text-xs text-gray-700 mb-2">Critical equipment requires immediate servicing to prevent disruption</p>
@@ -456,11 +402,19 @@
                             </div>
                         </div>
                         <div class="bg-white border-l-4 border-orange-500 rounded p-3">
-                            <h4 class="font-bold text-orange-900 text-xs mb-1">📋 FDA Audit Prep</h4>
+                            <h4 class="font-bold text-orange-900 text-xs mb-1">📋 Q4 FDA Audit in 2 Weeks</h4>
                             <p class="text-xs text-gray-700 mb-2">Final documentation review needed by next Friday</p>
                             <div class="flex items-center justify-between text-xs">
-                                <span class="text-gray-600">Due: Nov 8</span>
+                                <span class="text-gray-600">Due: Nov 14, 2025</span>
                                 <span class="text-orange-600 font-semibold">CRITICAL</span>
+                            </div>
+                        </div>
+                        <div class="bg-white border-l-4 border-yellow-500 rounded p-3">
+                            <h4 class="font-bold text-yellow-900 text-xs mb-1">💰 Reimbursement Claims Backlog</h4>
+                            <p class="text-xs text-gray-700 mb-2">Pending claims increased 8% - review needed to prevent cash flow impact</p>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-gray-600">Due: This Week</span>
+                                <span class="text-yellow-600 font-semibold">MEDIUM</span>
                             </div>
                         </div>
                     </div>

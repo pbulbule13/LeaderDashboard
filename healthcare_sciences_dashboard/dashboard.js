@@ -6,6 +6,88 @@ let charts = {};
 let currentTab = 'overview'; // Track current active tab
 let currentTabData = null; // Store current tab's data for context
 
+// Voice Recognition Setup
+let recognition = null;
+let synthesis = window.speechSynthesis;
+let isListening = false;
+
+// Initialize Speech Recognition
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('reasoningInput').value = transcript;
+        isListening = false;
+        document.getElementById('voiceBtn').innerHTML = '🎤 Voice';
+        document.getElementById('voiceBtn').classList.remove('bg-red-300');
+        document.getElementById('voiceBtn').classList.add('bg-gray-200');
+        // Auto-submit after voice input
+        askReasoning();
+    };
+
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        isListening = false;
+        document.getElementById('voiceBtn').innerHTML = '🎤 Voice';
+        document.getElementById('voiceBtn').classList.remove('bg-red-300');
+        document.getElementById('voiceBtn').classList.add('bg-gray-200');
+        showToast('Voice recognition error: ' + event.error, 'error');
+    };
+
+    recognition.onend = function() {
+        isListening = false;
+        document.getElementById('voiceBtn').innerHTML = '🎤 Voice';
+        document.getElementById('voiceBtn').classList.remove('bg-red-300');
+        document.getElementById('voiceBtn').classList.add('bg-gray-200');
+    };
+}
+
+// Voice Input Function
+function startVoiceInput() {
+    if (!recognition) {
+        showToast('Voice recognition not supported in this browser', 'error');
+        return;
+    }
+
+    if (isListening) {
+        recognition.stop();
+        isListening = false;
+        document.getElementById('voiceBtn').innerHTML = '🎤 Voice';
+        document.getElementById('voiceBtn').classList.remove('bg-red-300');
+        document.getElementById('voiceBtn').classList.add('bg-gray-200');
+    } else {
+        recognition.start();
+        isListening = true;
+        document.getElementById('voiceBtn').innerHTML = '🎤 Listening...';
+        document.getElementById('voiceBtn').classList.remove('bg-gray-200');
+        document.getElementById('voiceBtn').classList.add('bg-red-300');
+    }
+}
+
+// Text-to-Speech Function
+function speakText(text) {
+    if (!synthesis) {
+        console.error('Speech synthesis not supported');
+        return;
+    }
+
+    // Cancel any ongoing speech
+    synthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    utterance.lang = 'en-US';
+
+    synthesis.speak(utterance);
+}
+
 // Set current date
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
@@ -2387,6 +2469,12 @@ async function askReasoning() {
             })
         });
 
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server returned non-JSON response. The API endpoint may be unavailable.');
+        }
+
         const result = await response.json();
 
         console.log('Ask Reasoning Response:', result);
@@ -2400,6 +2488,12 @@ async function askReasoning() {
             aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
 
             const answer = result.answer || result.text || 'No response received';
+
+            // Check if voice response is enabled
+            const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
+            if (voiceEnabled) {
+                speakText(answer);
+            }
 
             // Escape HTML and convert newlines
             const escapedAnswer = answer
@@ -2417,6 +2511,7 @@ async function askReasoning() {
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
+                ${voiceEnabled ? '<div class="text-xs text-gray-400 mt-1 italic">🔊 Voice response played</div>' : ''}
             `;
             messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
         } else {
@@ -2477,6 +2572,12 @@ async function askQuick(question) {
 
             const answer = result.answer || result.text || 'No response received';
 
+            // Check if voice response is enabled
+            const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
+            if (voiceEnabled) {
+                speakText(answer);
+            }
+
             // Escape HTML and convert newlines
             const escapedAnswer = answer
                 .replace(/&/g, '&amp;')
@@ -2493,6 +2594,7 @@ async function askQuick(question) {
                 </div>
                 <div class="text-xs text-gray-700">${escapedAnswer}</div>
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
+                ${voiceEnabled ? '<div class="text-xs text-gray-400 mt-1 italic">🔊 Voice response played</div>' : ''}
             `;
             messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
         } else {

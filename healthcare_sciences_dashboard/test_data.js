@@ -6,24 +6,25 @@ const TEST_DATA = {
         order_volume: {
             monthly_orders: 245680,
             average_daily_orders: 8189,
+            peak_day_orders: 9845,
             growth_metrics: {
                 mom: 12.3,
                 yoy: 45.7,
                 qoq: 18.5
             },
             trend_data: [
-                { period: 'Jan', count: 198000 },
-                { period: 'Feb', count: 205000 },
-                { period: 'Mar', count: 218000 },
-                { period: 'Apr', count: 225000 },
-                { period: 'May', count: 232000 },
-                { period: 'Jun', count: 245680 }
+                { period: 'Jan', count: 198000, growth: 0 },
+                { period: 'Feb', count: 205000, growth: 3.5 },
+                { period: 'Mar', count: 218000, growth: 6.3 },
+                { period: 'Apr', count: 225000, growth: 3.2 },
+                { period: 'May', count: 232000, growth: 3.1 },
+                { period: 'Jun', count: 245680, growth: 5.9 }
             ],
             by_category: [
-                { category: 'Genetic Testing', orders: 98000, percentage: 39.9 },
-                { category: 'Blood Work', orders: 73000, percentage: 29.7 },
-                { category: 'Pathology', orders: 49000, percentage: 19.9 },
-                { category: 'Radiology', orders: 25680, percentage: 10.5 }
+                { category: 'Genetic Testing', orders: 98000, count: 98000, percentage: 39.9 },
+                { category: 'Blood Work', orders: 73000, count: 73000, percentage: 29.7 },
+                { category: 'Pathology', orders: 49000, count: 49000, percentage: 19.9 },
+                { category: 'Radiology', orders: 25680, count: 25680, percentage: 10.5 }
             ]
         },
         compliance: {
