@@ -8,16 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="config.js"></script>
     <style>
-        .tab-active { border-bottom: 3px solid #2563EB; color: #2563EB; font-weight: 600; background: #EFF6FF; }
+        .tab-active { border-bottom: 3px solid #6B7280; color: #374151; font-weight: 600; background: #F9FAFB; }
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .tile { transition: all 0.3s ease; }
-        .tile:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -5px rgba(37, 99, 235, 0.2); }
+        .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1); }
         .chart-container { position: relative; height: 300px; }
         .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
-        .email-item:hover { background: #F0F9FF; }
-        .calendar-event { border-left: 4px solid #2563EB; }
+        .email-item:hover { background: #F9FAFB; }
+        .calendar-event { border-left: 4px solid #9CA3AF; }
 
         /* Left Sidebar for AI Analytics - 20% width */
         .ai-sidebar {
@@ -98,13 +98,13 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+<body class="bg-gray-50">
     <!-- Header -->
-    <nav class="bg-white shadow-md border-b border-blue-200 sticky top-0 z-50">
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-full mx-auto px-6 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow">
+                    <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center shadow-sm">
                         <span class="text-white font-bold text-xl">HCS</span>
                     </div>
                     <div>
@@ -117,7 +117,7 @@
                         <p class="text-[10px] text-gray-400">Developed by</p>
                         <p class="text-xs font-semibold text-gray-700">Prashil Bulbule</p>
                     </div>
-                    <div id="stockPrice" class="text-right bg-blue-50 px-4 py-2 rounded-lg">
+                    <div id="stockPrice" class="text-right bg-white px-4 py-2 rounded-lg">
                         <p class="text-xs text-gray-600">Loading...</p>
                     </div>
                 </div>
@@ -140,76 +140,76 @@
     </nav>
 
     <!-- CEO Executive AI Assistant - Left Sidebar (20% width, persistent) -->
-    <div class="ai-sidebar bg-gradient-to-b from-purple-50 to-indigo-50 border-r-2 border-purple-200 shadow-lg">
+    <div class="ai-sidebar bg-white border-r-2 border-gray-200 shadow-lg">
         <div class="p-4">
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
+            <div class="bg-gray-700 text-white px-4 py-3 rounded-lg font-bold mb-4 shadow-md">
                 <span class="text-lg">👔 CEO Executive Assistant</span>
                 <p class="text-xs mt-1 opacity-90">AI-powered insights across all departments</p>
             </div>
             <div class="space-y-2 mb-4">
-                <button onclick="analyzeCurrentPage()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
+                <button onclick="analyzeCurrentPage()" class="w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📊 Analyze This Page</button>
                 <button onclick="askQuick('What are the key risks I should be aware of?')" class="w-full bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">⚠️ Key Risks</button>
                 <button onclick="askQuick('Show me today\'s day summary')" class="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📋 Day Summary</button>
-                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
+                <button onclick="askQuick('Compare performance across all departments')" class="w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-sm transition">📈 Dept. Performance</button>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-3 mb-4">
                 <label class="text-xs font-semibold text-gray-700 mb-1 block">Ask me anything:</label>
-                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-purple-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
-                <button onclick="askReasoning()" class="mt-2 w-full bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
+                <textarea id="reasoningInput" placeholder="e.g., 'What's our compliance status?' or 'Analyze lab performance trends'" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs h-16 resize-none focus:ring-2 focus:ring-gray-500" onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); askReasoning(); }"></textarea>
+                <button onclick="askReasoning()" class="mt-2 w-full bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition">
                     🚀 Ask AI Assistant
                 </button>
             </div>
             <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
-                <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3 shadow-sm">
-                    <p class="text-xs text-purple-900 mb-2">
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <p class="text-xs text-gray-700 mb-2">
                         <span class="font-bold">👔 Executive Assistant:</span>
                     </p>
                     <p class="text-xs text-gray-700">
                         I can help you with questions about Orders, Compliance, Lab Operations, Finance, Regional Performance, and more. Just ask!
                     </p>
                 </div>
-                <div class="bg-white border border-indigo-200 rounded-lg p-3 shadow-sm ai-insight-card">
+                <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm ai-insight-card">
                     <div class="flex items-start gap-2">
                         <span class="text-sm">🎯</span>
                         <div>
-                            <p class="font-semibold text-indigo-900 text-xs">Real-time Insight</p>
+                            <p class="font-semibold text-gray-700 text-xs">Real-time Insight</p>
                             <p class="text-xs text-gray-600 mt-1">Orders trending up 12% this week across all regions</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div id="daySummarySection" class="mt-4 space-y-2 max-h-[calc(100vh-650px)] overflow-y-auto">
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-blue-900 mb-2">📊 Today's Executive Summary</h3>
+                <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-gray-700 mb-2">📊 Today's Executive Summary</h3>
                     <div id="daySummaryContent" class="space-y-1 text-xs">
-                        <div class="flex justify-between py-1 border-b border-blue-100">
+                        <div class="flex justify-between py-1 border-b border-gray-100">
                             <span class="text-gray-600">📈 Orders:</span>
-                            <span class="font-semibold text-blue-900">24.5K (+15.2%)</span>
+                            <span class="font-semibold text-gray-700">24.5K (+15.2%)</span>
                         </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
+                        <div class="flex justify-between py-1 border-b border-gray-100">
                             <span class="text-gray-600">✅ Compliance:</span>
                             <span class="font-semibold text-green-900">94.5% (+0.3%)</span>
                         </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
+                        <div class="flex justify-between py-1 border-b border-gray-100">
                             <span class="text-gray-600">💵 Reimbursement:</span>
-                            <span class="font-semibold text-purple-900">98.5% (↑)</span>
+                            <span class="font-semibold text-gray-700">98.5% (↑)</span>
                         </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
+                        <div class="flex justify-between py-1 border-b border-gray-100">
                             <span class="text-gray-600">🔬 Lab TAT:</span>
-                            <span class="font-semibold text-orange-900">38.2hrs (target: 42hrs)</span>
+                            <span class="font-semibold text-gray-700">38.2hrs (target: 42hrs)</span>
                         </div>
-                        <div class="flex justify-between py-1 border-b border-blue-100">
+                        <div class="flex justify-between py-1 border-b border-gray-100">
                             <span class="text-gray-600">💰 Costs:</span>
                             <span class="font-semibold text-red-900">$2.8M (-2.1%)</span>
                         </div>
                         <div class="flex justify-between py-1">
                             <span class="text-gray-600">🔮 Forecast:</span>
-                            <span class="font-semibold text-indigo-900">26.8K next month</span>
+                            <span class="font-semibold text-gray-700">26.8K next month</span>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-green-900 mb-2">💡 Key Highlights</h3>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-gray-700 mb-2">💡 Key Highlights</h3>
                     <ul class="space-y-1 text-xs text-gray-700">
                         <li>• Orders up 15.2% - Strong regional performance</li>
                         <li>• Lab efficiency improved - TAT under target</li>
@@ -290,11 +290,11 @@
             <!-- Interactive KPI Charts with Time Period Toggles -->
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <!-- Orders Chart -->
-                <div class="bg-white border border-blue-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">📈 Orders</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-blue-100 text-blue-600 font-semibold" data-metric="orders" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('orders', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="orders" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('orders', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('orders', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
@@ -304,11 +304,11 @@
                 </div>
 
                 <!-- Reimbursement Chart -->
-                <div class="bg-white border border-purple-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">💵 Reimbursement</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-purple-100 text-purple-600 font-semibold" data-metric="reimbursement" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('reimbursement', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="reimbursement" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
@@ -318,11 +318,11 @@
                 </div>
 
                 <!-- Compliance Chart -->
-                <div class="bg-white border border-green-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">✅ Compliance</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-green-100 text-green-600 font-semibold" data-metric="compliance" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('compliance', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="compliance" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('compliance', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('compliance', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
@@ -334,11 +334,11 @@
 
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <!-- Lab TAT Chart -->
-                <div class="bg-white border border-orange-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">🔬 Lab TAT</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-orange-100 text-orange-600 font-semibold" data-metric="lab" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('lab', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="lab" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('lab', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('lab', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
@@ -348,11 +348,11 @@
                 </div>
 
                 <!-- Costs Chart -->
-                <div class="bg-white border border-red-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">💰 Operating Costs</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-red-100 text-red-600 font-semibold" data-metric="costs" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('costs', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="costs" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('costs', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('costs', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
@@ -362,11 +362,11 @@
                 </div>
 
                 <!-- Forecast Chart -->
-                <div class="bg-white border border-indigo-200 rounded-xl shadow-sm p-4 tile">
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-gray-800">🔮 Forecast</h3>
                         <div class="flex gap-1">
-                            <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-600 font-semibold" data-metric="forecast" data-period="day">D</button>
+                            <button onclick="updateMetricPeriod('forecast', 'day')" class="period-btn px-2 py-1 text-xs rounded bg-gray-200 text-gray-700 font-semibold" data-metric="forecast" data-period="day">D</button>
                             <button onclick="updateMetricPeriod('forecast', 'week')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="week">W</button>
                             <button onclick="updateMetricPeriod('forecast', 'month')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="month">M</button>
                             <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-gray-100 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
@@ -385,22 +385,22 @@
                         <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">24</span>
                     </div>
                     <div class="space-y-2 max-h-40 overflow-y-auto text-xs">
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">JD</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
+                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">JD</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Q4 Financial Review</p>
                                 <p class="text-gray-500 truncate">Meeting scheduled for tomorrow...</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center text-xs font-bold text-green-600">SK</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
+                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">SK</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Board Presentation</p>
                                 <p class="text-gray-500 truncate">Slides attached for review...</p>
                             </div>
                         </div>
-                        <div class="flex items-start gap-2 p-2 hover:bg-blue-50 rounded">
-                            <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-xs font-bold text-purple-600">MJ</div>
+                        <div class="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
+                            <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-bold text-gray-600">MJ</div>
                             <div class="flex-1">
                                 <p class="font-semibold text-gray-800">Regulatory Update</p>
                                 <p class="text-gray-500 truncate">FDA submission timeline...</p>
@@ -438,10 +438,10 @@
                 </div>
 
                 <!-- Quick Reminders Widget -->
-                <div class="bg-white border border-amber-300 rounded-xl shadow-sm p-4 tile">
-                    <h3 class="text-sm font-bold text-amber-900 mb-3">📝 Quick Reminders</h3>
-                    <textarea id="quickNoteInput" placeholder="Type a quick reminder..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-amber-500 focus:border-transparent"></textarea>
-                    <button onclick="saveQuickNote()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-1 rounded text-xs font-semibold">Save Reminder</button>
+                <div class="bg-white border border-gray-300 rounded-xl shadow-sm p-4 tile">
+                    <h3 class="text-sm font-bold text-gray-700 mb-3">📝 Quick Reminders</h3>
+                    <textarea id="quickNoteInput" placeholder="Type a quick reminder..." class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg mb-2 h-20 focus:ring-2 focus:ring-gray-500 focus:border-transparent"></textarea>
+                    <button onclick="saveQuickNote()" class="w-full bg-gray-700 hover:bg-gray-800 text-white py-1 rounded text-xs font-semibold">Save Reminder</button>
                     <div id="quickNotesDisplay" class="mt-3 space-y-1 max-h-16 overflow-y-auto text-xs"></div>
                 </div>
             </div>
@@ -694,14 +694,26 @@
                 <!-- Email Section -->
                 <div class="col-span-5">
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
-                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="font-bold text-gray-800">📨 Inbox <span id="email-count">(Loading...)</span></h3>
-                            <button onclick="refreshEmails()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-semibold">🔄 Refresh</button>
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-gray-800">📨 Inbox <span id="email-count">(Loading...)</span></h3>
+                                <button onclick="refreshEmails()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1 rounded text-xs font-semibold">🔄 Refresh</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="escalateToHuman()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                                    <span>🆘</span>
+                                    <span>Escalate to Human</span>
+                                </button>
+                                <button onclick="aiSummarizeEmails()" class="flex-1 bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                                    <span>🤖</span>
+                                    <span>AI Summary</span>
+                                </button>
+                            </div>
                         </div>
                         <div id="email-list-container" class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
                             <!-- Emails will be loaded dynamically from Gmail -->
                             <div class="p-6 text-center">
-                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-2"></div>
                                 <p class="text-sm text-gray-600">Loading your emails from Gmail...</p>
                             </div>
                         </div>
@@ -913,12 +925,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-sm font-semibold">
+                        <button class="mt-4 w-full bg-gray-700 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-semibold">
                             Log Exercise
                         </button>
                     </div>
 
-                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
                         <h4 class="font-semibold text-gray-800 mb-3">🏃 Today's Exercise</h4>
                         <div class="space-y-2">
                             <div class="bg-white rounded-lg p-3">
@@ -955,7 +967,7 @@
                                 <span class="text-sm text-gray-800">Update will and estate plan</span>
                             </div>
                         </div>
-                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-semibold">
+                        <button class="w-full bg-gray-700 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-semibold">
                             + Add Task
                         </button>
                     </div>
@@ -998,16 +1010,16 @@
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">⚡ Quick Actions</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm font-semibold border border-blue-200">
+                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 📞 Call Assistant
                             </button>
-                            <button class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm font-semibold border border-green-200">
+                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 🚗 Book Car
                             </button>
-                            <button class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm font-semibold border border-purple-200">
+                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 ✈️ Travel Plans
                             </button>
-                            <button class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm font-semibold border border-orange-200">
+                            <button class="bg-gray-50 hover:bg-gray-100 text-gray-700 p-3 rounded-lg text-sm font-semibold border border-gray-200">
                                 🍽️ Reservations
                             </button>
                         </div>
@@ -1056,7 +1068,7 @@
         <div id="content-orders" class="tab-content hidden fade-in">
             <div id="orders-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading order volume data...</p>
                 </div>
             </div>
@@ -1065,7 +1077,7 @@
         <div id="content-compliance" class="tab-content hidden fade-in">
             <div id="compliance-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading compliance data...</p>
                 </div>
             </div>
@@ -1074,7 +1086,7 @@
         <div id="content-reimbursement" class="tab-content hidden fade-in">
             <div id="reimbursement-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading reimbursement data...</p>
                 </div>
             </div>
@@ -1083,7 +1095,7 @@
         <div id="content-costs" class="tab-content hidden fade-in">
             <div id="costs-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading costs data...</p>
                 </div>
             </div>
@@ -1092,7 +1104,7 @@
         <div id="content-lab" class="tab-content hidden fade-in">
             <div id="lab-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading lab metrics...</p>
                 </div>
             </div>
@@ -1101,7 +1113,7 @@
         <div id="content-regional" class="tab-content hidden fade-in">
             <div id="regional-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading regional data...</p>
                 </div>
             </div>
@@ -1110,7 +1122,7 @@
         <div id="content-forecasting" class="tab-content hidden fade-in">
             <div id="forecasting-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading forecast data...</p>
                 </div>
             </div>
@@ -1119,7 +1131,7 @@
         <div id="content-market" class="tab-content hidden fade-in">
             <div id="market-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading market intelligence...</p>
                 </div>
             </div>
@@ -1128,7 +1140,7 @@
         <div id="content-milestones" class="tab-content hidden fade-in">
             <div id="milestones-content">
                 <div class="text-center py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600 mb-4"></div>
                     <p class="text-gray-600">Loading project milestones...</p>
                 </div>
             </div>

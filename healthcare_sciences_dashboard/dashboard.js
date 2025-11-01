@@ -587,28 +587,83 @@ async function loadStockData() {
 
 // Email Functions
 function composeEmail() {
-    alert('Opening email composer...');
+    showToast('Opening email composer...', 'success');
+    // Auto-close notification
+    setTimeout(() => {
+        // Email composer would open here
+        console.log('Email composer opened');
+    }, 500);
 }
 
 function loadEmails(folder) {
-    alert(`Loading ${folder} folder...`);
+    showToast(`Loading ${folder} emails...`, 'info');
+    // Auto-close and load
+    setTimeout(() => {
+        console.log(`Loaded ${folder} folder`);
+    }, 500);
 }
 
 function refreshEmails() {
-    alert('Refreshing emails...');
+    showToast('Refreshing emails...', 'info');
+    // Auto-close and refresh
+    setTimeout(() => {
+        console.log('Emails refreshed');
+    }, 500);
 }
 
 function aiSummarizeEmails() {
-    alert('AI is summarizing your inbox...');
+    showToast('AI is analyzing your inbox...', 'info');
+    setTimeout(() => {
+        showToast('Inbox summary ready! Check AI panel.', 'success');
+    }, 2000);
 }
 
 function aiPriorityEmails() {
-    alert('AI is finding priority emails...');
+    showToast('AI is identifying priority emails...', 'info');
+    setTimeout(() => {
+        showToast('Priority emails highlighted.', 'success');
+    }, 2000);
+}
+
+function escalateToHuman() {
+    showToast('Escalating to human support...', 'warning');
+    setTimeout(() => {
+        showToast('Support team notified. You will be contacted shortly.', 'success');
+        // Could integrate with support ticket system here
+        console.log('Escalated to human support');
+    }, 1500);
 }
 
 // Calendar Functions
 function scheduleNewMeeting() {
-    alert('Opening meeting scheduler...');
+    showToast('Opening meeting scheduler...', 'success');
+    setTimeout(() => {
+        console.log('Meeting scheduler opened');
+    }, 500);
+}
+
+// Toast Notification System (replaces annoying alerts)
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-orange-500',
+        info: 'bg-gray-700'
+    };
+
+    toast.className = `fixed bottom-6 right-6 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all transform translate-y-0 opacity-100`;
+    toast.textContent = message;
+    toast.style.animation = 'slideInUp 0.3s ease-out';
+
+    document.body.appendChild(toast);
+
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 function generateCalendar() {
