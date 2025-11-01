@@ -69,11 +69,63 @@ function startVoiceInput() {
     }
 }
 
-// Text-to-Speech Function
-function speakText(text) {
+// Text-to-Speech Function with ElevenLabs
+let useElevenLabs = localStorage.getItem('useElevenLabs') !== 'false'; // Default true
+let isFullVoiceMode = false;
+
+async function speakTextElevenLabs(text) {
+    const ELEVENLABS_API_KEY = 'sk_7e3adcb3fbbdde6e407e6b93857b2b6e816c1cada21205fe';
+    const VOICE_ID = '2qfp6zPuviqeCOZIE9RZ';
+
+    try {
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'audio/mpeg',
+                'Content-Type': 'application/json',
+                'xi-api-key': ELEVENLABS_API_KEY
+            },
+            body: JSON.stringify({
+                text: text,
+                model_id: 'eleven_monolingual_v1',
+                voice_settings: {
+                    stability: 0.5,
+                    similarity_boost: 0.75
+                }
+            })
+        });
+
+        if (!response.ok) {
+            console.error('ElevenLabs API error:', response.status);
+            throw new Error('ElevenLabs API failed');
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+
+        return new Promise((resolve, reject) => {
+            audio.onended = () => {
+                URL.revokeObjectURL(audioUrl);
+                resolve();
+            };
+            audio.onerror = (e) => {
+                console.error('Audio playback error:', e);
+                reject(e);
+            };
+            audio.play().catch(reject);
+        });
+    } catch (error) {
+        console.error('ElevenLabs TTS error:', error);
+        // Fallback to browser TTS
+        return speakTextBrowser(text);
+    }
+}
+
+function speakTextBrowser(text) {
     if (!synthesis) {
         console.error('Speech synthesis not supported');
-        return;
+        return Promise.resolve();
     }
 
     // Cancel any ongoing speech
@@ -96,7 +148,19 @@ function speakText(text) {
         }
     }
 
-    synthesis.speak(utterance);
+    return new Promise((resolve) => {
+        utterance.onend = resolve;
+        utterance.onerror = resolve;
+        synthesis.speak(utterance);
+    });
+}
+
+async function speakText(text) {
+    if (useElevenLabs) {
+        return await speakTextElevenLabs(text);
+    } else {
+        return await speakTextBrowser(text);
+    }
 }
 
 // Function to save voice preference
@@ -112,6 +176,177 @@ function handleVoiceChange(voiceName) {
         // Test the voice
         speakText('Voice changed successfully. This is how I will sound.');
     }
+}
+
+// Toggle between ElevenLabs and Browser voice
+function toggleVoiceProvider(useEL) {
+    useElevenLabs = useEL;
+    localStorage.setItem('useElevenLabs', useEL);
+    const message = useEL ? 'ElevenLabs voice enabled' : 'Browser voice enabled';
+    speakText(message);
+}
+
+// Full Voice Mode - Continuous voice interaction
+let recognitionInstance = null;
+
+async function toggleFullVoiceMode() {
+    const btn = document.getElementById('fullVoiceModeBtn');
+    if (!btn) return;
+
+    isFullVoiceMode = !isFullVoiceMode;
+
+    if (isFullVoiceMode) {
+        btn.classList.remove('bg-blue-100');
+        btn.classList.add('bg-red-200', 'animate-pulse');
+        btn.innerHTML = '🔴 Voice Mode Active';
+
+        // Welcome message
+        await speakText('Full voice mode activated. I am listening. How can I help you?');
+
+        // Start continuous listening
+        startContinuousListening();
+    } else {
+        btn.classList.remove('bg-red-200', 'animate-pulse');
+        btn.classList.add('bg-blue-100');
+        btn.innerHTML = '🎤 Full Voice Mode';
+
+        stopContinuousListening();
+        await speakText('Voice mode deactivated');
+    }
+}
+
+function startContinuousListening() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionInstance = new SpeechRecognition();
+    recognitionInstance.continuous = true;
+    recognitionInstance.interimResults = false;
+    recognitionInstance.lang = 'en-US';
+
+    recognitionInstance.onresult = async (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        console.log('Heard:', transcript);
+
+        // Show what was heard
+        const indicator = document.getElementById('voiceModeIndicator');
+        if (indicator) {
+            indicator.textContent = `Heard: "${transcript}"`;
+        }
+
+        // Process the question
+        await processVoiceQuestion(transcript);
+    };
+
+    recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        if (isFullVoiceMode && event.error !== 'no-speech') {
+            // Restart if still in voice mode and error isn't just silence
+            setTimeout(() => {
+                if (isFullVoiceMode && recognitionInstance) {
+                    recognitionInstance.start();
+                }
+            }, 1000);
+        }
+    };
+
+    recognitionInstance.onend = () => {
+        // Restart if still in voice mode
+        if (isFullVoiceMode) {
+            setTimeout(() => {
+                if (isFullVoiceMode && recognitionInstance) {
+                    recognitionInstance.start();
+                }
+            }, 500);
+        }
+    };
+
+    recognitionInstance.start();
+}
+
+function stopContinuousListening() {
+    if (recognitionInstance) {
+        recognitionInstance.stop();
+        recognitionInstance = null;
+    }
+}
+
+async function processVoiceQuestion(question) {
+    try {
+        // Use tab-specific Q&A endpoint with context
+        const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: question,
+                tab: currentTab,
+                tab_data: currentTabData
+            })
+        });
+
+        let result;
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            // API is down, use fallback
+            console.log('API unavailable for voice question, using fallback');
+            const mockResponse = typeof generateAIResponse === 'function'
+                ? generateAIResponse(question)
+                : { response: 'The backend is currently offline. Please start it with: python run_app.py', agent_used: 'Offline' };
+
+            result = {
+                success: true,
+                answer: mockResponse.response
+            };
+        } else {
+            result = await response.json();
+        }
+
+        if (result.success || result.answer) {
+            const answer = result.answer || result.text || 'No response received';
+
+            // Speak the answer using ElevenLabs
+            await speakText(answer);
+
+            // Optionally display in the chat
+            addVoiceMessageToChat(question, answer);
+        }
+    } catch (error) {
+        console.error('Voice question error:', error);
+        await speakText('Sorry, I encountered an error processing your question.');
+    }
+}
+
+function addVoiceMessageToChat(question, answer) {
+    const messagesDiv = document.getElementById('reasoningMessages');
+    if (!messagesDiv) return;
+
+    // Add user question
+    const userMsg = document.createElement('div');
+    userMsg.className = 'bg-blue-50 border border-blue-100 rounded-lg p-3 mb-2';
+    userMsg.innerHTML = `<p class="text-xs font-semibold text-gray-700">🎤 You (voice):</p><p class="text-xs text-gray-800">${question}</p>`;
+    messagesDiv.insertBefore(userMsg, messagesDiv.firstChild);
+
+    // Add AI response
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
+    const escapedAnswer = answer
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/\n/g, '<br>');
+    aiMsg.innerHTML = `
+        <div class="flex items-start gap-2 mb-2">
+            <span class="text-xs font-semibold text-gray-700">🤖 AI:</span>
+            <span class="text-xs text-gray-500">🔊 Voice Response</span>
+        </div>
+        <div class="text-xs text-gray-700">${escapedAnswer}</div>
+    `;
+    messagesDiv.insertBefore(aiMsg, messagesDiv.firstChild);
 }
 
 // Function to populate voice selector
