@@ -10,6 +10,11 @@
 .env.*
 !.env.example
 
+# Frontend API configuration (contains ElevenLabs keys)
+**/voice-config.local.js
+**/config.local.js
+**/*.local.js
+
 # API Keys and tokens
 *.token
 *.json.secret

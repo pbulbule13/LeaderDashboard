@@ -74,23 +74,35 @@ let useElevenLabs = localStorage.getItem('useElevenLabs') !== 'false'; // Defaul
 let isFullVoiceMode = false;
 
 async function speakTextElevenLabs(text) {
-    const ELEVENLABS_API_KEY = 'sk_7e3adcb3fbbdde6e407e6b93857b2b6e816c1cada21205fe';
-    const VOICE_ID = '2qfp6zPuviqeCOZIE9RZ';
+    // Load config from voice-config.local.js (gitignored, contains your API keys)
+    const config = typeof VOICE_CONFIG !== 'undefined' ? VOICE_CONFIG : {
+        ELEVENLABS_API_KEY: null,
+        VOICE_ID: null,
+        model: 'eleven_monolingual_v1',
+        stability: 0.5,
+        similarity_boost: 0.75
+    };
+
+    if (!config.ELEVENLABS_API_KEY || !config.VOICE_ID) {
+        console.warn('ElevenLabs API key or Voice ID not configured. Copy voice-config.example.js to voice-config.local.js and add your keys.');
+        // Fallback to browser voice
+        return speakTextBrowser(text);
+    }
 
     try {
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${config.VOICE_ID}`, {
             method: 'POST',
             headers: {
                 'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',
-                'xi-api-key': ELEVENLABS_API_KEY
+                'xi-api-key': config.ELEVENLABS_API_KEY
             },
             body: JSON.stringify({
                 text: text,
-                model_id: 'eleven_monolingual_v1',
+                model_id: config.model,
                 voice_settings: {
-                    stability: 0.5,
-                    similarity_boost: 0.75
+                    stability: config.stability,
+                    similarity_boost: config.similarity_boost
                 }
             })
         });
