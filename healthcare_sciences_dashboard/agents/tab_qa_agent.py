@@ -25,35 +25,41 @@ class TabQAAgent:
     TAB_CONTEXTS = {
         "overview": {
             "name": "Dashboard Overview",
-            "description": "High-level executive summary of all business metrics",
-            "data_types": ["orders", "compliance", "costs", "lab_metrics", "stock", "forecasting"],
+            "description": "High-level executive summary of all business metrics, including emails, calendar, reminders, and key performance indicators",
+            "data_types": ["orders", "compliance", "costs", "lab_metrics", "stock", "forecasting", "emails", "calendar", "reminders", "critical_alerts"],
             "capabilities": [
+                "View emails, calendar events, and reminders from the dashboard widgets",
                 "Compare multiple metrics across the business",
                 "Identify trends and anomalies",
                 "Provide executive summaries",
-                "Highlight areas needing attention"
+                "Highlight areas needing attention",
+                "Access Quick Reminders to help manage tasks"
             ]
         },
         "email": {
             "name": "Communications",
-            "description": "Email management, inbox triage, and communication tools",
-            "data_types": ["emails", "inbox_status", "priorities", "drafts"],
+            "description": "Email management, inbox triage, and communication tools. You have access to view email subjects, senders, previews, and metadata from the dashboard.",
+            "data_types": ["emails", "inbox_status", "priorities", "drafts", "email_list", "unread_count"],
             "capabilities": [
-                "Summarize inbox and priorities",
+                "View and analyze emails shown on the dashboard",
+                "Summarize inbox and priorities based on visible emails",
+                "Identify urgent emails that need attention",
                 "Draft email responses",
-                "Categorize emails by urgency",
-                "Manage communication workflows"
+                "Categorize emails by urgency and importance",
+                "Provide communication workflow recommendations"
             ]
         },
         "personal": {
             "name": "Personal Assistant",
-            "description": "Calendar, tasks, goals, and personal productivity",
-            "data_types": ["calendar", "tasks", "goals", "health_metrics"],
+            "description": "Calendar, tasks, goals, and personal productivity. You can see calendar events, meeting schedules, tasks, reminders, and health metrics from the dashboard.",
+            "data_types": ["calendar", "tasks", "goals", "health_metrics", "meetings", "schedule", "reminders"],
             "capabilities": [
-                "Manage schedule and meetings",
-                "Track tasks and goals",
-                "Provide productivity insights",
-                "Monitor work-life balance"
+                "View and analyze calendar events shown on dashboard",
+                "See today's meetings and schedule",
+                "Track tasks, reminders, and goals",
+                "Provide productivity insights based on visible data",
+                "Monitor work-life balance",
+                "Help with time management and prioritization"
             ]
         },
         "orders": {
@@ -180,7 +186,10 @@ class TabQAAgent:
 
         # Define the prompt template
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are an intelligent executive assistant for HealthCare Sciences, providing insights on the {tab_name} dashboard.
+            ("system", """You are an intelligent executive assistant for HealthCare Sciences CEO with FULL ACCESS to the {tab_name} dashboard data.
+
+**IMPORTANT - YOU HAVE DIRECT DATA ACCESS:**
+You can see and analyze ALL the data shown on the current dashboard tab. The "Current Data" section below contains the ACTUAL, REAL-TIME data from the dashboard that you can analyze and reference.
 
 **Your Context:**
 {tab_description}
@@ -191,25 +200,26 @@ class TabQAAgent:
 **Your Capabilities:**
 {capabilities}
 
-**Current Data:**
+**Current Data You Can See and Analyze:**
 {current_data}
 
 **Your Personality:**
 - Professional yet conversational
-- Data-driven and analytical
+- Data-driven and analytical - USE THE ACTUAL NUMBERS from the data above
 - Proactive in identifying insights
 - Clear and concise in communication
 - Always provide reasoning behind your answers
 
 **Response Guidelines:**
-1. Directly answer the user's question using the current data
-2. Provide specific numbers, percentages, or metrics when available
-3. Explain the reasoning behind your analysis
-4. Highlight trends, patterns, or anomalies
-5. Offer actionable insights or recommendations when relevant
-6. If data is missing, acknowledge it and provide what you can
+1. YOU HAVE ACCESS to the data shown above - analyze it directly
+2. Reference SPECIFIC numbers, percentages, and metrics from the Current Data
+3. For emails, calendar, orders, compliance, etc. - the data is RIGHT THERE in Current Data
+4. Provide insights based on the ACTUAL data you can see
+5. Never say "I don't have access" - you DO have access to everything shown above
+6. If specific data is truly not provided in Current Data section, then acknowledge that limitation
+7. Be confident - you're looking at the same dashboard data the CEO sees
 
-Remember: You're helping a CEO make informed decisions. Be insightful, accurate, and helpful."""),
+Remember: You're helping a CEO make informed decisions based on REAL data you can see. Be insightful, accurate, and helpful."""),
             ("human", "{question}")
         ])
 
@@ -270,7 +280,7 @@ Remember: You're helping a CEO make informed decisions. Be insightful, accurate,
             print(f"[ERROR] Failed to create LLM client for {model_name}: {e}")
             raise
 
-    async def ask(self, question: str, tab: str, tab_data: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def ask(self, question: str, tab: str, tab_data: Dict[str, Any] = None, voice_mode: bool = False) -> Dict[str, Any]:
         """
         Answer a question about a specific dashboard tab with context and reasoning.
 
@@ -278,6 +288,7 @@ Remember: You're helping a CEO make informed decisions. Be insightful, accurate,
             question: The user's question
             tab: The dashboard tab identifier (e.g., 'orders', 'compliance')
             tab_data: Current data from the tab
+            voice_mode: If True, provide concise 1-2 line responses without special characters
 
         Returns:
             Dict with response, reasoning, and metadata
@@ -308,6 +319,18 @@ Remember: You're helping a CEO make informed decisions. Be insightful, accurate,
             response = await self.llm.ainvoke(prompt_value)
             answer = response.content
 
+            # Format for voice mode if requested
+            if voice_mode:
+                # Remove special characters and markdown formatting
+                answer = answer.replace('*', '').replace('#', '').replace('`', '')
+                answer = answer.replace('-', '').replace('•', '').replace('→', '')
+                # Keep only first 1-2 sentences
+                sentences = answer.split('.')
+                if len(sentences) > 2:
+                    answer = '. '.join(sentences[:2]) + '.'
+                # Clean up any extra whitespace
+                answer = ' '.join(answer.split())
+
             return {
                 "success": True,
                 "answer": answer,
@@ -315,7 +338,8 @@ Remember: You're helping a CEO make informed decisions. Be insightful, accurate,
                 "tab_name": tab_context["name"],
                 "question": question,
                 "has_reasoning": True,
-                "model": self.model_name
+                "model": self.model_name,
+                "voice_mode": voice_mode
             }
 
         except Exception as e:

@@ -175,12 +175,7 @@
                     </button>
                     <div id="voiceModeIndicator" class="text-xs text-gray-600 mt-1 text-center h-4"></div>
                 </div>
-                <div class="mt-2">
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" id="elevenLabsToggle" checked onchange="toggleVoiceProvider(this.checked)" class="rounded">
-                        <span class="text-xs text-gray-600">🎙️ Use ElevenLabs Voice</span>
-                    </label>
-                </div>
+                <!-- Voice provider selection removed - always use ElevenLabs -->
             </div>
             <div id="reasoningMessages" class="space-y-3 max-h-[300px] overflow-y-auto">
                 <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 shadow-sm">
@@ -336,8 +331,8 @@
                 </div>
             </div>
 
-            <!-- Quick Widgets Row - Email, Calendar, Notes -->
-            <div class="grid grid-cols-3 gap-4 mb-6">
+            <!-- Quick Widgets Row - Email, Calendar, Reminders, Alerts -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
                 <!-- Email Widget -->
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile cursor-pointer" onclick="switchTab('email')">
                     <div class="flex justify-between items-center mb-3">
@@ -394,6 +389,17 @@
                                 <p class="text-gray-500">Office</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reminders Widget -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 tile">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">📝 Quick Reminders</h3>
+                        <button onclick="addReminder()" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">+ Add</button>
+                    </div>
+                    <div id="quick-reminders-list" class="space-y-2 max-h-40 overflow-y-auto text-xs">
+                        <p class="text-gray-500 text-center py-4">No reminders yet</p>
                     </div>
                 </div>
 

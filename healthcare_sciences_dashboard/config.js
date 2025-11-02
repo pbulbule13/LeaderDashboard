@@ -10,16 +10,16 @@ const DASHBOARD_CONFIG = {
         endpoints: {
             overview: '/api/dashboard/overview',
             stock: '/api/dashboard/tiles/stock',
-            orders: '/api/dashboard/tiles/orders',
+            orders: '/api/dashboard/tiles/order-volume',
             compliance: '/api/dashboard/tiles/compliance',
             reimbursement: '/api/dashboard/tiles/reimbursement',
-            costs: '/api/dashboard/tiles/costs',
-            lab: '/api/dashboard/tiles/lab',
+            costs: '/api/dashboard/tiles/operating-costs',
+            lab: '/api/dashboard/tiles/lab-metrics',
             regional: '/api/dashboard/tiles/regional',
             forecasting: '/api/dashboard/tiles/forecasting',
-            market: '/api/dashboard/tiles/market',
+            market: '/api/dashboard/tiles/market-intelligence',
             milestones: '/api/dashboard/tiles/milestones',
-            aiQuery: '/api/query/ask'
+            aiQuery: '/api/query/ask-tab'
         },
         refreshInterval: 300000  // 5 minutes in milliseconds
     },

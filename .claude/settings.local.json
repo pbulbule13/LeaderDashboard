@@ -29,7 +29,12 @@
       "Bash(netstat:*)",
       "Bash(taskkill /F /PID 5784)",
       "Bash(taskkill:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(git log:*)",
+      "Bash(nul)",
+      "Bash(ping:*)",
+      "Bash(cp:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

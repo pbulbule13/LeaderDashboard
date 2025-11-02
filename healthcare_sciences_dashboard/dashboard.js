@@ -73,7 +73,40 @@ function startVoiceInput() {
 let useElevenLabs = localStorage.getItem('useElevenLabs') !== 'false'; // Default true
 let isFullVoiceMode = false;
 
+// Global audio management - prevent multiple voices
+let currentAudio = null;
+let isAudioPlaying = false;
+
+function stopAllAudio() {
+    console.log('[AUDIO] Stopping all audio...');
+
+    // Stop any currently playing audio
+    if (currentAudio) {
+        try {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio.src = '';
+            currentAudio = null;
+        } catch (e) {
+            console.error('[AUDIO] Error stopping audio:', e);
+        }
+    }
+
+    // Stop browser speech synthesis
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+
+    isAudioPlaying = false;
+    console.log('[AUDIO] All audio stopped');
+}
+
 async function speakTextElevenLabs(text) {
+    // Stop any currently playing audio first
+    stopAllAudio();
+
+    // Set audio playing flag
+    isAudioPlaying = true;
     // Load config from voice-config.local.js (gitignored, contains your API keys)
     const config = typeof VOICE_CONFIG !== 'undefined' ? VOICE_CONFIG : {
         ELEVENLABS_API_KEY: null,
@@ -116,19 +149,33 @@ async function speakTextElevenLabs(text) {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
 
+        // Store current audio globally
+        currentAudio = audio;
+
         return new Promise((resolve, reject) => {
             audio.onended = () => {
                 URL.revokeObjectURL(audioUrl);
+                isAudioPlaying = false;
+                currentAudio = null;
+                console.log('[AUDIO] ElevenLabs audio finished');
                 resolve();
             };
             audio.onerror = (e) => {
                 console.error('Audio playback error:', e);
+                isAudioPlaying = false;
+                currentAudio = null;
                 reject(e);
             };
-            audio.play().catch(reject);
+            audio.play().catch((err) => {
+                isAudioPlaying = false;
+                currentAudio = null;
+                reject(err);
+            });
         });
     } catch (error) {
         console.error('ElevenLabs TTS error:', error);
+        isAudioPlaying = false;
+        currentAudio = null;
         // Fallback to browser TTS
         return speakTextBrowser(text);
     }
@@ -137,11 +184,15 @@ async function speakTextElevenLabs(text) {
 function speakTextBrowser(text) {
     if (!synthesis) {
         console.error('Speech synthesis not supported');
+        isAudioPlaying = false;
         return Promise.resolve();
     }
 
-    // Cancel any ongoing speech
-    synthesis.cancel();
+    // Stop all audio first
+    stopAllAudio();
+
+    // Set audio playing flag
+    isAudioPlaying = true;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
@@ -161,8 +212,16 @@ function speakTextBrowser(text) {
     }
 
     return new Promise((resolve) => {
-        utterance.onend = resolve;
-        utterance.onerror = resolve;
+        utterance.onend = () => {
+            isAudioPlaying = false;
+            console.log('[AUDIO] Browser TTS finished');
+            resolve();
+        };
+        utterance.onerror = () => {
+            isAudioPlaying = false;
+            console.log('[AUDIO] Browser TTS error');
+            resolve();
+        };
         synthesis.speak(utterance);
     });
 }
@@ -295,7 +354,8 @@ async function processVoiceQuestion(question) {
             body: JSON.stringify({
                 question: question,
                 tab: currentTab,
-                tab_data: currentTabData
+                tab_data: currentTabData,
+                voice_mode: true  // Enable concise voice-friendly responses
             })
         });
 
@@ -1117,13 +1177,21 @@ async function loadOrdersData() {
         if (!data.peak_day_orders) {
             data.peak_day_orders = Math.max(...data.trend_data.map(t => t.count));
         }
-        if (!data.trend_data[0].growth) {
+        if (data.trend_data && data.trend_data.length > 0 && !data.trend_data[0].growth) {
             for (let i = 1; i < data.trend_data.length; i++) {
                 data.trend_data[i].growth = ((data.trend_data[i].count - data.trend_data[i-1].count) / data.trend_data[i-1].count * 100).toFixed(1);
             }
             data.trend_data[0].growth = 0;
         }
-        if (!data.by_category[0].count) {
+        // API returns product_lines, not by_category
+        if (!data.by_category && data.product_lines) {
+            data.by_category = data.product_lines.map(p => ({
+                category: p.product_line,
+                orders: p.orders,
+                count: p.orders,
+                percentage: p.percentage
+            }));
+        } else if (data.by_category && data.by_category.length > 0 && !data.by_category[0].count) {
             data.by_category = data.by_category.map(c => ({
                 ...c,
                 count: c.orders
@@ -2862,9 +2930,9 @@ async function askReasoning() {
 
             const answer = result.answer || result.text || 'No response received';
 
-            // Check if voice response is enabled
+            // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
-            if (voiceEnabled) {
+            if (voiceEnabled && !isFullVoiceMode) {
                 speakText(answer);
             }
 
@@ -2983,9 +3051,9 @@ async function askQuick(question) {
 
             const answer = result.answer || result.text || 'No response received';
 
-            // Check if voice response is enabled
+            // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
-            if (voiceEnabled) {
+            if (voiceEnabled && !isFullVoiceMode) {
                 speakText(answer);
             }
 
@@ -3031,3 +3099,73 @@ document.addEventListener('DOMContentLoaded', () => {
         renderQuickNotes();
     }, 1000);
 });
+
+// ==================== REMINDERS FUNCTIONALITY ====================
+let reminders = JSON.parse(localStorage.getItem('quickReminders') || '[]');
+
+function loadReminders() {
+    const list = document.getElementById('quick-reminders-list');
+    if (!list) return;
+
+    if (reminders.length === 0) {
+        list.innerHTML = '<p class="text-gray-500 text-center py-4">No reminders yet</p>';
+        return;
+    }
+
+    list.innerHTML = reminders.map((reminder, index) => {
+        const checked = reminder.completed ? 'checked' : '';
+        const lineThrough = reminder.completed ? 'line-through text-gray-400' : '';
+        const desc = reminder.description ? '<p class="text-gray-600">' + reminder.description + '</p>' : '';
+        return '<div class="flex items-start gap-2 p-2 bg-gray-50 rounded border border-gray-200">' +
+            '<input type="checkbox" onchange="toggleReminder(' + index + ')" ' + checked + ' class="mt-1">' +
+            '<div class="flex-1 ' + lineThrough + '">' +
+            '<p class="font-semibold text-gray-800">' + reminder.title + '</p>' +
+            desc +
+            '</div>' +
+            '<button onclick="deleteReminder(' + index + ')" class="text-red-500 hover:text-red-700">×</button>' +
+            '</div>';
+    }).join('');
+}
+
+function addReminder(title, description) {
+    if (!title) {
+        title = prompt('Reminder title:');
+        if (!title) return;
+        description = prompt('Description (optional):') || '';
+    }
+
+    reminders.push({
+        id: Date.now(),
+        title: title,
+        description: description || '',
+        completed: false,
+        created: new Date().toISOString()
+    });
+
+    localStorage.setItem('quickReminders', JSON.stringify(reminders));
+    loadReminders();
+    return true;
+}
+
+function toggleReminder(index) {
+    reminders[index].completed = !reminders[index].completed;
+    localStorage.setItem('quickReminders', JSON.stringify(reminders));
+    loadReminders();
+}
+
+function deleteReminder(index) {
+    reminders.splice(index, 1);
+    localStorage.setItem('quickReminders', JSON.stringify(reminders));
+    loadReminders();
+}
+
+function getReminders() {
+    return reminders;
+}
+
+// Initialize reminders when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadReminders);
+} else {
+    loadReminders();
+}
