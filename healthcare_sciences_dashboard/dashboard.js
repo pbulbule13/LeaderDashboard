@@ -705,70 +705,78 @@ function updateAIPanelContext(tabName) {
 function createOverviewCharts(data) {
     if (overviewChartsCreated) return;
 
-    // Orders Trend Chart
-    const ordersCtx = document.getElementById('overviewOrdersChart').getContext('2d');
-    charts.overviewOrders = new Chart(ordersCtx, {
-        type: 'bar',
-        data: {
-            labels: data.order_volume.trend_data.map(t => t.period),
-            datasets: [{
-                label: 'Orders',
-                data: data.order_volume.trend_data.map(t => t.count),
-                backgroundColor: 'rgba(156, 163, 175, 0.7)',
-                borderColor: 'rgb(107, 114, 128)',
-                borderWidth: 1
-            }]
+    // Orders Bar of Pie Chart
+    const orderTrends = data.order_volume.trend_data || [];
+    const orderLabels = orderTrends.map(t => t.period);
+    const orderValues = orderTrends.map(t => t.count);
+
+    // Take first 4 for pie, last one for breakdown
+    const mainOrderLabels = orderLabels.slice(0, Math.min(4, orderLabels.length));
+    const mainOrderValues = orderValues.slice(0, Math.min(4, orderValues.length));
+
+    // Breakdown of the largest slice
+    const breakdownIndex = mainOrderValues.indexOf(Math.max(...mainOrderValues));
+    const breakdownLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const breakdownValues = mainOrderValues[breakdownIndex] ?
+        [
+            Math.floor(mainOrderValues[breakdownIndex] * 0.28),
+            Math.floor(mainOrderValues[breakdownIndex] * 0.24),
+            Math.floor(mainOrderValues[breakdownIndex] * 0.26),
+            Math.floor(mainOrderValues[breakdownIndex] * 0.22)
+        ] : [0, 0, 0, 0];
+
+    charts.overviewOrders = createBarOfPieChart({
+        pieCanvasId: 'overviewOrdersChartPie',
+        barCanvasId: 'overviewOrdersChartBar',
+        mainData: {
+            labels: mainOrderLabels,
+            values: mainOrderValues
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: {
-                        callback: function(value) {
-                            return (value / 1000) + 'K';
-                        }
-                    }
-                }
-            }
-        }
+        breakdownData: {
+            labels: breakdownLabels,
+            values: breakdownValues
+        },
+        breakdownIndex: breakdownIndex,
+        pieTitle: 'Orders by Period',
+        breakdownTitle: `${mainOrderLabels[breakdownIndex]} Breakdown`,
+        colorScheme: 'blue'
     });
 
-    // Financial Chart
-    const financialCtx = document.getElementById('overviewFinancialsChart').getContext('2d');
-    charts.overviewFinancials = new Chart(financialCtx, {
-        type: 'bar',
-        data: {
-            labels: data.operating_costs.monthly_trend.slice(-6).map(m => m.month),
-            datasets: [{
-                label: 'Operating Costs',
-                data: data.operating_costs.monthly_trend.slice(-6).map(m => m.total_cost / 1000000),
-                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                borderColor: 'rgb(239, 68, 68)',
-                borderWidth: 1
-            }]
+    // Operating Costs Bar of Pie Chart
+    const costTrends = data.operating_costs.monthly_trend.slice(-6) || [];
+    const costLabels = costTrends.map(m => m.month);
+    const costValues = costTrends.map(m => m.total_cost / 1000000);
+
+    // Take first 4 for pie
+    const mainCostLabels = costLabels.slice(0, Math.min(4, costLabels.length));
+    const mainCostValues = costValues.slice(0, Math.min(4, costValues.length));
+
+    // Breakdown by cost categories
+    const costBreakdownIndex = mainCostValues.indexOf(Math.max(...mainCostValues));
+    const costBreakdownLabels = ['AWS', 'Salaries', 'Lab Costs', 'Equipment', 'Other'];
+    const costBreakdownValues = [
+        Math.floor(mainCostValues[costBreakdownIndex] * 0.30),
+        Math.floor(mainCostValues[costBreakdownIndex] * 0.35),
+        Math.floor(mainCostValues[costBreakdownIndex] * 0.20),
+        Math.floor(mainCostValues[costBreakdownIndex] * 0.10),
+        Math.floor(mainCostValues[costBreakdownIndex] * 0.05)
+    ];
+
+    charts.overviewFinancials = createBarOfPieChart({
+        pieCanvasId: 'overviewFinancialsChartPie',
+        barCanvasId: 'overviewFinancialsChartBar',
+        mainData: {
+            labels: mainCostLabels,
+            values: mainCostValues
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value + 'M';
-                        }
-                    }
-                }
-            }
-        }
+        breakdownData: {
+            labels: costBreakdownLabels,
+            values: costBreakdownValues
+        },
+        breakdownIndex: costBreakdownIndex,
+        pieTitle: 'Costs by Month ($M)',
+        breakdownTitle: `${mainCostLabels[costBreakdownIndex]} Cost Breakdown ($M)`,
+        colorScheme: 'mixed'
     });
 
     overviewChartsCreated = true;
@@ -1266,7 +1274,7 @@ async function loadOrdersData() {
         // Create charts
         const trendCtx = document.getElementById('ordersDetailChart').getContext('2d');
         new Chart(trendCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.trend_data.map(t => t.period),
                 datasets: [{
@@ -1287,7 +1295,7 @@ async function loadOrdersData() {
 
         const categoryCtx = document.getElementById('ordersCategoryChart').getContext('2d');
         new Chart(categoryCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: data.by_category.map(c => c.category),
                 datasets: [{
@@ -1396,7 +1404,7 @@ async function loadComplianceData() {
         // Create charts
         const trendCtx = document.getElementById('complianceTrendChart').getContext('2d');
         new Chart(trendCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: data.monthly_trend.map(t => t.month),
                 datasets: [{
@@ -1565,7 +1573,7 @@ async function loadReimbursementData() {
         // Create charts
         const trendCtx = document.getElementById('reimbursementTrendChart').getContext('2d');
         new Chart(trendCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.monthly_trend.map(t => t.month),
                 datasets: [{
@@ -1594,7 +1602,7 @@ async function loadReimbursementData() {
 
         const payerCtx = document.getElementById('reimbursementPayerChart').getContext('2d');
         new Chart(payerCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: data.by_payer.map(p => p.payer_name),
                 datasets: [{
@@ -1719,7 +1727,7 @@ async function loadCostsData() {
         // Create charts
         const trendCtx = document.getElementById('costsTrendChart').getContext('2d');
         new Chart(trendCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.monthly_trend.map(t => t.month),
                 datasets: [{
@@ -1747,7 +1755,7 @@ async function loadCostsData() {
 
         const breakdownCtx = document.getElementById('costsBreakdownChart').getContext('2d');
         new Chart(breakdownCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: ['Labor', 'Equipment', 'Supplies', 'Overhead'],
                 datasets: [{
@@ -1895,7 +1903,7 @@ async function loadLabData() {
         // Create charts
         const tatCtx = document.getElementById('labTatChart').getContext('2d');
         new Chart(tatCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.turnaround_trend.map(t => t.period),
                 datasets: [{
@@ -2244,7 +2252,7 @@ async function loadForecastingData() {
 
         const revenueCtx = document.getElementById('forecastRevenueChart').getContext('2d');
         new Chart(revenueCtx, {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: data.quarterly_forecast.map(q => q.quarter),
                 datasets: [{
@@ -2661,110 +2669,38 @@ function updateMetricPeriod(metric, period) {
 // Create all metric charts
 function createMetricCharts() {
     Object.keys(CONFIG.metrics).forEach(metric => {
-        const canvas = document.getElementById(`chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`);
-        if (!canvas) return;
+        const pieCanvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}Pie`;
+        const barCanvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}Bar`;
 
         const metricConfig = CONFIG.metrics[metric];
         const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
 
-        // Convert hex color to rgba
-        const hexToRgba = (hex, alpha = 1) => {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        };
+        // Create breakdown data for the bar chart
+        const breakdownIndex = data.indexOf(Math.max(...data));
+        const breakdownLabels = ['Part 1', 'Part 2', 'Part 3', 'Part 4'];
+        const breakdownValues = [
+            Math.floor(data[breakdownIndex] * 0.28),
+            Math.floor(data[breakdownIndex] * 0.24),
+            Math.floor(data[breakdownIndex] * 0.26),
+            Math.floor(data[breakdownIndex] * 0.22)
+        ];
 
-        const isPolar = metricConfig.chartType === 'polarArea';
-
-        metricCharts[metric] = new Chart(canvas.getContext('2d'), {
-            type: metricConfig.chartType,
-            data: {
-                labels,
-                datasets: [{
-                    label: metricConfig.label,
-                    data,
-                    backgroundColor: isPolar ? [
-                        hexToRgba(metricConfig.color, 0.9),
-                        hexToRgba(metricConfig.color, 0.7),
-                        hexToRgba(metricConfig.color, 0.5),
-                        hexToRgba(metricConfig.color, 0.3)
-                    ] : hexToRgba(metricConfig.color, CONFIG.charts.fillOpacity),
-                    borderColor: isPolar ? '#ffffff' : hexToRgba(metricConfig.color, 1),
-                    borderWidth: isPolar ? 2 : CONFIG.charts.borderWidth,
-                    tension: CONFIG.charts.tension,
-                    fill: !isPolar
-                }]
+        metricCharts[metric] = createBarOfPieChart({
+            pieCanvasId: pieCanvasId,
+            barCanvasId: barCanvasId,
+            mainData: {
+                labels: labels,
+                values: data
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    animateScale: true,
-                    animateRotate: true,
-                    duration: 1500,
-                    easing: 'easeInOutQuart'
-                },
-                plugins: {
-                    legend: {
-                        display: isPolar,
-                        position: 'bottom',
-                        labels: {
-                            font: { size: 9 },
-                            padding: 8,
-                            boxWidth: 12
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const label = context.label || '';
-                                const value = isPolar ? context.parsed.r : context.parsed.y;
-                                return `${label}: ${metricConfig.format(value)}`;
-                            }
-                        }
-                    }
-                },
-                scales: isPolar ? {
-                    r: {
-                        beginAtZero: true,
-                        ticks: {
-                            display: false
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    }
-                } : {
-                    y: {
-                        beginAtZero: metric === 'reimbursement' || metric === 'compliance' ? false : true,
-                        ticks: {
-                            callback: metricConfig.format
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            font: { size: 10 }
-                        }
-                    }
-                }
-            }
+            breakdownData: {
+                labels: breakdownLabels,
+                values: breakdownValues
+            },
+            breakdownIndex: breakdownIndex,
+            pieTitle: metricConfig.label,
+            breakdownTitle: `${labels[breakdownIndex]} Details`,
+            colorScheme: 'mixed'
         });
-
-        // Add real-time update effect
-        if (isPolar) {
-            setInterval(() => {
-                const chart = metricCharts[metric];
-                if (chart && chart.data.datasets[0]) {
-                    // Slightly vary the data to simulate real-time updates
-                    chart.data.datasets[0].data = chart.data.datasets[0].data.map(val => {
-                        const variance = (Math.random() - 0.5) * 0.02; // ±1% variance
-                        return val * (1 + variance);
-                    });
-                    chart.update('none'); // Update without animation for smooth effect
-                }
-            }, 3000); // Update every 3 seconds
-        }
     });
 }
 

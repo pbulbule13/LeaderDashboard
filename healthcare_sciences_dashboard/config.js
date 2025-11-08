@@ -63,7 +63,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#2563EB',      // blue-600
             borderColor: '#93C5FD',    // blue-200
             format: (value) => (value / 1000).toFixed(0) + 'K',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -82,7 +82,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#9333EA',      // purple-600
             borderColor: '#E9D5FF',    // purple-200
             format: (value) => value.toFixed(1) + '%',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -101,7 +101,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#16A34A',      // green-600
             borderColor: '#BBF7D0',    // green-200
             format: (value) => value.toFixed(1) + '%',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -120,7 +120,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#EA580C',      // orange-600
             borderColor: '#FED7AA',    // orange-200
             format: (value) => value.toFixed(1) + 'h',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -139,7 +139,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#DC2626',      // red-600
             borderColor: '#FECACA',    // red-200
             format: (value) => '$' + (value / 1000000).toFixed(1) + 'M',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -158,7 +158,7 @@ const DASHBOARD_CONFIG = {
             textColor: '#4F46E5',      // indigo-600
             borderColor: '#C7D2FE',    // indigo-200
             format: (value) => (value / 1000).toFixed(0) + 'K',
-            chartType: 'polarArea',
+            chartType: 'bar',
             periods: ['day', 'week', 'month', 'quarter'],
             defaultPeriod: 'day',
             baseValues: {
@@ -172,7 +172,7 @@ const DASHBOARD_CONFIG = {
 
     // ==================== CHART SETTINGS ====================
     charts: {
-        defaultType: 'line',
+        defaultType: 'bar',
         animationDuration: 300,
         tension: 0.4,
         borderWidth: 2,

@@ -15,7 +15,29 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .tile { transition: all 0.3s ease; }
         .tile:hover { transform: translateY(-2px); box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1); }
-        .chart-container { position: relative; height: 300px; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        .bar-pie-container {
+            display: grid;
+            grid-template-columns: 45% 55%;
+            gap: 1rem;
+            height: 100%;
+            align-items: center;
+            padding: 0.5rem;
+            background: linear-gradient(to right, rgba(239, 246, 255, 0.3) 0%, rgba(239, 246, 255, 0.3) 45%, transparent 45%, transparent 100%);
+            border-radius: 8px;
+        }
+        .bar-pie-container canvas { width: 100% !important; height: 100% !important; }
+        .bar-pie-container::after {
+            content: '';
+            position: absolute;
+            left: 45%;
+            top: 50%;
+            width: 2%;
+            height: 2px;
+            background: linear-gradient(to right, #93C5FD, #DBEAFE);
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
         .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
         .email-item:hover { background: #F9FAFB; }
@@ -255,7 +277,10 @@
                             <button onclick="updateMetricPeriod('orders', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="orders" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartOrders"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartOrdersPie"></canvas>
+                        <canvas id="chartOrdersBar"></canvas>
+                    </div>
                 </div>
 
                 <!-- Reimbursement Chart -->
@@ -269,7 +294,10 @@
                             <button onclick="updateMetricPeriod('reimbursement', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="reimbursement" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartReimbursement"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartReimbursementPie"></canvas>
+                        <canvas id="chartReimbursementBar"></canvas>
+                    </div>
                 </div>
 
                 <!-- Compliance Chart -->
@@ -283,7 +311,10 @@
                             <button onclick="updateMetricPeriod('compliance', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="compliance" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartCompliance"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartCompliancePie"></canvas>
+                        <canvas id="chartComplianceBar"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -299,7 +330,10 @@
                             <button onclick="updateMetricPeriod('lab', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="lab" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartLab"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartLabPie"></canvas>
+                        <canvas id="chartLabBar"></canvas>
+                    </div>
                 </div>
 
                 <!-- Costs Chart -->
@@ -313,7 +347,10 @@
                             <button onclick="updateMetricPeriod('costs', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="costs" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartCosts"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartCostsPie"></canvas>
+                        <canvas id="chartCostsBar"></canvas>
+                    </div>
                 </div>
 
                 <!-- Forecast Chart -->
@@ -327,7 +364,10 @@
                             <button onclick="updateMetricPeriod('forecast', 'quarter')" class="period-btn px-2 py-1 text-xs rounded hover:bg-blue-50 text-gray-600" data-metric="forecast" data-period="quarter">Q</button>
                         </div>
                     </div>
-                    <div class="h-48"><canvas id="chartForecast"></canvas></div>
+                    <div class="h-48 bar-pie-container">
+                        <canvas id="chartForecastPie"></canvas>
+                        <canvas id="chartForecastBar"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -445,14 +485,16 @@
             <div class="grid grid-cols-3 gap-6 mb-6">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">📊 Order Volume Trend</h3>
-                    <div class="chart-container">
-                        <canvas id="overviewOrdersChart"></canvas>
+                    <div class="chart-container bar-pie-container">
+                        <canvas id="overviewOrdersChartPie"></canvas>
+                        <canvas id="overviewOrdersChartBar"></canvas>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">💰 Operating Costs</h3>
-                    <div class="chart-container">
-                        <canvas id="overviewFinancialsChart"></canvas>
+                    <div class="chart-container bar-pie-container">
+                        <canvas id="overviewFinancialsChartPie"></canvas>
+                        <canvas id="overviewFinancialsChartBar"></canvas>
                     </div>
                 </div>
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
@@ -1143,6 +1185,7 @@
     </div>
 
     <script src="test_data.js"></script>
+    <script src="bar-of-pie.js"></script>
     <script src="dashboard.js"></script>
     <script src="voice_agent_integration.js"></script>
     <script src="communications_enhanced.js"></script>
