@@ -109,7 +109,10 @@ Provide a strategic analysis with:
         Create appropriate LLM client based on model name.
 
         Supports:
-        - OpenAI models (gpt-*, deepseek-*, grok-*)
+        - OpenAI models (gpt-*)
+        - Euron models (euron-*, euri-*, gpt-4.1-*)
+        - DeepSeek models (deepseek-*)
+        - Grok models (grok-*)
         - Anthropic models (claude-*)
         - Google models (gemini-*)
         """
@@ -124,12 +127,21 @@ Provide a strategic analysis with:
             elif "gemini" in model_lower:
                 return ChatGoogleGenerativeAI(model=model_name, temperature=0.7)
 
-            # OpenAI and OpenAI-compatible models (GPT, DeepSeek, Grok, etc.)
+            # OpenAI and OpenAI-compatible models (GPT, DeepSeek, Grok, Euron, etc.)
             else:
-                # For DeepSeek and Grok, they use OpenAI-compatible APIs
+                # For DeepSeek, Grok, and Euron, they use OpenAI-compatible APIs
                 # DeepSeek uses base_url="https://api.deepseek.com"
                 # Grok uses base_url="https://api.x.ai/v1"
-                if "deepseek" in model_lower:
+                # Euron uses base_url="https://api.euron.one/api/v1/euri"
+                if "euron" in model_lower or "euri" in model_lower or "gpt-4.1" in model_lower:
+                    # Euron uses OpenAI-compatible API
+                    return ChatOpenAI(
+                        model=model_name,
+                        temperature=0.7,
+                        openai_api_base=os.getenv("EURON_API_BASE", "https://api.euron.one/api/v1/euri"),
+                        openai_api_key=os.getenv("EURON_API_KEY", os.getenv("OPENAI_API_KEY"))
+                    )
+                elif "deepseek" in model_lower:
                     # DeepSeek uses OpenAI-compatible API
                     return ChatOpenAI(
                         model=model_name,

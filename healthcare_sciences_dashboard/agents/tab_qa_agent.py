@@ -229,6 +229,7 @@ Remember: You're helping a CEO make informed decisions based on REAL data you ca
 
         Supports:
         - OpenAI models (gpt-*, o1-*)
+        - Euron models (euron-*, euri-*, gpt-4.1-*)
         - DeepSeek models (deepseek-*)
         - Google Gemini models (gemini-*)
         """
@@ -246,6 +247,22 @@ Remember: You're helping a CEO make informed decisions based on REAL data you ca
                     temperature=0.7,
                     max_tokens=2000,
                     google_api_key=api_key
+                )
+
+            # Euron models
+            elif "euron" in model_lower or "euri" in model_lower or "gpt-4.1" in model_lower:
+                api_key = os.getenv("EURON_API_KEY", os.getenv("OPENAI_API_KEY"))
+                api_base = os.getenv("EURON_API_BASE", "https://api.euron.one/api/v1/euri")
+
+                if not api_key:
+                    raise ValueError("EURON_API_KEY or OPENAI_API_KEY environment variable is required for Euron")
+
+                return ChatOpenAI(
+                    model=model_name,
+                    temperature=0.7,
+                    max_tokens=2000,
+                    openai_api_base=api_base,
+                    openai_api_key=api_key
                 )
 
             # DeepSeek models
