@@ -1303,6 +1303,13 @@ async function loadOrdersData() {
 
     } catch (error) {
         console.error('Error rendering orders data:', error);
+        container.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 m-4">
+                <h3 class="text-red-800 font-bold mb-2">Error Loading Orders Data</h3>
+                <p class="text-red-600 text-sm">${error.message}</p>
+                <pre class="text-xs text-red-500 mt-2 overflow-auto">${error.stack}</pre>
+            </div>
+        `;
     }
 }
 
@@ -1429,6 +1436,13 @@ async function loadComplianceData() {
 
     } catch (error) {
         console.error('Error rendering compliance data:', error);
+        container.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 m-4">
+                <h3 class="text-red-800 font-bold mb-2">Error Loading Compliance Data</h3>
+                <p class="text-red-600 text-sm">${error.message}</p>
+                <pre class="text-xs text-red-500 mt-2 overflow-auto">${error.stack}</pre>
+            </div>
+        `;
     }
 }
 
@@ -1907,6 +1921,13 @@ async function loadLabData() {
 
     } catch (error) {
         console.error('Error rendering lab data:', error);
+        container.innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 m-4">
+                <h3 class="text-red-800 font-bold mb-2">Error Loading Labs Data</h3>
+                <p class="text-red-600 text-sm">${error.message}</p>
+                <pre class="text-xs text-red-500 mt-2 overflow-auto">${error.stack}</pre>
+            </div>
+        `;
     }
 }
 
