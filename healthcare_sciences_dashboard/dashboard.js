@@ -705,78 +705,75 @@ function updateAIPanelContext(tabName) {
 function createOverviewCharts(data) {
     if (overviewChartsCreated) return;
 
-    // Orders Bar of Pie Chart
+    // Orders Multilevel Donut Chart
     const orderTrends = data.order_volume.trend_data || [];
     const orderLabels = orderTrends.map(t => t.period);
     const orderValues = orderTrends.map(t => t.count);
 
-    // Take first 4 for pie, last one for breakdown
-    const mainOrderLabels = orderLabels.slice(0, Math.min(4, orderLabels.length));
-    const mainOrderValues = orderValues.slice(0, Math.min(4, orderValues.length));
+    // Inner ring: main periods
+    const innerOrderLabels = orderLabels.slice(0, Math.min(3, orderLabels.length));
+    const innerOrderValues = orderValues.slice(0, Math.min(3, orderValues.length));
 
-    // Breakdown of the largest slice
-    const breakdownIndex = mainOrderValues.indexOf(Math.max(...mainOrderValues));
-    const breakdownLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    const breakdownValues = mainOrderValues[breakdownIndex] ?
-        [
-            Math.floor(mainOrderValues[breakdownIndex] * 0.28),
-            Math.floor(mainOrderValues[breakdownIndex] * 0.24),
-            Math.floor(mainOrderValues[breakdownIndex] * 0.26),
-            Math.floor(mainOrderValues[breakdownIndex] * 0.22)
-        ] : [0, 0, 0, 0];
+    // Outer ring: breakdown of largest period
+    const maxOrderIndex = orderValues.indexOf(Math.max(...orderValues));
+    const outerOrderLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    const outerOrderValues = orderValues[maxOrderIndex] ? [
+        Math.floor(orderValues[maxOrderIndex] * 0.28),
+        Math.floor(orderValues[maxOrderIndex] * 0.24),
+        Math.floor(orderValues[maxOrderIndex] * 0.26),
+        Math.floor(orderValues[maxOrderIndex] * 0.22)
+    ] : [0, 0, 0, 0];
 
-    charts.overviewOrders = createBarOfPieChart({
-        pieCanvasId: 'overviewOrdersChartPie',
-        barCanvasId: 'overviewOrdersChartBar',
-        mainData: {
-            labels: mainOrderLabels,
-            values: mainOrderValues
+    charts.overviewOrders = createMultilevelDonutChart({
+        canvasId: 'overviewOrdersChart',
+        innerData: {
+            labels: innerOrderLabels,
+            values: innerOrderValues
         },
-        breakdownData: {
-            labels: breakdownLabels,
-            values: breakdownValues
+        outerData: {
+            labels: outerOrderLabels,
+            values: outerOrderValues
         },
-        breakdownIndex: breakdownIndex,
-        pieTitle: 'Orders by Period',
-        breakdownTitle: `${mainOrderLabels[breakdownIndex]} Breakdown`,
-        colorScheme: 'blue'
+        title: 'Order Volume Distribution',
+        innerLabel: 'Period',
+        outerLabel: 'Weekly Breakdown',
+        colorScheme: 'professional'
     });
 
-    // Operating Costs Bar of Pie Chart
+    // Operating Costs Multilevel Donut Chart
     const costTrends = data.operating_costs.monthly_trend.slice(-6) || [];
     const costLabels = costTrends.map(m => m.month);
     const costValues = costTrends.map(m => m.total_cost / 1000000);
 
-    // Take first 4 for pie
-    const mainCostLabels = costLabels.slice(0, Math.min(4, costLabels.length));
-    const mainCostValues = costValues.slice(0, Math.min(4, costValues.length));
+    // Inner ring: main months
+    const innerCostLabels = costLabels.slice(0, Math.min(3, costLabels.length));
+    const innerCostValues = costValues.slice(0, Math.min(3, costValues.length));
 
-    // Breakdown by cost categories
-    const costBreakdownIndex = mainCostValues.indexOf(Math.max(...mainCostValues));
-    const costBreakdownLabels = ['AWS', 'Salaries', 'Lab Costs', 'Equipment', 'Other'];
-    const costBreakdownValues = [
-        Math.floor(mainCostValues[costBreakdownIndex] * 0.30),
-        Math.floor(mainCostValues[costBreakdownIndex] * 0.35),
-        Math.floor(mainCostValues[costBreakdownIndex] * 0.20),
-        Math.floor(mainCostValues[costBreakdownIndex] * 0.10),
-        Math.floor(mainCostValues[costBreakdownIndex] * 0.05)
-    ];
+    // Outer ring: cost breakdown
+    const maxCostIndex = costValues.indexOf(Math.max(...costValues));
+    const outerCostLabels = ['AWS', 'Salaries', 'Lab', 'Equipment', 'Other'];
+    const outerCostValues = costValues[maxCostIndex] ? [
+        (costValues[maxCostIndex] * 0.30),
+        (costValues[maxCostIndex] * 0.35),
+        (costValues[maxCostIndex] * 0.20),
+        (costValues[maxCostIndex] * 0.10),
+        (costValues[maxCostIndex] * 0.05)
+    ] : [0, 0, 0, 0, 0];
 
-    charts.overviewFinancials = createBarOfPieChart({
-        pieCanvasId: 'overviewFinancialsChartPie',
-        barCanvasId: 'overviewFinancialsChartBar',
-        mainData: {
-            labels: mainCostLabels,
-            values: mainCostValues
+    charts.overviewFinancials = createMultilevelDonutChart({
+        canvasId: 'overviewFinancialsChart',
+        innerData: {
+            labels: innerCostLabels,
+            values: innerCostValues
         },
-        breakdownData: {
-            labels: costBreakdownLabels,
-            values: costBreakdownValues
+        outerData: {
+            labels: outerCostLabels,
+            values: outerCostValues
         },
-        breakdownIndex: costBreakdownIndex,
-        pieTitle: 'Costs by Month ($M)',
-        breakdownTitle: `${mainCostLabels[costBreakdownIndex]} Cost Breakdown ($M)`,
-        colorScheme: 'mixed'
+        title: 'Operating Costs Distribution ($M)',
+        innerLabel: 'Month',
+        outerLabel: 'Cost Categories',
+        colorScheme: 'professional'
     });
 
     overviewChartsCreated = true;
@@ -2669,37 +2666,39 @@ function updateMetricPeriod(metric, period) {
 // Create all metric charts
 function createMetricCharts() {
     Object.keys(CONFIG.metrics).forEach(metric => {
-        const pieCanvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}Pie`;
-        const barCanvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}Bar`;
+        const canvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`;
 
         const metricConfig = CONFIG.metrics[metric];
         const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
 
-        // Create breakdown data for the bar chart
-        const breakdownIndex = data.indexOf(Math.max(...data));
-        const breakdownLabels = ['Part 1', 'Part 2', 'Part 3', 'Part 4'];
-        const breakdownValues = [
-            Math.floor(data[breakdownIndex] * 0.28),
-            Math.floor(data[breakdownIndex] * 0.24),
-            Math.floor(data[breakdownIndex] * 0.26),
-            Math.floor(data[breakdownIndex] * 0.22)
+        // Create inner ring data (main categories)
+        const innerLabels = labels.slice(0, Math.min(3, labels.length));
+        const innerData = data.slice(0, Math.min(3, data.length));
+
+        // Create outer ring data (subcategories - breakdown of largest)
+        const maxIndex = data.indexOf(Math.max(...data));
+        const outerLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+        const outerData = [
+            Math.floor(data[maxIndex] * 0.28),
+            Math.floor(data[maxIndex] * 0.24),
+            Math.floor(data[maxIndex] * 0.26),
+            Math.floor(data[maxIndex] * 0.22)
         ];
 
-        metricCharts[metric] = createBarOfPieChart({
-            pieCanvasId: pieCanvasId,
-            barCanvasId: barCanvasId,
-            mainData: {
-                labels: labels,
-                values: data
+        metricCharts[metric] = createMultilevelDonutChart({
+            canvasId: canvasId,
+            innerData: {
+                labels: innerLabels,
+                values: innerData
             },
-            breakdownData: {
-                labels: breakdownLabels,
-                values: breakdownValues
+            outerData: {
+                labels: outerLabels,
+                values: outerData
             },
-            breakdownIndex: breakdownIndex,
-            pieTitle: metricConfig.label,
-            breakdownTitle: `${labels[breakdownIndex]} Details`,
-            colorScheme: 'mixed'
+            title: metricConfig.label,
+            innerLabel: 'Period',
+            outerLabel: 'Breakdown',
+            colorScheme: 'professional'
         });
     });
 }
