@@ -1178,6 +1178,9 @@ async function loadOrdersData() {
     }
 
     console.log('Data ready, has trend_data:', !!data?.trend_data);
+    console.log('Data object:', data);
+    console.log('Has monthly_orders:', !!data?.monthly_orders);
+    console.log('Has growth_metrics:', !!data?.growth_metrics);
 
     try {
         // Ensure data has required fields
