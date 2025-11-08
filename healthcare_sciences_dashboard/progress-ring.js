@@ -49,7 +49,7 @@ class ProgressRingChart {
                 data: [percentage, remaining],
                 backgroundColor: [ringColors[index], 'rgba(229, 231, 235, 0.3)'],
                 borderWidth: 0,
-                cutout: `${50 + (index * 12)}%`, // Each ring gets progressively smaller - thicker rings
+                cutout: `${35 + (index * 15)}%`, // Much thicker rings - reduced from 50% to 35%
                 circumference: 360,
                 rotation: -90, // Start from top
                 borderRadius: 10,
@@ -184,20 +184,20 @@ function createProgressRingChart(config) {
     });
 }
 
-// Apple Watch style color generator
+// Professional light color palette generator
 function generateProgressColors(count) {
-    const appleWatchColors = [
-        '#FF2D55', // Move ring (red/pink)
-        '#00FF00', // Exercise ring (green)
-        '#00C7BE', // Stand ring (cyan)
-        '#5856D6', // Purple
-        '#FF9500', // Orange
-        '#FFCC00'  // Yellow
+    const professionalColors = [
+        '#93C5FD', // Light blue
+        '#86EFAC', // Light green
+        '#FCD34D', // Light yellow
+        '#C4B5FD', // Light purple
+        '#F9A8D4', // Light pink
+        '#67E8F9'  // Light cyan
     ];
 
     const colors = [];
     for (let i = 0; i < count; i++) {
-        colors.push(appleWatchColors[i % appleWatchColors.length]);
+        colors.push(professionalColors[i % professionalColors.length]);
     }
     return colors;
 }

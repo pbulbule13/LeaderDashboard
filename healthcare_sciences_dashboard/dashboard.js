@@ -1261,32 +1261,40 @@ async function loadOrdersData() {
             </div>
         `;
 
-        // Create Apple Watch-style progress ring charts
-        const recentTrends = data.trend_data.slice(-3);  // Last 3 periods
-        const maxTrendValue = Math.max(...recentTrends.map(t => t.count)) * 1.2;
+        // Create Apple Watch-style progress ring charts (with delay to ensure DOM is ready)
+        setTimeout(() => {
+            try {
+                const recentTrends = data.trend_data.slice(-3);  // Last 3 periods
+                const maxTrendValue = Math.max(...recentTrends.map(t => t.count)) * 1.2;
 
-        createProgressRingChart({
-            canvasId: 'ordersDetailChart',
-            labels: recentTrends.map(t => t.period),
-            values: recentTrends.map(t => t.count),
-            maxValues: recentTrends.map(() => maxTrendValue),
-            title: 'Order Volume Trend',
-            showCenterText: true,
-            centerLabel: recentTrends[0].period
-        });
+                createProgressRingChart({
+                    canvasId: 'ordersDetailChart',
+                    labels: recentTrends.map(t => t.period),
+                    values: recentTrends.map(t => t.count),
+                    maxValues: recentTrends.map(() => maxTrendValue),
+                    title: 'Order Volume Trend',
+                    showCenterText: true,
+                    centerLabel: recentTrends[0].period
+                });
 
-        const topCategories = data.by_category.slice(0, 3);  // Top 3 categories
-        const maxCategoryValue = Math.max(...topCategories.map(c => c.count)) * 1.2;
+                const topCategories = data.by_category.slice(0, 3);  // Top 3 categories
+                const maxCategoryValue = Math.max(...topCategories.map(c => c.count)) * 1.2;
 
-        createProgressRingChart({
-            canvasId: 'ordersCategoryChart',
-            labels: topCategories.map(c => c.category),
-            values: topCategories.map(c => c.count),
-            maxValues: topCategories.map(() => maxCategoryValue),
-            title: 'Orders by Category',
-            showCenterText: true,
-            centerLabel: topCategories[0].category
-        });
+                createProgressRingChart({
+                    canvasId: 'ordersCategoryChart',
+                    labels: topCategories.map(c => c.category),
+                    values: topCategories.map(c => c.count),
+                    maxValues: topCategories.map(() => maxCategoryValue),
+                    title: 'Orders by Category',
+                    showCenterText: true,
+                    centerLabel: topCategories[0].category
+                });
+
+                console.log('Orders tab charts created successfully');
+            } catch (error) {
+                console.error('Error creating orders tab charts:', error);
+            }
+        }, 100);
 
         // Update current tab data for AI context
         if (currentTab === 'orders') {
@@ -1380,31 +1388,39 @@ async function loadComplianceData() {
             </div>
         `;
 
-        // Create Apple Watch-style progress ring charts
-        const recentMonths = data.monthly_trend.slice(-3);  // Last 3 months
+        // Create Apple Watch-style progress ring charts (with delay to ensure DOM is ready)
+        setTimeout(() => {
+            try {
+                const recentMonths = data.monthly_trend.slice(-3);  // Last 3 months
 
-        createProgressRingChart({
-            canvasId: 'complianceTrendChart',
-            labels: recentMonths.map(t => t.month),
-            values: recentMonths.map(t => 100 - t.return_rate),
-            maxValues: [100, 100, 100],  // Compliance rate is always out of 100%
-            title: 'Compliance Trend',
-            showCenterText: true,
-            centerLabel: recentMonths[0].month
-        });
+                createProgressRingChart({
+                    canvasId: 'complianceTrendChart',
+                    labels: recentMonths.map(t => t.month),
+                    values: recentMonths.map(t => 100 - t.return_rate),
+                    maxValues: [100, 100, 100],  // Compliance rate is always out of 100%
+                    title: 'Compliance Trend',
+                    showCenterText: true,
+                    centerLabel: recentMonths[0].month
+                });
 
-        const topReasons = data.top_return_reasons.slice(0, 3);  // Top 3 reasons
-        const maxReasonCount = Math.max(...topReasons.map(r => r.count)) * 1.2;
+                const topReasons = data.top_return_reasons.slice(0, 3);  // Top 3 reasons
+                const maxReasonCount = Math.max(...topReasons.map(r => r.count)) * 1.2;
 
-        createProgressRingChart({
-            canvasId: 'complianceReasonsChart',
-            labels: topReasons.map(r => r.reason),
-            values: topReasons.map(r => r.count),
-            maxValues: topReasons.map(() => maxReasonCount),
-            title: 'Return Reasons',
-            showCenterText: true,
-            centerLabel: topReasons[0].reason
-        });
+                createProgressRingChart({
+                    canvasId: 'complianceReasonsChart',
+                    labels: topReasons.map(r => r.reason),
+                    values: topReasons.map(r => r.count),
+                    maxValues: topReasons.map(() => maxReasonCount),
+                    title: 'Return Reasons',
+                    showCenterText: true,
+                    centerLabel: topReasons[0].reason
+                });
+
+                console.log('Compliance tab charts created successfully');
+            } catch (error) {
+                console.error('Error creating compliance tab charts:', error);
+            }
+        }, 100);
 
         // Update current tab data for AI context
         if (currentTab === 'compliance') {
@@ -1850,31 +1866,39 @@ async function loadLabData() {
             </div>
         `;
 
-        // Create Apple Watch-style progress ring charts
-        const recentTat = data.turnaround_trend.slice(-3);  // Last 3 periods
+        // Create Apple Watch-style progress ring charts (with delay to ensure DOM is ready)
+        setTimeout(() => {
+            try {
+                const recentTat = data.turnaround_trend.slice(-3);  // Last 3 periods
 
-        createProgressRingChart({
-            canvasId: 'labTatChart',
-            labels: recentTat.map(t => t.period),
-            values: recentTat.map(t => t.avg_hours),
-            maxValues: recentTat.map(() => data.target_turnaround_hours * 1.5),  // Show target as max
-            title: 'TAT Trend',
-            showCenterText: true,
-            centerLabel: recentTat[0].period
-        });
+                createProgressRingChart({
+                    canvasId: 'labTatChart',
+                    labels: recentTat.map(t => t.period),
+                    values: recentTat.map(t => t.avg_hours),
+                    maxValues: recentTat.map(() => data.target_turnaround_hours * 1.5),  // Show target as max
+                    title: 'TAT Trend',
+                    showCenterText: true,
+                    centerLabel: recentTat[0].period
+                });
 
-        const topTests = data.tests_by_type.slice(0, 3);  // Top 3 test types
-        const maxTestCount = Math.max(...topTests.map(t => t.count)) * 1.2;
+                const topTests = data.tests_by_type.slice(0, 3);  // Top 3 test types
+                const maxTestCount = Math.max(...topTests.map(t => t.count)) * 1.2;
 
-        createProgressRingChart({
-            canvasId: 'labTestsChart',
-            labels: topTests.map(t => t.test_type),
-            values: topTests.map(t => t.count),
-            maxValues: topTests.map(() => maxTestCount),
-            title: 'Tests by Type',
-            showCenterText: true,
-            centerLabel: topTests[0].test_type
-        });
+                createProgressRingChart({
+                    canvasId: 'labTestsChart',
+                    labels: topTests.map(t => t.test_type),
+                    values: topTests.map(t => t.count),
+                    maxValues: topTests.map(() => maxTestCount),
+                    title: 'Tests by Type',
+                    showCenterText: true,
+                    centerLabel: topTests[0].test_type
+                });
+
+                console.log('Labs tab charts created successfully');
+            } catch (error) {
+                console.error('Error creating labs tab charts:', error);
+            }
+        }, 100);
 
         // Update current tab data for AI context
         if (currentTab === 'lab') {
