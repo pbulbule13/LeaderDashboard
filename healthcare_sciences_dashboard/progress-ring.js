@@ -57,6 +57,31 @@ class ProgressRingChart {
             };
         });
 
+        // Create center text plugin if needed
+        const centerTextPlugin = this.options.showCenterText ? {
+            id: 'centerText',
+            beforeDraw: (chart) => {
+                const ctx = chart.ctx;
+                const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#1F2937';
+                ctx.font = 'bold 24px Inter, system-ui, sans-serif';
+
+                const mainValue = values[0];
+                ctx.fillText(mainValue.toLocaleString(), centerX, centerY - 5);
+
+                ctx.fillStyle = '#6B7280';
+                ctx.font = '12px Inter, system-ui, sans-serif';
+                ctx.fillText(this.options.centerLabel || '', centerX, centerY + 15);
+
+                ctx.restore();
+            }
+        } : null;
+
         this.chart = new Chart(this.canvas, {
             type: 'doughnut',
             data: {
@@ -111,42 +136,11 @@ class ProgressRingChart {
                     duration: 1500,
                     easing: 'easeInOutQuart'
                 }
-            }
+            },
+            plugins: centerTextPlugin ? [centerTextPlugin] : []
         });
-
-        // Add center text
-        this.addCenterText();
     }
 
-    addCenterText() {
-        if (!this.options.showCenterText) return;
-
-        const centerPlugin = {
-            id: 'centerText',
-            beforeDraw: (chart) => {
-                const ctx = chart.ctx;
-                const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
-                const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
-
-                ctx.save();
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#1F2937';
-                ctx.font = 'bold 24px Inter, system-ui, sans-serif';
-
-                const mainValue = this.data.values[0];
-                ctx.fillText(mainValue.toLocaleString(), centerX, centerY - 5);
-
-                ctx.fillStyle = '#6B7280';
-                ctx.font = '12px Inter, system-ui, sans-serif';
-                ctx.fillText(this.options.centerLabel || '', centerX, centerY + 15);
-
-                ctx.restore();
-            }
-        };
-
-        this.chart.options.plugins.push(centerPlugin);
-    }
 
     update(newData) {
         this.data = newData;
