@@ -49,11 +49,11 @@ class ProgressRingChart {
                 data: [percentage, remaining],
                 backgroundColor: [ringColors[index], 'rgba(229, 231, 235, 0.3)'],
                 borderWidth: 0,
-                cutout: `${65 + (index * 8)}%`, // Each ring gets progressively smaller
+                cutout: `${50 + (index * 12)}%`, // Each ring gets progressively smaller - thicker rings
                 circumference: 360,
                 rotation: -90, // Start from top
                 borderRadius: 10,
-                spacing: 2
+                spacing: 0
             };
         });
 

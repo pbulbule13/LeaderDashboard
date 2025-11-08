@@ -705,49 +705,69 @@ function updateAIPanelContext(tabName) {
 function createOverviewCharts(data) {
     if (overviewChartsCreated) return;
 
-    // Orders Progress Ring Chart
-    const orderTrends = data.order_volume.trend_data || [];
-    const orderLabels = orderTrends.map(t => t.period);
-    const orderValues = orderTrends.map(t => t.count);
+    try {
+        // Orders Progress Ring Chart
+        const orderCanvas = document.getElementById('overviewOrdersChart');
+        if (orderCanvas) {
+            const orderTrends = data.order_volume.trend_data || [];
+            const orderLabels = orderTrends.map(t => t.period);
+            const orderValues = orderTrends.map(t => t.count);
 
-    // Take first 3 periods for rings
-    const ringOrderLabels = orderLabels.slice(0, Math.min(3, orderLabels.length));
-    const ringOrderValues = orderValues.slice(0, Math.min(3, orderValues.length));
+            // Take first 3 periods for rings
+            const ringOrderLabels = orderLabels.slice(0, Math.min(3, orderLabels.length));
+            const ringOrderValues = orderValues.slice(0, Math.min(3, orderValues.length));
 
-    const maxOrderValue = Math.max(...ringOrderValues) * 1.2;
-    const orderMaxValues = ringOrderValues.map(() => maxOrderValue);
+            const maxOrderValue = Math.max(...ringOrderValues) * 1.2;
+            const orderMaxValues = ringOrderValues.map(() => maxOrderValue);
 
-    charts.overviewOrders = createProgressRingChart({
-        canvasId: 'overviewOrdersChart',
-        labels: ringOrderLabels,
-        values: ringOrderValues,
-        maxValues: orderMaxValues,
-        title: 'Order Volume Progress',
-        centerLabel: 'Orders',
-        showCenterText: true
-    });
+            charts.overviewOrders = createProgressRingChart({
+                canvasId: 'overviewOrdersChart',
+                labels: ringOrderLabels,
+                values: ringOrderValues,
+                maxValues: orderMaxValues,
+                title: 'Order Volume Progress',
+                centerLabel: 'Orders',
+                showCenterText: true
+            });
+            console.log('Successfully created overview orders chart');
+        } else {
+            console.warn('overviewOrdersChart canvas not found');
+        }
+    } catch (error) {
+        console.error('Error creating overview orders chart:', error);
+    }
 
-    // Operating Costs Progress Ring Chart
-    const costTrends = data.operating_costs.monthly_trend.slice(-6) || [];
-    const costLabels = costTrends.map(m => m.month);
-    const costValues = costTrends.map(m => m.total_cost / 1000000);
+    try {
+        // Operating Costs Progress Ring Chart
+        const costCanvas = document.getElementById('overviewFinancialsChart');
+        if (costCanvas) {
+            const costTrends = data.operating_costs.monthly_trend.slice(-6) || [];
+            const costLabels = costTrends.map(m => m.month);
+            const costValues = costTrends.map(m => m.total_cost / 1000000);
 
-    // Take last 3 months for rings
-    const ringCostLabels = costLabels.slice(-3);
-    const ringCostValues = costValues.slice(-3);
+            // Take last 3 months for rings
+            const ringCostLabels = costLabels.slice(-3);
+            const ringCostValues = costValues.slice(-3);
 
-    const maxCostValue = Math.max(...ringCostValues) * 1.2;
-    const costMaxValues = ringCostValues.map(() => maxCostValue);
+            const maxCostValue = Math.max(...ringCostValues) * 1.2;
+            const costMaxValues = ringCostValues.map(() => maxCostValue);
 
-    charts.overviewFinancials = createProgressRingChart({
-        canvasId: 'overviewFinancialsChart',
-        labels: ringCostLabels,
-        values: ringCostValues,
-        maxValues: costMaxValues,
-        title: 'Operating Costs ($M)',
-        centerLabel: 'Costs',
-        showCenterText: true
-    });
+            charts.overviewFinancials = createProgressRingChart({
+                canvasId: 'overviewFinancialsChart',
+                labels: ringCostLabels,
+                values: ringCostValues,
+                maxValues: costMaxValues,
+                title: 'Operating Costs ($M)',
+                centerLabel: 'Costs',
+                showCenterText: true
+            });
+            console.log('Successfully created overview financials chart');
+        } else {
+            console.warn('overviewFinancialsChart canvas not found');
+        }
+    } catch (error) {
+        console.error('Error creating overview financials chart:', error);
+    }
 
     overviewChartsCreated = true;
 }
@@ -2578,28 +2598,40 @@ function updateMetricPeriod(metric, period) {
 // Create all metric charts
 function createMetricCharts() {
     Object.keys(CONFIG.metrics).forEach(metric => {
-        const canvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`;
+        try {
+            const canvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`;
+            const canvas = document.getElementById(canvasId);
 
-        const metricConfig = CONFIG.metrics[metric];
-        const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
+            if (!canvas) {
+                console.warn(`Canvas element ${canvasId} not found for metric ${metric}`);
+                return;
+            }
 
-        // Create Apple Watch style progress rings
-        const ringLabels = labels.slice(0, Math.min(3, labels.length));
-        const ringValues = data.slice(0, Math.min(3, data.length));
+            const metricConfig = CONFIG.metrics[metric];
+            const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
 
-        // Calculate max values for each ring (for progress calculation)
-        const maxValue = Math.max(...ringValues) * 1.2; // 120% of max for scaling
-        const maxValues = ringValues.map(() => maxValue);
+            // Create Apple Watch style progress rings
+            const ringLabels = labels.slice(0, Math.min(3, labels.length));
+            const ringValues = data.slice(0, Math.min(3, data.length));
 
-        metricCharts[metric] = createProgressRingChart({
-            canvasId: canvasId,
-            labels: ringLabels,
-            values: ringValues,
-            maxValues: maxValues,
-            title: metricConfig.label,
-            centerLabel: ringLabels[0],
-            showCenterText: true
-        });
+            // Calculate max values for each ring (for progress calculation)
+            const maxValue = Math.max(...ringValues) * 1.2; // 120% of max for scaling
+            const maxValues = ringValues.map(() => maxValue);
+
+            metricCharts[metric] = createProgressRingChart({
+                canvasId: canvasId,
+                labels: ringLabels,
+                values: ringValues,
+                maxValues: maxValues,
+                title: metricConfig.label,
+                centerLabel: ringLabels[0],
+                showCenterText: true
+            });
+
+            console.log(`Successfully created chart for ${metric}`);
+        } catch (error) {
+            console.error(`Error creating chart for ${metric}:`, error);
+        }
     });
 }
 
@@ -2930,9 +2962,11 @@ async function askQuick(question) {
 // Initialize metric charts and quick notes on load
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
+        console.log('Initializing metric charts...');
         createMetricCharts();
         renderQuickNotes();
-    }, 1000);
+        console.log('Chart initialization complete');
+    }, 1500);  // Increased timeout to ensure all elements are loaded
 });
 
 // ==================== REMINDERS FUNCTIONALITY ====================
