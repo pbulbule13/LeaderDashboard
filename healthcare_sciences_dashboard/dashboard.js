@@ -728,7 +728,7 @@ function createOverviewCharts(data) {
                 colors: ['#DBEAFE', '#93C5FD', '#60A5FA'],  // Blue theme for orders
                 title: 'Order Volume Progress',
                 centerLabel: 'Orders',
-                showCenterText: true
+                showCenterText: false
             });
             console.log('Successfully created overview orders chart');
         } else {
@@ -761,7 +761,7 @@ function createOverviewCharts(data) {
                 colors: ['#FEF3C7', '#FCD34D', '#F59E0B'],  // Yellow/Amber theme for costs
                 title: 'Operating Costs ($M)',
                 centerLabel: 'Costs',
-                showCenterText: true
+                showCenterText: false
             });
             console.log('Successfully created overview financials chart');
         } else {
@@ -1301,7 +1301,7 @@ async function loadOrdersData() {
                     maxValues: recentTrends.map(() => maxTrendValue),
                     colors: ['#DBEAFE', '#93C5FD', '#3B82F6'],  // Blue theme for order trends
                     title: 'Order Volume Trend',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: recentTrends[0].period
                 });
 
@@ -1315,7 +1315,7 @@ async function loadOrdersData() {
                     maxValues: topCategories.map(() => maxCategoryValue),
                     colors: ['#E0E7FF', '#A5B4FC', '#6366F1'],  // Indigo theme for categories
                     title: 'Orders by Category',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: topCategories[0].category
                 });
 
@@ -1441,7 +1441,7 @@ async function loadComplianceData() {
                     maxValues: [100, 100, 100],  // Compliance rate is always out of 100%
                     colors: ['#D1FAE5', '#6EE7B7', '#10B981'],  // Green theme for compliance
                     title: 'Compliance Trend',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: recentMonths[0].month
                 });
 
@@ -1455,7 +1455,7 @@ async function loadComplianceData() {
                     maxValues: topReasons.map(() => maxReasonCount),
                     colors: ['#FED7AA', '#FDBA74', '#F97316'],  // Orange theme for issues
                     title: 'Return Reasons',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: topReasons[0].reason
                 });
 
@@ -1935,7 +1935,7 @@ async function loadLabData() {
                     maxValues: recentTat.map(() => data.target_turnaround_hours * 1.5),  // Show target as max
                     colors: ['#EDE9FE', '#C4B5FD', '#8B5CF6'],  // Purple theme for lab metrics
                     title: 'TAT Trend',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: recentTat[0].period
                 });
 
@@ -1949,7 +1949,7 @@ async function loadLabData() {
                     maxValues: topTests.map(() => maxTestCount),
                     colors: ['#CFFAFE', '#67E8F9', '#06B6D4'],  // Cyan/Teal theme for test types
                     title: 'Tests by Type',
-                    showCenterText: true,
+                    showCenterText: false,
                     centerLabel: topTests[0].test_type
                 });
 
@@ -2728,7 +2728,7 @@ function createMetricCharts() {
                 colors: colorSchemes[metric] || ['#93C5FD', '#86EFAC', '#FCD34D'],  // Use scheme or default
                 title: metricConfig.label,
                 centerLabel: ringLabels[0],
-                showCenterText: true
+                showCenterText: false
             });
 
             console.log(`Successfully created chart for ${metric}`);
