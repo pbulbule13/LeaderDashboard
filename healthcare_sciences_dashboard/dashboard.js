@@ -1183,9 +1183,18 @@ async function loadOrdersData() {
     console.log('Has growth_metrics:', !!data?.growth_metrics);
 
     try {
-        // Ensure data has required fields
+        // Ensure data has required fields with defaults
+        if (!data.monthly_orders && data.trend_data) {
+            data.monthly_orders = data.trend_data[data.trend_data.length - 1]?.count || 0;
+        }
+        if (!data.growth_metrics) {
+            data.growth_metrics = { mom: 0, yoy: 0 };
+        }
+        if (!data.average_daily_orders && data.monthly_orders) {
+            data.average_daily_orders = Math.round(data.monthly_orders / 30);
+        }
         if (!data.peak_day_orders) {
-            data.peak_day_orders = Math.max(...data.trend_data.map(t => t.count));
+            data.peak_day_orders = data.trend_data ? Math.max(...data.trend_data.map(t => t.count)) : 0;
         }
         if (data.trend_data && data.trend_data.length > 0 && !data.trend_data[0].growth) {
             for (let i = 1; i < data.trend_data.length; i++) {
@@ -1206,6 +1215,10 @@ async function loadOrdersData() {
                 ...c,
                 count: c.orders
             }));
+        }
+        // Ensure by_category exists
+        if (!data.by_category) {
+            data.by_category = [];
         }
 
         container.innerHTML = `
@@ -1344,10 +1357,15 @@ async function loadComplianceData() {
     }
 
     try {
-        // Ensure data has required fields
+        // Ensure data has required fields with defaults
+        if (!data.overall_return_rate) data.overall_return_rate = 0;
+        if (!data.total_returns) data.total_returns = 0;
+        if (!data.total_claims) data.total_claims = 0;
         if (!data.rejection_rate) {
             data.rejection_rate = data.overall_return_rate * 0.6; // Estimate rejection is 60% of returns
         }
+        if (!data.monthly_trend) data.monthly_trend = [];
+        if (!data.top_return_reasons) data.top_return_reasons = [];
 
         container.innerHTML = `
             <div class="space-y-6">
@@ -1799,11 +1817,18 @@ async function loadLabData() {
         if (!data.average_turnaround_hours && data.average_tat_hours) {
             data.average_turnaround_hours = data.average_tat_hours;
         }
+        if (!data.average_turnaround_hours) data.average_turnaround_hours = 0;
+        if (!data.target_turnaround_hours) data.target_turnaround_hours = 24;
+        if (!data.efficiency_score) data.efficiency_score = 0;
+        if (!data.error_rate) data.error_rate = 0;
         if (!data.lab_capacity) {
             data.lab_capacity = { utilization_percentage: 0, current_load: 0, max_capacity: 0 };
         }
         if (!data.tests_by_type) {
             data.tests_by_type = [];
+        }
+        if (!data.turnaround_trend) {
+            data.turnaround_trend = [];
         }
 
         container.innerHTML = `
