@@ -705,75 +705,48 @@ function updateAIPanelContext(tabName) {
 function createOverviewCharts(data) {
     if (overviewChartsCreated) return;
 
-    // Orders Multilevel Donut Chart
+    // Orders Progress Ring Chart
     const orderTrends = data.order_volume.trend_data || [];
     const orderLabels = orderTrends.map(t => t.period);
     const orderValues = orderTrends.map(t => t.count);
 
-    // Inner ring: main periods
-    const innerOrderLabels = orderLabels.slice(0, Math.min(3, orderLabels.length));
-    const innerOrderValues = orderValues.slice(0, Math.min(3, orderValues.length));
+    // Take first 3 periods for rings
+    const ringOrderLabels = orderLabels.slice(0, Math.min(3, orderLabels.length));
+    const ringOrderValues = orderValues.slice(0, Math.min(3, orderValues.length));
 
-    // Outer ring: breakdown of largest period
-    const maxOrderIndex = orderValues.indexOf(Math.max(...orderValues));
-    const outerOrderLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    const outerOrderValues = orderValues[maxOrderIndex] ? [
-        Math.floor(orderValues[maxOrderIndex] * 0.28),
-        Math.floor(orderValues[maxOrderIndex] * 0.24),
-        Math.floor(orderValues[maxOrderIndex] * 0.26),
-        Math.floor(orderValues[maxOrderIndex] * 0.22)
-    ] : [0, 0, 0, 0];
+    const maxOrderValue = Math.max(...ringOrderValues) * 1.2;
+    const orderMaxValues = ringOrderValues.map(() => maxOrderValue);
 
-    charts.overviewOrders = createMultilevelDonutChart({
+    charts.overviewOrders = createProgressRingChart({
         canvasId: 'overviewOrdersChart',
-        innerData: {
-            labels: innerOrderLabels,
-            values: innerOrderValues
-        },
-        outerData: {
-            labels: outerOrderLabels,
-            values: outerOrderValues
-        },
-        title: 'Order Volume Distribution',
-        innerLabel: 'Period',
-        outerLabel: 'Weekly Breakdown',
-        colorScheme: 'professional'
+        labels: ringOrderLabels,
+        values: ringOrderValues,
+        maxValues: orderMaxValues,
+        title: 'Order Volume Progress',
+        centerLabel: 'Orders',
+        showCenterText: true
     });
 
-    // Operating Costs Multilevel Donut Chart
+    // Operating Costs Progress Ring Chart
     const costTrends = data.operating_costs.monthly_trend.slice(-6) || [];
     const costLabels = costTrends.map(m => m.month);
     const costValues = costTrends.map(m => m.total_cost / 1000000);
 
-    // Inner ring: main months
-    const innerCostLabels = costLabels.slice(0, Math.min(3, costLabels.length));
-    const innerCostValues = costValues.slice(0, Math.min(3, costValues.length));
+    // Take last 3 months for rings
+    const ringCostLabels = costLabels.slice(-3);
+    const ringCostValues = costValues.slice(-3);
 
-    // Outer ring: cost breakdown
-    const maxCostIndex = costValues.indexOf(Math.max(...costValues));
-    const outerCostLabels = ['AWS', 'Salaries', 'Lab', 'Equipment', 'Other'];
-    const outerCostValues = costValues[maxCostIndex] ? [
-        (costValues[maxCostIndex] * 0.30),
-        (costValues[maxCostIndex] * 0.35),
-        (costValues[maxCostIndex] * 0.20),
-        (costValues[maxCostIndex] * 0.10),
-        (costValues[maxCostIndex] * 0.05)
-    ] : [0, 0, 0, 0, 0];
+    const maxCostValue = Math.max(...ringCostValues) * 1.2;
+    const costMaxValues = ringCostValues.map(() => maxCostValue);
 
-    charts.overviewFinancials = createMultilevelDonutChart({
+    charts.overviewFinancials = createProgressRingChart({
         canvasId: 'overviewFinancialsChart',
-        innerData: {
-            labels: innerCostLabels,
-            values: innerCostValues
-        },
-        outerData: {
-            labels: outerCostLabels,
-            values: outerCostValues
-        },
-        title: 'Operating Costs Distribution ($M)',
-        innerLabel: 'Month',
-        outerLabel: 'Cost Categories',
-        colorScheme: 'professional'
+        labels: ringCostLabels,
+        values: ringCostValues,
+        maxValues: costMaxValues,
+        title: 'Operating Costs ($M)',
+        centerLabel: 'Costs',
+        showCenterText: true
     });
 
     overviewChartsCreated = true;
@@ -1268,42 +1241,31 @@ async function loadOrdersData() {
             </div>
         `;
 
-        // Create charts
-        const trendCtx = document.getElementById('ordersDetailChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'bar',
-            data: {
-                labels: data.trend_data.map(t => t.period),
-                datasets: [{
-                    label: 'Orders',
-                    data: data.trend_data.map(t => t.count),
-                    borderColor: '#3B82F6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+        // Create Apple Watch-style progress ring charts
+        const recentTrends = data.trend_data.slice(-3);  // Last 3 periods
+        const maxTrendValue = Math.max(...recentTrends.map(t => t.count)) * 1.2;
+
+        createProgressRingChart({
+            canvasId: 'ordersDetailChart',
+            labels: recentTrends.map(t => t.period),
+            values: recentTrends.map(t => t.count),
+            maxValues: recentTrends.map(() => maxTrendValue),
+            title: 'Order Volume Trend',
+            showCenterText: true,
+            centerLabel: recentTrends[0].period
         });
 
-        const categoryCtx = document.getElementById('ordersCategoryChart').getContext('2d');
-        new Chart(categoryCtx, {
-            type: 'bar',
-            data: {
-                labels: data.by_category.map(c => c.category),
-                datasets: [{
-                    data: data.by_category.map(c => c.count),
-                    backgroundColor: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
+        const topCategories = data.by_category.slice(0, 3);  // Top 3 categories
+        const maxCategoryValue = Math.max(...topCategories.map(c => c.count)) * 1.2;
+
+        createProgressRingChart({
+            canvasId: 'ordersCategoryChart',
+            labels: topCategories.map(c => c.category),
+            values: topCategories.map(c => c.count),
+            maxValues: topCategories.map(() => maxCategoryValue),
+            title: 'Orders by Category',
+            showCenterText: true,
+            centerLabel: topCategories[0].category
         });
 
         // Update current tab data for AI context
@@ -1398,59 +1360,30 @@ async function loadComplianceData() {
             </div>
         `;
 
-        // Create charts
-        const trendCtx = document.getElementById('complianceTrendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'bar',
-            data: {
-                labels: data.monthly_trend.map(t => t.month),
-                datasets: [{
-                    label: 'Compliance Rate',
-                    data: data.monthly_trend.map(t => 100 - t.return_rate),
-                    backgroundColor: [
-                        'rgba(156, 163, 175, 0.9)',
-                        'rgba(156, 163, 175, 0.75)',
-                        'rgba(156, 163, 175, 0.6)',
-                        'rgba(156, 163, 175, 0.45)',
-                        'rgba(156, 163, 175, 0.3)',
-                        'rgba(156, 163, 175, 0.15)'
-                    ],
-                    borderColor: 'rgb(107, 114, 128)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            font: { size: 10 },
-                            padding: 10
-                        }
-                    }
-                }
-            }
+        // Create Apple Watch-style progress ring charts
+        const recentMonths = data.monthly_trend.slice(-3);  // Last 3 months
+
+        createProgressRingChart({
+            canvasId: 'complianceTrendChart',
+            labels: recentMonths.map(t => t.month),
+            values: recentMonths.map(t => 100 - t.return_rate),
+            maxValues: [100, 100, 100],  // Compliance rate is always out of 100%
+            title: 'Compliance Trend',
+            showCenterText: true,
+            centerLabel: recentMonths[0].month
         });
 
-        const reasonsCtx = document.getElementById('complianceReasonsChart').getContext('2d');
-        new Chart(reasonsCtx, {
-            type: 'bar',
-            data: {
-                labels: data.top_return_reasons.map(r => r.reason),
-                datasets: [{
-                    label: 'Count',
-                    data: data.top_return_reasons.map(r => r.count),
-                    backgroundColor: '#F97316'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+        const topReasons = data.top_return_reasons.slice(0, 3);  // Top 3 reasons
+        const maxReasonCount = Math.max(...topReasons.map(r => r.count)) * 1.2;
+
+        createProgressRingChart({
+            canvasId: 'complianceReasonsChart',
+            labels: topReasons.map(r => r.reason),
+            values: topReasons.map(r => r.count),
+            maxValues: topReasons.map(() => maxReasonCount),
+            title: 'Return Reasons',
+            showCenterText: true,
+            centerLabel: topReasons[0].reason
         });
 
         // Update current tab data for AI context
@@ -1897,51 +1830,30 @@ async function loadLabData() {
             </div>
         `;
 
-        // Create charts
-        const tatCtx = document.getElementById('labTatChart').getContext('2d');
-        new Chart(tatCtx, {
-            type: 'bar',
-            data: {
-                labels: data.turnaround_trend.map(t => t.period),
-                datasets: [{
-                    label: 'Average TAT (hours)',
-                    data: data.turnaround_trend.map(t => t.avg_hours),
-                    borderColor: 'rgb(107, 114, 128)',
-                    backgroundColor: 'rgba(156, 163, 175, 0.3)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Target',
-                    data: data.turnaround_trend.map(() => data.target_turnaround_hours),
-                    borderColor: 'rgb(156, 163, 175)',
-                    borderDash: [5, 5],
-                    borderWidth: 2,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true, position: 'bottom' } }
-            }
+        // Create Apple Watch-style progress ring charts
+        const recentTat = data.turnaround_trend.slice(-3);  // Last 3 periods
+
+        createProgressRingChart({
+            canvasId: 'labTatChart',
+            labels: recentTat.map(t => t.period),
+            values: recentTat.map(t => t.avg_hours),
+            maxValues: recentTat.map(() => data.target_turnaround_hours * 1.5),  // Show target as max
+            title: 'TAT Trend',
+            showCenterText: true,
+            centerLabel: recentTat[0].period
         });
 
-        const testsCtx = document.getElementById('labTestsChart').getContext('2d');
-        new Chart(testsCtx, {
-            type: 'bar',
-            data: {
-                labels: data.tests_by_type.map(t => t.test_type),
-                datasets: [{
-                    label: 'Test Volume',
-                    data: data.tests_by_type.map(t => t.count),
-                    backgroundColor: ['#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+        const topTests = data.tests_by_type.slice(0, 3);  // Top 3 test types
+        const maxTestCount = Math.max(...topTests.map(t => t.count)) * 1.2;
+
+        createProgressRingChart({
+            canvasId: 'labTestsChart',
+            labels: topTests.map(t => t.test_type),
+            values: topTests.map(t => t.count),
+            maxValues: topTests.map(() => maxTestCount),
+            title: 'Tests by Type',
+            showCenterText: true,
+            centerLabel: topTests[0].test_type
         });
 
         // Update current tab data for AI context
@@ -2671,34 +2583,22 @@ function createMetricCharts() {
         const metricConfig = CONFIG.metrics[metric];
         const { labels, data } = generateMetricData(metric, metricConfig.defaultPeriod);
 
-        // Create inner ring data (main categories)
-        const innerLabels = labels.slice(0, Math.min(3, labels.length));
-        const innerData = data.slice(0, Math.min(3, data.length));
+        // Create Apple Watch style progress rings
+        const ringLabels = labels.slice(0, Math.min(3, labels.length));
+        const ringValues = data.slice(0, Math.min(3, data.length));
 
-        // Create outer ring data (subcategories - breakdown of largest)
-        const maxIndex = data.indexOf(Math.max(...data));
-        const outerLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
-        const outerData = [
-            Math.floor(data[maxIndex] * 0.28),
-            Math.floor(data[maxIndex] * 0.24),
-            Math.floor(data[maxIndex] * 0.26),
-            Math.floor(data[maxIndex] * 0.22)
-        ];
+        // Calculate max values for each ring (for progress calculation)
+        const maxValue = Math.max(...ringValues) * 1.2; // 120% of max for scaling
+        const maxValues = ringValues.map(() => maxValue);
 
-        metricCharts[metric] = createMultilevelDonutChart({
+        metricCharts[metric] = createProgressRingChart({
             canvasId: canvasId,
-            innerData: {
-                labels: innerLabels,
-                values: innerData
-            },
-            outerData: {
-                labels: outerLabels,
-                values: outerData
-            },
+            labels: ringLabels,
+            values: ringValues,
+            maxValues: maxValues,
             title: metricConfig.label,
-            innerLabel: 'Period',
-            outerLabel: 'Breakdown',
-            colorScheme: 'professional'
+            centerLabel: ringLabels[0],
+            showCenterText: true
         });
     });
 }
