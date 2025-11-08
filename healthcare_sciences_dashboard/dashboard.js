@@ -1153,22 +1153,31 @@ function generateCalendar() {
 // ==================== BUSINESS TAB LOAD FUNCTIONS ====================
 
 async function loadOrdersData() {
+    console.log('=== loadOrdersData CALLED ===');
     const container = document.getElementById('orders-content');
+    console.log('Container found:', !!container);
 
     let data;
     try {
+        console.log('Starting API fetch...');
         const response = await fetch(`${API_BASE}${CONFIG.api.endpoints.overview}`);
+        console.log('Response received:', response.status);
         const result = await response.json();
+        console.log('Result parsed, success:', result.success);
 
         if (result.success) {
             data = result.data.order_volume;
+            console.log('Using API data');
         } else {
             data = TEST_DATA.overview.order_volume;
+            console.log('Using TEST_DATA');
         }
     } catch (error) {
-        console.log('API unavailable, using test data for orders');
+        console.log('API error, using test data for orders:', error.message);
         data = TEST_DATA.overview.order_volume;
     }
+
+    console.log('Data ready, has trend_data:', !!data?.trend_data);
 
     try {
         // Ensure data has required fields
