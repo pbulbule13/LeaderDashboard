@@ -725,6 +725,7 @@ function createOverviewCharts(data) {
                 labels: ringOrderLabels,
                 values: ringOrderValues,
                 maxValues: orderMaxValues,
+                colors: ['#DBEAFE', '#93C5FD', '#60A5FA'],  // Blue theme for orders
                 title: 'Order Volume Progress',
                 centerLabel: 'Orders',
                 showCenterText: true
@@ -757,6 +758,7 @@ function createOverviewCharts(data) {
                 labels: ringCostLabels,
                 values: ringCostValues,
                 maxValues: costMaxValues,
+                colors: ['#FEF3C7', '#FCD34D', '#F59E0B'],  // Yellow/Amber theme for costs
                 title: 'Operating Costs ($M)',
                 centerLabel: 'Costs',
                 showCenterText: true
@@ -1297,6 +1299,7 @@ async function loadOrdersData() {
                     labels: recentTrends.map(t => t.period),
                     values: recentTrends.map(t => t.count),
                     maxValues: recentTrends.map(() => maxTrendValue),
+                    colors: ['#DBEAFE', '#93C5FD', '#3B82F6'],  // Blue theme for order trends
                     title: 'Order Volume Trend',
                     showCenterText: true,
                     centerLabel: recentTrends[0].period
@@ -1310,6 +1313,7 @@ async function loadOrdersData() {
                     labels: topCategories.map(c => c.category),
                     values: topCategories.map(c => c.count),
                     maxValues: topCategories.map(() => maxCategoryValue),
+                    colors: ['#E0E7FF', '#A5B4FC', '#6366F1'],  // Indigo theme for categories
                     title: 'Orders by Category',
                     showCenterText: true,
                     centerLabel: topCategories[0].category
@@ -1435,6 +1439,7 @@ async function loadComplianceData() {
                     labels: recentMonths.map(t => t.month),
                     values: recentMonths.map(t => 100 - t.return_rate),
                     maxValues: [100, 100, 100],  // Compliance rate is always out of 100%
+                    colors: ['#D1FAE5', '#6EE7B7', '#10B981'],  // Green theme for compliance
                     title: 'Compliance Trend',
                     showCenterText: true,
                     centerLabel: recentMonths[0].month
@@ -1448,6 +1453,7 @@ async function loadComplianceData() {
                     labels: topReasons.map(r => r.reason),
                     values: topReasons.map(r => r.count),
                     maxValues: topReasons.map(() => maxReasonCount),
+                    colors: ['#FED7AA', '#FDBA74', '#F97316'],  // Orange theme for issues
                     title: 'Return Reasons',
                     showCenterText: true,
                     centerLabel: topReasons[0].reason
@@ -1927,6 +1933,7 @@ async function loadLabData() {
                     labels: recentTat.map(t => t.period),
                     values: recentTat.map(t => t.avg_hours),
                     maxValues: recentTat.map(() => data.target_turnaround_hours * 1.5),  // Show target as max
+                    colors: ['#EDE9FE', '#C4B5FD', '#8B5CF6'],  // Purple theme for lab metrics
                     title: 'TAT Trend',
                     showCenterText: true,
                     centerLabel: recentTat[0].period
@@ -1940,6 +1947,7 @@ async function loadLabData() {
                     labels: topTests.map(t => t.test_type),
                     values: topTests.map(t => t.count),
                     maxValues: topTests.map(() => maxTestCount),
+                    colors: ['#CFFAFE', '#67E8F9', '#06B6D4'],  // Cyan/Teal theme for test types
                     title: 'Tests by Type',
                     showCenterText: true,
                     centerLabel: topTests[0].test_type
@@ -2679,6 +2687,18 @@ function updateMetricPeriod(metric, period) {
 
 // Create all metric charts
 function createMetricCharts() {
+    // Define color schemes for different metrics - rotating palette
+    const colorSchemes = {
+        orders: ['#DBEAFE', '#93C5FD', '#3B82F6'],          // Blue
+        compliance: ['#D1FAE5', '#6EE7B7', '#10B981'],     // Green
+        reimbursement: ['#FEF3C7', '#FCD34D', '#F59E0B'],  // Yellow
+        costs: ['#FED7AA', '#FDBA74', '#F97316'],          // Orange
+        lab: ['#EDE9FE', '#C4B5FD', '#8B5CF6'],            // Purple
+        regional: ['#CFFAFE', '#67E8F9', '#06B6D4'],       // Cyan
+        forecasting: ['#FCE7F3', '#F9A8D4', '#EC4899'],    // Pink
+        market: ['#E0E7FF', '#A5B4FC', '#6366F1']          // Indigo
+    };
+
     Object.keys(CONFIG.metrics).forEach(metric => {
         try {
             const canvasId = `chart${metric.charAt(0).toUpperCase() + metric.slice(1)}`;
@@ -2705,6 +2725,7 @@ function createMetricCharts() {
                 labels: ringLabels,
                 values: ringValues,
                 maxValues: maxValues,
+                colors: colorSchemes[metric] || ['#93C5FD', '#86EFAC', '#FCD34D'],  // Use scheme or default
                 title: metricConfig.label,
                 centerLabel: ringLabels[0],
                 showCenterText: true
