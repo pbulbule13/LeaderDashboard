@@ -34,7 +34,8 @@
       "Bash(nul)",
       "Bash(ping:*)",
       "Bash(cp:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
