@@ -210,14 +210,28 @@ You can see and analyze ALL the data shown on the current dashboard tab. The "Cu
 - Clear and concise in communication
 - Always provide reasoning behind your answers
 
+**IMPORTANT - Response Format:**
+You MUST respond with a JSON object containing two fields:
+{{
+  "answer": "Your concise, direct answer to the question (1-3 sentences)",
+  "reasoning": "Your detailed analysis, reasoning, and insights (2-4 sentences explaining HOW you arrived at the answer, what data you analyzed, and any important context)"
+}}
+
 **Response Guidelines:**
 1. YOU HAVE ACCESS to the data shown above - analyze it directly
-2. Reference SPECIFIC numbers, percentages, and metrics from the Current Data
-3. For emails, calendar, orders, compliance, etc. - the data is RIGHT THERE in Current Data
-4. Provide insights based on the ACTUAL data you can see
-5. Never say "I don't have access" - you DO have access to everything shown above
-6. If specific data is truly not provided in Current Data section, then acknowledge that limitation
-7. Be confident - you're looking at the same dashboard data the CEO sees
+2. In the "answer" field: Provide a clear, concise response (1-3 sentences)
+3. In the "reasoning" field: Explain your analysis, what data you reviewed, patterns you noticed, and why your answer is important
+4. Reference SPECIFIC numbers, percentages, and metrics from the Current Data in the reasoning
+5. For emails, calendar, orders, compliance, etc. - the data is RIGHT THERE in Current Data
+6. Never say "I don't have access" - you DO have access to everything shown above
+7. If specific data is truly not provided in Current Data section, acknowledge that in the reasoning
+8. Be confident - you're looking at the same dashboard data the CEO sees
+
+Example response format:
+{{
+  "answer": "You have 15 orders pending, showing a 12% increase from last week. The Midwest region is driving most of this growth.",
+  "reasoning": "I analyzed the order volume data and found 15 pending orders with a 12% week-over-week increase. When reviewing regional breakdown, the Midwest accounts for 8 of these orders (53%), which is significantly higher than its usual 35% share. This suggests strong demand growth in that region that may require additional attention to fulfillment capacity."
+}}
 
 Remember: You're helping a CEO make informed decisions based on REAL data you can see. Be insightful, accurate, and helpful."""),
             ("human", "{question}")
@@ -332,12 +346,33 @@ Remember: You're helping a CEO make informed decisions based on REAL data you ca
         )
 
         try:
-            # Get response from Claude
+            # Get response from LLM
             response = await self.llm.ainvoke(prompt_value)
-            answer = response.content
+            content = response.content.strip()
+
+            # Try to parse JSON response
+            answer = ""
+            reasoning = ""
+
+            try:
+                # Remove markdown code blocks if present
+                if content.startswith('```'):
+                    content = content.split('```')[1]
+                    if content.startswith('json'):
+                        content = content[4:].strip()
+
+                import json
+                parsed = json.loads(content)
+                answer = parsed.get("answer", "")
+                reasoning = parsed.get("reasoning", "")
+            except json.JSONDecodeError:
+                # If JSON parsing fails, treat entire response as answer
+                answer = content
+                reasoning = ""
 
             # Format for voice mode if requested
             if voice_mode:
+                # For voice, use only the answer (concise version)
                 # Remove special characters and markdown formatting
                 answer = answer.replace('*', '').replace('#', '').replace('`', '')
                 answer = answer.replace('-', '').replace('•', '').replace('→', '')
@@ -351,10 +386,11 @@ Remember: You're helping a CEO make informed decisions based on REAL data you ca
             return {
                 "success": True,
                 "answer": answer,
+                "reasoning": reasoning,
                 "tab": tab,
                 "tab_name": tab_context["name"],
                 "question": question,
-                "has_reasoning": True,
+                "has_reasoning": bool(reasoning),
                 "model": self.model_name,
                 "voice_mode": voice_mode
             }

@@ -3,7 +3,7 @@
  * Connects Communications tab to real Gmail and Google Calendar
  */
 
-const VOICE_AGENT_API = 'http://localhost:8000';
+const VOICE_AGENT_API = window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://leaderdashboard-694708874867.us-central1.run.app';
 
 // Load emails when Communications tab is opened
 async function loadRealEmails() {

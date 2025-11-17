@@ -2899,6 +2899,7 @@ async function askReasoning() {
             aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
 
             const answer = result.answer || result.text || 'No response received';
+            const reasoning = result.reasoning || '';
 
             // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
@@ -2915,12 +2916,26 @@ async function askReasoning() {
                 .replace(/'/g, '&#039;')
                 .replace(/\n/g, '<br>');
 
+            const escapedReasoning = reasoning
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
                     <span class="text-xs font-semibold text-gray-700">🤖 AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
-                <div class="text-xs text-gray-700">${escapedAnswer}</div>
+                <div class="text-xs font-semibold text-gray-800 mb-2">${escapedAnswer}</div>
+                ${reasoning ? `
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-2 rounded mt-2">
+                        <div class="text-xs font-semibold text-blue-900 mb-1">💡 Reasoning:</div>
+                        <div class="text-xs text-blue-800">${escapedReasoning}</div>
+                    </div>
+                ` : ''}
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
                 ${voiceEnabled ? '<div class="text-xs text-gray-400 mt-1 italic">🔊 Voice response played</div>' : ''}
             `;
@@ -3020,6 +3035,7 @@ async function askQuick(question) {
             aiMsg.className = 'bg-white border border-gray-300 shadow-sm rounded-lg p-3 mb-2';
 
             const answer = result.answer || result.text || 'No response received';
+            const reasoning = result.reasoning || '';
 
             // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
@@ -3036,12 +3052,26 @@ async function askQuick(question) {
                 .replace(/'/g, '&#039;')
                 .replace(/\n/g, '<br>');
 
+            const escapedReasoning = reasoning
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+
             aiMsg.innerHTML = `
                 <div class="flex items-start gap-2 mb-2">
                     <span class="text-xs font-semibold text-gray-700">🤖 AI:</span>
                     <span class="text-xs text-gray-500">${result.tab_name || currentTab}</span>
                 </div>
-                <div class="text-xs text-gray-700">${escapedAnswer}</div>
+                <div class="text-xs font-semibold text-gray-800 mb-2">${escapedAnswer}</div>
+                ${reasoning ? `
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-2 rounded mt-2">
+                        <div class="text-xs font-semibold text-blue-900 mb-1">💡 Reasoning:</div>
+                        <div class="text-xs text-blue-800">${escapedReasoning}</div>
+                    </div>
+                ` : ''}
                 ${result.model ? `<div class="text-xs text-gray-400 mt-1 italic">Model: ${result.model}</div>` : ''}
                 ${voiceEnabled ? '<div class="text-xs text-gray-400 mt-1 italic">🔊 Voice response played</div>' : ''}
             `;

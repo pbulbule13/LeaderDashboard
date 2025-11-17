@@ -5,8 +5,8 @@
 const DASHBOARD_CONFIG = {
     // ==================== API SETTINGS ====================
     api: {
-        // API is always on port 8000, frontend on port 3000
-        baseUrl: 'http://localhost:8000',
+        // Production API URL (Cloud Run) or localhost for development
+        baseUrl: window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://leaderdashboard-694708874867.us-central1.run.app',
         endpoints: {
             overview: '/api/dashboard/overview',
             stock: '/api/dashboard/tiles/stock',
