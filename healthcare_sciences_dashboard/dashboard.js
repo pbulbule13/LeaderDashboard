@@ -107,42 +107,27 @@ async function speakTextElevenLabs(text) {
 
     // Set audio playing flag
     isAudioPlaying = true;
-    // Load config from voice-config.local.js (gitignored, contains your API keys)
-    const config = typeof VOICE_CONFIG !== 'undefined' ? VOICE_CONFIG : {
-        ELEVENLABS_API_KEY: null,
-        VOICE_ID: null,
-        model: 'eleven_monolingual_v1',
-        stability: 0.5,
-        similarity_boost: 0.75
-    };
-
-    if (!config.ELEVENLABS_API_KEY || !config.VOICE_ID) {
-        console.warn('ElevenLabs API key or Voice ID not configured. Copy voice-config.example.js to voice-config.local.js and add your keys.');
-        // Fallback to browser voice
-        return speakTextBrowser(text);
-    }
 
     try {
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${config.VOICE_ID}`, {
+        // Use backend TTS endpoint (API key is stored securely on backend)
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8000'
+            : 'https://leaderdashboard-694708874867.us-central1.run.app';
+
+        const response = await fetch(`${API_BASE_URL}/voice-agent/tts`, {
             method: 'POST',
             headers: {
-                'Accept': 'audio/mpeg',
                 'Content-Type': 'application/json',
-                'xi-api-key': config.ELEVENLABS_API_KEY
+                'Accept': 'audio/mpeg'
             },
             body: JSON.stringify({
-                text: text,
-                model_id: config.model,
-                voice_settings: {
-                    stability: config.stability,
-                    similarity_boost: config.similarity_boost
-                }
+                text: text
             })
         });
 
         if (!response.ok) {
-            console.error('ElevenLabs API error:', response.status);
-            throw new Error('ElevenLabs API failed');
+            console.error('Backend TTS API error:', response.status);
+            throw new Error('Backend TTS API failed');
         }
 
         const audioBlob = await response.blob();
