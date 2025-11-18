@@ -5,6 +5,7 @@ let overviewChartsCreated = false;
 let charts = {};
 let currentTab = 'overview'; // Track current active tab
 let currentTabData = null; // Store current tab's data for context
+let allDashboardData = {}; // Store ALL tabs data for comprehensive AI context
 
 // Voice Recognition Setup
 let recognition = null;
@@ -331,15 +332,18 @@ function stopContinuousListening() {
 }
 
 async function processVoiceQuestion(question) {
+    // Stop any currently playing audio before processing new voice question
+    stopAllAudio();
+
     try {
-        // Use tab-specific Q&A endpoint with context
+        // Use tab-specific Q&A endpoint with context - now includes ALL dashboard data
         const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 question: question,
                 tab: currentTab,
-                tab_data: currentTabData,
+                tab_data: allDashboardData,  // Send ALL tabs data for comprehensive answers
                 voice_mode: true  // Enable concise voice-friendly responses
             })
         });
@@ -990,6 +994,7 @@ async function loadOverviewData() {
         `).join('');
 
         // Update current tab data for AI context
+        allDashboardData['overview'] = data;  // Always store in global data
         if (currentTab === 'overview') {
             currentTabData = data;
         }
@@ -1311,6 +1316,7 @@ async function loadOrdersData() {
         }, 100);
 
         // Update current tab data for AI context
+        allDashboardData['orders'] = data;  // Always store in global data
         if (currentTab === 'orders') {
             currentTabData = data;
         }
@@ -1451,6 +1457,7 @@ async function loadComplianceData() {
         }, 100);
 
         // Update current tab data for AI context
+        allDashboardData['compliance'] = data;  // Always store in global data
         if (currentTab === 'compliance') {
             currentTabData = data;
         }
@@ -1618,6 +1625,7 @@ async function loadReimbursementData() {
         });
 
         // Update current tab data for AI context
+        allDashboardData['reimbursement'] = data;  // Always store in global data
         if (currentTab === 'reimbursement') {
             currentTabData = data;
         }
@@ -1776,6 +1784,7 @@ async function loadCostsData() {
         });
 
         // Update current tab data for AI context
+        allDashboardData['costs'] = data;  // Always store in global data
         if (currentTab === 'costs') {
             currentTabData = data;
         }
@@ -1945,6 +1954,7 @@ async function loadLabData() {
         }, 100);
 
         // Update current tab data for AI context
+        allDashboardData['lab'] = data;  // Always store in global data
         if (currentTab === 'lab') {
             currentTabData = data;
         }
@@ -2104,6 +2114,7 @@ async function loadRegionalData() {
         });
 
         // Update current tab data for AI context
+        allDashboardData['regional'] = data;  // Always store in global data
         if (currentTab === 'regional') {
             currentTabData = data;
         }
@@ -2283,6 +2294,7 @@ async function loadForecastingData() {
         });
 
         // Update current tab data for AI context
+        allDashboardData['forecasting'] = data;  // Always store in global data
         if (currentTab === 'forecasting') {
             currentTabData = data;
         }
@@ -2421,6 +2433,7 @@ async function loadMarketData() {
         `;
 
         // Update current tab data for AI context
+        allDashboardData['market'] = data;  // Always store in global data
         if (currentTab === 'market') {
             currentTabData = data;
         }
@@ -2600,6 +2613,7 @@ async function loadMilestonesData() {
         `;
 
         // Update current tab data for AI context
+        allDashboardData['milestones'] = data;  // Always store in global data
         if (currentTab === 'milestones') {
             currentTabData = data;
         }
@@ -2804,6 +2818,9 @@ async function askReasoning() {
     const question = input.value.trim();
     if (!question) return;
 
+    // Stop any currently playing audio before starting new response
+    stopAllAudio();
+
     const messagesDiv = document.getElementById('reasoningMessages');
 
     // Add user question at the TOP (insert before first child)
@@ -2824,14 +2841,14 @@ async function askReasoning() {
     try {
         let result;
         try {
-            // Use tab-specific Q&A endpoint with context
+            // Use tab-specific Q&A endpoint with context - now includes ALL dashboard data
             const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: question,
                     tab: currentTab,
-                    tab_data: currentTabData
+                    tab_data: allDashboardData  // Send ALL tabs data for comprehensive answers
                 })
             });
 
@@ -2960,14 +2977,14 @@ async function askQuick(question) {
     try {
         let result;
         try {
-            // Use tab-specific Q&A endpoint with context
+            // Use tab-specific Q&A endpoint with context - now includes ALL dashboard data
             const response = await fetch(`${API_BASE}/api/query/ask-tab`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: question,
                     tab: currentTab,
-                    tab_data: currentTabData
+                    tab_data: allDashboardData  // Send ALL tabs data for comprehensive answers
                 })
             });
 
