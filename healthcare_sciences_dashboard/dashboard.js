@@ -77,6 +77,9 @@ let isFullVoiceMode = false;
 // Global audio management - prevent multiple voices
 let currentAudio = null;
 let isAudioPlaying = false;
+let isProcessingVoice = false; // Prevent multiple simultaneous voice responses
+let voiceRequestId = 0; // Counter for voice requests
+let currentVoiceRequestId = 0; // Track which request is currently being processed
 
 function stopAllAudio() {
     console.log('[AUDIO] Stopping all audio...');
@@ -332,7 +335,14 @@ function stopContinuousListening() {
 }
 
 async function processVoiceQuestion(question) {
-    // Stop any currently playing audio before processing new voice question
+    // Assign a unique ID to this request
+    const myRequestId = ++voiceRequestId;
+    currentVoiceRequestId = myRequestId;
+    isProcessingVoice = true; // Set flag for other functions to check
+
+    console.log(`[VOICE #${myRequestId}] Processing question:`, question);
+
+    // Stop any currently playing audio immediately
     stopAllAudio();
 
     try {
@@ -347,6 +357,12 @@ async function processVoiceQuestion(question) {
                 voice_mode: true  // Enable concise voice-friendly responses
             })
         });
+
+        // Check if this request is still the current one (user might have asked another question)
+        if (currentVoiceRequestId !== myRequestId) {
+            console.log(`[VOICE #${myRequestId}] Aborted - newer request exists (#${currentVoiceRequestId})`);
+            return;
+        }
 
         let result;
         const contentType = response.headers.get('content-type');
@@ -365,18 +381,41 @@ async function processVoiceQuestion(question) {
             result = await response.json();
         }
 
+        // Check again before speaking (user might have interrupted during API call)
+        if (currentVoiceRequestId !== myRequestId) {
+            console.log(`[VOICE #${myRequestId}] Aborted before speaking - newer request exists (#${currentVoiceRequestId})`);
+            return;
+        }
+
         if (result.success || result.answer) {
             const answer = result.answer || result.text || 'No response received';
 
-            // Speak the answer using ElevenLabs
+            console.log(`[VOICE #${myRequestId}] Speaking response...`);
+            // Speak the answer using ElevenLabs (this will wait until speaking is done)
             await speakText(answer);
 
-            // Optionally display in the chat
-            addVoiceMessageToChat(question, answer);
+            // Check one more time after speaking (in case interrupted mid-speech)
+            if (currentVoiceRequestId === myRequestId) {
+                // Optionally display in the chat (only if still current)
+                addVoiceMessageToChat(question, answer);
+                console.log(`[VOICE #${myRequestId}] Completed successfully`);
+            } else {
+                console.log(`[VOICE #${myRequestId}] Interrupted during speech`);
+            }
         }
     } catch (error) {
-        console.error('Voice question error:', error);
-        await speakText('Sorry, I encountered an error processing your question.');
+        console.error(`[VOICE #${myRequestId}] Error:`, error);
+
+        // Only speak error if this is still the current request
+        if (currentVoiceRequestId === myRequestId) {
+            await speakText('Sorry, I encountered an error processing your question.');
+        }
+    } finally {
+        // Clear the flag only if this is still the current request
+        if (currentVoiceRequestId === myRequestId) {
+            isProcessingVoice = false;
+            console.log(`[VOICE #${myRequestId}] Cleared processing flag`);
+        }
     }
 }
 
@@ -2904,9 +2943,10 @@ async function askReasoning() {
             const reasoning = result.reasoning || '';
 
             // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
+            // Also check if not already processing a voice to prevent overlaps
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
-            if (voiceEnabled && !isFullVoiceMode) {
-                speakText(answer);
+            if (voiceEnabled && !isFullVoiceMode && !isProcessingVoice) {
+                await speakText(answer);
             }
 
             // Escape HTML and convert newlines
@@ -3040,9 +3080,10 @@ async function askQuick(question) {
             const reasoning = result.reasoning || '';
 
             // Check if voice response is enabled (but NOT if Full Voice Mode is active to avoid duplicates)
+            // Also check if not already processing a voice to prevent overlaps
             const voiceEnabled = document.getElementById('voiceResponseEnabled')?.checked;
-            if (voiceEnabled && !isFullVoiceMode) {
-                speakText(answer);
+            if (voiceEnabled && !isFullVoiceMode && !isProcessingVoice) {
+                await speakText(answer);
             }
 
             // Escape HTML and convert newlines
