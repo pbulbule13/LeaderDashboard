@@ -335,10 +335,19 @@ function stopContinuousListening() {
 }
 
 async function processVoiceQuestion(question) {
-    // Assign a unique ID to this request
+    // CRITICAL: Block ALL new requests if one is already being processed
+    // This ensures ONLY ONE voice is active at any time
+    if (isProcessingVoice) {
+        console.log('[VOICE BLOCKED] Already processing a question, ignoring:', question);
+        return; // Completely reject this request
+    }
+
+    // Mark that we're now processing (blocks all future requests until we're done)
+    isProcessingVoice = true;
+
+    // Assign a unique ID to this request for tracking
     const myRequestId = ++voiceRequestId;
     currentVoiceRequestId = myRequestId;
-    isProcessingVoice = true; // Set flag for other functions to check
 
     console.log(`[VOICE #${myRequestId}] Processing question:`, question);
 
@@ -405,17 +414,12 @@ async function processVoiceQuestion(question) {
         }
     } catch (error) {
         console.error(`[VOICE #${myRequestId}] Error:`, error);
-
-        // Only speak error if this is still the current request
-        if (currentVoiceRequestId === myRequestId) {
-            await speakText('Sorry, I encountered an error processing your question.');
-        }
+        await speakText('Sorry, I encountered an error processing your question.');
     } finally {
-        // Clear the flag only if this is still the current request
-        if (currentVoiceRequestId === myRequestId) {
-            isProcessingVoice = false;
-            console.log(`[VOICE #${myRequestId}] Cleared processing flag`);
-        }
+        // ALWAYS clear the processing flag when done (success or error)
+        // This allows the next question to be processed
+        isProcessingVoice = false;
+        console.log(`[VOICE #${myRequestId}] Finished - ready for next question`);
     }
 }
 
