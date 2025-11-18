@@ -291,14 +291,30 @@ function startContinuousListening() {
         const transcript = event.results[event.results.length - 1][0].transcript;
         console.log('Heard:', transcript);
 
+        // IMMEDIATELY STOP listening to prevent hearing additional questions
+        if (recognitionInstance) {
+            console.log('[RECOGNITION] Stopping listening while processing...');
+            recognitionInstance.stop();
+        }
+
         // Show what was heard
         const indicator = document.getElementById('voiceModeIndicator');
         if (indicator) {
-            indicator.textContent = `Heard: "${transcript}"`;
+            indicator.textContent = `Heard: "${transcript}" - Processing...`;
         }
 
-        // Process the question
+        // Process the question (this will take time)
         await processVoiceQuestion(transcript);
+
+        // ONLY restart listening AFTER the answer is completely spoken
+        if (isFullVoiceMode && recognitionInstance) {
+            console.log('[RECOGNITION] Restarting listening after response complete');
+            setTimeout(() => {
+                if (isFullVoiceMode && recognitionInstance) {
+                    recognitionInstance.start();
+                }
+            }, 500);
+        }
     };
 
     recognitionInstance.onerror = (event) => {
@@ -314,14 +330,10 @@ function startContinuousListening() {
     };
 
     recognitionInstance.onend = () => {
-        // Restart if still in voice mode
-        if (isFullVoiceMode) {
-            setTimeout(() => {
-                if (isFullVoiceMode && recognitionInstance) {
-                    recognitionInstance.start();
-                }
-            }, 500);
-        }
+        // NOTE: Don't auto-restart here anymore
+        // Restart is now managed by onresult after processing completes
+        // This prevents the race condition of multiple questions being heard
+        console.log('[RECOGNITION] Recognition ended');
     };
 
     recognitionInstance.start();
