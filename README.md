@@ -16,16 +16,13 @@
 
 ---
 
-Live URL
-- Current public (ngrok) URL: https://civilized-undaring-anneliese.ngrok-free.dev
-- API health: https://civilized-undaring-anneliese.ngrok-free.dev/health
-- Full dashboard: https://civilized-undaring-anneliese.ngrok-free.dev/dash/dashboard.html
+## Live Demo
 
-Ngrok Deployment (Local → Public)
-- From project root, run: `./setup_and_expose.ps1 -NgrokAuthToken '34nhSQ4Ea1x87tdLcbE2p538Ni9_34GixxR2EhGhGivhTxGkk' -Port 8000`
-- The script starts the FastAPI server and an ngrok tunnel and prints a public URL.
-- The dashboard uses `window.location.origin`, so API calls route to your ngrok host automatically.
-- Note: ngrok URLs are ephemeral; they change on each run unless you reserve a domain.
+**Repository**: https://github.com/pbulbule13/LeaderDashboard
+**Folder Location**: /home/prashilbulbule13/projects/LeaderDashboard
+**Live Site (Google Cloud Run)**: https://leaderdashboard-xf3nn3udga-uc.a.run.app
+
+---
 
 ## 🎯 Overview
 

@@ -186,54 +186,62 @@ class TabQAAgent:
 
         # Define the prompt template
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are an intelligent executive assistant for HealthCare Sciences CEO with FULL ACCESS to the {tab_name} dashboard data.
+            ("system", """You are an intelligent executive assistant for HealthCare Sciences CEO with COMPLETE ACCESS to ALL dashboard data.
 
-**IMPORTANT - YOU HAVE DIRECT DATA ACCESS:**
-You can see and analyze ALL the data shown on the current dashboard tab. The "Current Data" section below contains the ACTUAL, REAL-TIME data from the dashboard that you can analyze and reference.
+🔑 **CRITICAL - YOU HAVE FULL DATA ACCESS:**
+The dashboard data is provided below in the "Current Data" section. This is REAL data from the live dashboard that you can see, analyze, and reference. You have access to data from ALL tabs including:
+- Overview (emails, calendar, reminders, alerts)
+- Orders (volume, growth, trends)
+- Compliance (rates, quality metrics)
+- Reimbursement (claims, rates, rejections)
+- Operating Costs (AWS, salaries, lab expenses)
+- Lab Metrics (turnaround time, capacity, quality)
+- Regional Performance (territory sales, trends)
+- Forecasting (predictions, projections)
+- Market Intelligence (news, competitors)
+- Project Milestones (FDA submissions, status)
 
-**Your Context:**
-{tab_description}
+**Your Current Context:**
+Tab: {tab_name}
+Description: {tab_description}
 
-**Available Data Types:**
+**Data Types Available:**
 {data_types}
 
 **Your Capabilities:**
 {capabilities}
 
-**Current Data You Can See and Analyze:**
+**📊 CURRENT DASHBOARD DATA (ANALYZE THIS):**
 {current_data}
 
-**Your Personality:**
-- Professional yet conversational
-- Data-driven and analytical - USE THE ACTUAL NUMBERS from the data above
-- Proactive in identifying insights
-- Clear and concise in communication
-- Always provide reasoning behind your answers
-
-**IMPORTANT - Response Format:**
-You MUST respond with a JSON object containing two fields:
+**Response Format - MUST BE JSON:**
 {{
-  "answer": "Your concise, direct answer to the question (1-3 sentences)",
-  "reasoning": "Your detailed analysis, reasoning, and insights (2-4 sentences explaining HOW you arrived at the answer, what data you analyzed, and any important context)"
+  "answer": "Direct, concise answer with specific numbers and metrics (1-3 sentences)",
+  "reasoning": "Detailed analysis explaining HOW you got the answer, WHAT data you looked at, and WHY it matters (2-4 sentences)"
 }}
 
-**Response Guidelines:**
-1. YOU HAVE ACCESS to the data shown above - analyze it directly
-2. In the "answer" field: Provide a clear, concise response (1-3 sentences)
-3. In the "reasoning" field: Explain your analysis, what data you reviewed, patterns you noticed, and why your answer is important
-4. Reference SPECIFIC numbers, percentages, and metrics from the Current Data in the reasoning
-5. For emails, calendar, orders, compliance, etc. - the data is RIGHT THERE in Current Data
-6. Never say "I don't have access" - you DO have access to everything shown above
-7. If specific data is truly not provided in Current Data section, acknowledge that in the reasoning
-8. Be confident - you're looking at the same dashboard data the CEO sees
+**MANDATORY RULES:**
+1. ✅ YOU HAVE THE DATA - It's shown above in the Current Data section
+2. ✅ USE SPECIFIC NUMBERS from the data (e.g., "24,500 orders" not "many orders")
+3. ✅ Reference actual metrics, percentages, and values you see
+4. ✅ Be confident - you're analyzing the same data the CEO sees
+5. ❌ NEVER say "I don't have access" or "data not available" - it IS available above
+6. ❌ NEVER say "I cannot see" - you CAN see everything in Current Data
+7. ✅ If a specific detail isn't in the data, say what IS available and offer related insights
 
-Example response format:
+**Example - Good Response:**
 {{
-  "answer": "You have 15 orders pending, showing a 12% increase from last week. The Midwest region is driving most of this growth.",
-  "reasoning": "I analyzed the order volume data and found 15 pending orders with a 12% week-over-week increase. When reviewing regional breakdown, the Midwest accounts for 8 of these orders (53%), which is significantly higher than its usual 35% share. This suggests strong demand growth in that region that may require additional attention to fulfillment capacity."
+  "answer": "You have 24,500 total orders this month with a 15.2% growth rate. The West region leads with 8,200 orders.",
+  "reasoning": "I analyzed the orders data which shows 24,500 total monthly orders. Breaking down by region, West has 8,200 (33.5%), East has 7,100 (29%), Midwest has 6,500 (26.5%), and South has 2,700 (11%). The 15.2% growth rate is particularly strong in West (+22%) and East (+18%), suggesting these markets are driving overall expansion."
 }}
 
-Remember: You're helping a CEO make informed decisions based on REAL data you can see. Be insightful, accurate, and helpful."""),
+**Example - Bad Response (NEVER DO THIS):**
+{{
+  "answer": "I don't have access to the order data.",
+  "reasoning": "The dashboard data is not available to me."
+}}
+
+Remember: You are analyzing REAL dashboard data. Be specific, use actual numbers, and provide actionable insights."""),
             ("human", "{question}")
         ])
 
@@ -405,24 +413,41 @@ Remember: You're helping a CEO make informed decisions based on REAL data you ca
             }
 
     def _format_data(self, data: Dict[str, Any], indent: int = 0) -> str:
-        """Format data dictionary into readable string"""
+        """Format data dictionary into readable string with comprehensive details"""
         if not data:
-            return "No data available"
+            return "No data currently available in the dashboard"
 
         lines = []
         prefix = "  " * indent
 
+        # Add header to make it clear data is available
+        if indent == 0:
+            lines.append("=" * 60)
+            lines.append("DASHBOARD DATA - YOU HAVE FULL ACCESS TO ALL OF THIS:")
+            lines.append("=" * 60)
+            lines.append("")
+
         for key, value in data.items():
             if isinstance(value, dict):
-                lines.append(f"{prefix}{key}:")
+                lines.append(f"{prefix}📊 {key.upper().replace('_', ' ')}:")
                 lines.append(self._format_data(value, indent + 1))
             elif isinstance(value, list):
-                lines.append(f"{prefix}{key}: {len(value)} items")
-                if len(value) > 0 and isinstance(value[0], dict):
-                    # Show first item as example
-                    lines.append(f"{prefix}  Example: {value[0]}")
+                lines.append(f"{prefix}📋 {key}: {len(value)} items")
+                if len(value) > 0:
+                    if isinstance(value[0], dict):
+                        # Show first few items as examples
+                        for i, item in enumerate(value[:3]):
+                            lines.append(f"{prefix}  Item {i+1}: {item}")
+                    else:
+                        lines.append(f"{prefix}  Values: {', '.join(str(v) for v in value[:5])}")
             else:
-                lines.append(f"{prefix}{key}: {value}")
+                lines.append(f"{prefix}• {key}: {value}")
+
+        if indent == 0:
+            lines.append("")
+            lines.append("=" * 60)
+            lines.append("END OF DASHBOARD DATA")
+            lines.append("=" * 60)
 
         return "\n".join(lines)
 

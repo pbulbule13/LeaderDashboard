@@ -1,0 +1,50 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/ceoleadershipdashboard/ceo-docker/ceo-dashboard-api:$SHORT_SHA'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/ceoleadershipdashboard/ceo-docker/ceo-dashboard-api:latest'
+      - '.'
+
+  # Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/ceoleadershipdashboard/ceo-docker/ceo-dashboard-api:$SHORT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/ceoleadershipdashboard/ceo-docker/ceo-dashboard-api:latest'
+
+  # Deploy to Cloud Run in ceoleadershipdashboard project
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ceo-dashboard-api'
+      - '--image=us-central1-docker.pkg.dev/ceoleadershipdashboard/ceo-docker/ceo-dashboard-api:$SHORT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--concurrency=80'
+      - '--max-instances=10'
+      - '--set-env-vars=TEST_MODE=true'
+      - '--project=ceoleadershipdashboard'
+
+  # Upload frontend to Google Cloud Storage
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args:
+      - '-m'
+      - 'rsync'
+      - '-r'
+      - '-d'
+      - './healthcare_sciences_dashboard'
+      - 'gs://ceo-dashboard-web-ceoleadershipdashboard'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
